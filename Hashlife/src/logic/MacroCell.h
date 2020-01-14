@@ -9,7 +9,6 @@ public:
 
 	MacroCell(bool alive);
 	MacroCell(MacroCell *nw_, MacroCell *ne_, MacroCell *sw_, MacroCell *se_);
-	virtual ~MacroCell();
 
 	MacroCell* create(bool alive);
 	MacroCell* create(MacroCell *nw_, MacroCell *ne_, MacroCell *sw_, MacroCell *se_);
