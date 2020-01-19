@@ -3,8 +3,8 @@
 CellMap::CellMap(Game* g, unsigned int w, unsigned int h)
 	: game(g) width(w), height(h), length_in_bytes(w * h)
 {
-	cells = new unsigned char[length_in_bytes];
-	temp_cells = new unsigned char[length_in_bytes];
+	cells = new Cell[length_in_bytes];
+	temp_cells = new Cell[length_in_bytes];
 	memset(cells, 0, length_in_bytes);
 }
 
@@ -73,7 +73,7 @@ void CellMap::nextGeneration()
 {
 	unsigned int count;
 	unsigned int w = width, h = height;
-	unsigned char *cell_ptr;
+	Cell* cell_ptr;
 
 	memcpy(temp_cells, cells, length_in_bytes);
 
@@ -111,16 +111,4 @@ void CellMap::nextGeneration()
 
 void CellMap::init()
 {
-	unsigned int x, y, init_length;
-	unsigned int seed = (unsigned)time(NULL);
-
-	srand(seed);
-	init_length = (width * height) / 2;
-	do
-	{
-		x = rand() % (width - 1);
-		y = rand() % (height - 1);
-		if (CellState(x, y) == 0)
-			SetCell(x, y);
-	} while (--init_length);
 }
