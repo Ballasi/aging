@@ -14,7 +14,7 @@ CellMap::~CellMap()
 	delete[] temp_cells;
 }
 
-void CellMap::setCell(unsigned int x, unsigned int y)
+void CellMap::giveLifeToCell(unsigned int x, unsigned int y)
 {
 	int w = width, h = height;
 	Cell* cell_ptr = cells + (y * w) + x;
@@ -39,7 +39,7 @@ void CellMap::setCell(unsigned int x, unsigned int y)
 		*(cell_ptr + w + 1) += 0x02; // below right
 }
 
-void CellMap::clearCell(unsigned int x, unsigned int y)
+void CellMap::killCell(unsigned int x, unsigned int y)
 {
 	int w = width, h = height;
 	Cell* cell_ptr = cells + (y * w) + x;
@@ -87,19 +87,19 @@ void CellMap::nextGeneration()
 				neighbours = *cell_ptr >> 1;
 				if (*cell_ptr & 0x01)
 				{
-					// TODO: reset the rules
+					// TODO: adapt the game's rules
 					if ((neighbours != 2) && (neighbours != 3))
 					{
-						clearCell(x, y);
+						killCell(x, y);
 						game->drawCell(x, y, 0);
 					}
 				}
 				else
 				{
-					// TODO: reset the rules
+					// TODO: adapt the game's rules
 					if (neighbours == 3)
 					{
-						setCell(x, y);
+						giveLifeToCell(x, y);
 						game->drawCell(x, y, 1);
 					}
 				}
