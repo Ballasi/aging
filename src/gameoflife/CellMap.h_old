@@ -10,9 +10,9 @@ typedef uint8_t Cell;
  * where 0s are not used,
  *       1s are the neighbour count,
  *       2  is the state of the cell (1 means alive).
- * The difference between this version and the old one is that the neighbour
- * count is only calculated when making up a new generation.
- * This allows us to not use the temp_cells array.
+ * The difference between this version and the new one is that the neighbour
+ * count is always up-to-date in this version. The new version only fetches
+ * it when calculating a new generation.
  */
 
 class Game;
@@ -22,18 +22,19 @@ class CellMap
 public:
 	CellMap(Game* g, unsigned int w, unsigned int h);
 	~CellMap();
-	void changeCellState(unsigned int x, unsigned int y, int toAlive);
-	inline int isAlive(unsigned int x, unsigned int y);
+	void giveLifeToCell(unsigned int x, unsigned int y);
+	void killCell(unsigned int x, unsigned int y);
+	inline int isAlive(int x, int y);
 	void nextGeneration();
-	void loadRLE();
+	void init();
 
 private:
 	Game* game;
 	Cell* cells;
+	Cell* temp_cells;
 	unsigned int width;
 	unsigned int height;
 	unsigned int length_in_bytes;
-	void updateNeighbourCount();
 };
 
 #endif // __CELLMAP_H
