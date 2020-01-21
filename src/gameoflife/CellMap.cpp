@@ -12,10 +12,10 @@ CellMap::~CellMap()
 	delete[] cells;
 }
 
-void CellMap::changeCellState(unsigned int x, unsigned int y, int toAlive)
+void CellMap::changeCellState(unsigned int c, unsigned int l, int toAlive)
 {
 	unsigned int w = width, h = height;
-	Cell* cell_ptr = cells + (y * w) + x;
+	Cell* cell_ptr = cells + (l * w) + c;
 
 	if (toAlive)
 		*(cell_ptr) |= 0b01;
@@ -23,9 +23,9 @@ void CellMap::changeCellState(unsigned int x, unsigned int y, int toAlive)
 		*(cell_ptr) &= ~0b01;
 }
 
-inline int CellMap::isAlive(unsigned int x, unsigned int y)
+inline int CellMap::isAlive(unsigned int c, unsigned int l)
 {
-	return *(cells + (y * width) + x) & 0b01;
+	return *(cells + (l * width) + c) & 0b01;
 }
 
 void CellMap::nextGeneration()
@@ -36,9 +36,9 @@ void CellMap::nextGeneration()
 	Cell* cell_ptr;
 
 	cell_ptr = cells;
-	for (unsigned int y = 0; y < h; ++y)
+	for (unsigned int l = 0; l < h; ++l)
 	{
-		for (unsigned int x = 0; x < w; ++x)
+		for (unsigned int c = 0; c < w; ++c)
 		{
 			if (*cell_ptr != 0)
 			{
@@ -48,8 +48,8 @@ void CellMap::nextGeneration()
 					// TODO: adapt the game's rules
 					if ((neighbours != 2) && (neighbours != 3))
 					{
-						changeCellState(x, y, 0);
-						game->drawCell(x, y, 0);
+						changeCellState(c, l, 0);
+						game->drawCell(c, l, 0);
 					}
 				}
 				else
@@ -57,8 +57,8 @@ void CellMap::nextGeneration()
 					// TODO: adapt the game's rules
 					if (neighbours == 3)
 					{
-						changeCellState(x, y, 1);
-						game->drawCell(x, y, 1);
+						changeCellState(c, l, 1);
+						game->drawCell(c, l, 1);
 					}
 				}
 			}
@@ -80,25 +80,25 @@ void CellMap::updateNeighbourCount()
 
 	// and we calculate the neighbour count
 	cell_ptr = cells;
-	for (unsigned int y = 0; y < h; ++y)
+	for (unsigned int l = 0; l < h; ++l)
 	{
-		for (unsigned int x = 0; x < w; ++w)
+		for (unsigned int c = 0; c < w; ++w)
 		{
-			if (x > 0 && y > 0)
+			if (c > 0 && l > 0)
 				*(cell_ptr - w - 1) += 0b10; // top left
-			if (y > 0)
+			if (l > 0)
 				*(cell_ptr - w) += 0b10; // top
-			if (x < w - 1 && y > 0)
+			if (c < w - 1 && l > 0)
 				*(cell_ptr - w + 1) += 0b10; // top right
-			if (x > 0)
+			if (c > 0)
 				*(cell_ptr - 1) += 0b10; // left
-			if (x < w - 1)
+			if (c < w - 1)
 				*(cell_ptr + 1) += 0b10; // right
-			if (x > 0 && y < h - 1)
+			if (c > 0 && l < h - 1)
 				*(cell_ptr + w - 1) += 0b10; // below left
-			if (y < h - 1)
+			if (l < h - 1)
 				*(cell_ptr + w) += 0b10; // below
-			if (x < w - 1 && y < h - 1)
+			if (c < w - 1 && l < h - 1)
 				*(cell_ptr + w + 1) += 0b10; // below right
 			++cell_ptr;
 		}

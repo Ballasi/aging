@@ -22,8 +22,8 @@ class CellMap
 public:
 	CellMap(Game* g, unsigned int w, unsigned int h);
 	~CellMap();
-	void changeCellState(unsigned int x, unsigned int y, int toAlive);
-	inline int isAlive(unsigned int x, unsigned int y);
+	void changeCellState(unsigned int c, unsigned int l, int toAlive);
+	inline int isAlive(unsigned int c, unsigned int l);
 	void nextGeneration();
 	void loadRLE();
 
