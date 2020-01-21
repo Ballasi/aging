@@ -9,6 +9,7 @@ public:
 	Game();
 	~Game();
 	void drawCell(unsigned int x, unsigned int y, int alive);
+	void drawGrid();
 	void nextGeneration();
 
 private:

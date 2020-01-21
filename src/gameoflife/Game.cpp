@@ -13,6 +13,14 @@ void Game::drawCell(unsigned int x, unsigned int y, int alive)
 	// TODO
 }
 
+void Game::drawGrid()
+{
+	for (unsigned int c = 0; c < map->getWidth(); ++c)
+		for (unsigned int l = 0; l < map->getHeight(); ++l)
+			if (map->isAlive(i, j))
+				drawCell(i, j, 1);
+}
+
 void Game::nextGeneration()
 {
 	++generation;

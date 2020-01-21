@@ -29,6 +29,8 @@ public:
 	inline int isAlive(unsigned int c, unsigned int l);
 	void nextGeneration();
 	void loadRLE();
+	unsigned int getWidth();
+	unsigned int getHeight();
 
 private:
 	Game* game;

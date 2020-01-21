@@ -62,6 +62,7 @@ void CellMap::nextGeneration()
 					}
 				}
 			}
+			++cell_ptr;
 		}
 	}
 }
@@ -85,22 +86,25 @@ void CellMap::updateNeighbourCount()
 	{
 		for (unsigned int c = 0; c < w; ++c)
 		{
-			if (c > 0 && l > 0)
-				*(cell_ptr - w - 1) += 0b10; // top left
-			if (l > 0)
-				*(cell_ptr - w) += 0b10; // top
-			if (c < w - 1 && l > 0)
-				*(cell_ptr - w + 1) += 0b10; // top right
-			if (c > 0)
-				*(cell_ptr - 1) += 0b10; // left
-			if (c < w - 1)
-				*(cell_ptr + 1) += 0b10; // right
-			if (c > 0 && l < h - 1)
-				*(cell_ptr + w - 1) += 0b10; // below left
-			if (l < h - 1)
-				*(cell_ptr + w) += 0b10; // below
-			if (c < w - 1 && l < h - 1)
-				*(cell_ptr + w + 1) += 0b10; // below right
+			if (*cell_ptr & 0b01)
+			{
+				if (c > 0 && l > 0)
+					*(cell_ptr - w - 1) += 0b10; // top left
+				if (l > 0)
+					*(cell_ptr - w) += 0b10; // top
+				if (c < w - 1 && l > 0)
+					*(cell_ptr - w + 1) += 0b10; // top right
+				if (c > 0)
+					*(cell_ptr - 1) += 0b10; // left
+				if (c < w - 1)
+					*(cell_ptr + 1) += 0b10; // right
+				if (c > 0 && l < h - 1)
+					*(cell_ptr + w - 1) += 0b10; // below left
+				if (l < h - 1)
+					*(cell_ptr + w) += 0b10; // below
+				if (c < w - 1 && l < h - 1)
+					*(cell_ptr + w + 1) += 0b10; // below right
+			}
 			++cell_ptr;
 		}
 	}
@@ -108,4 +112,14 @@ void CellMap::updateNeighbourCount()
 
 void CellMap::loadRLE()
 {
+}
+
+void CellMap::getWidth()
+{
+	return width;
+}
+
+void CellMap::getHeight()
+{
+	return height;
 }
