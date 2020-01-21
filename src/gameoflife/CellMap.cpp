@@ -1,4 +1,5 @@
 #include "CellMap.h"
+#include "Game.h"
 
 CellMap::CellMap(Game* g, unsigned int w, unsigned int h)
 	: game(g), width(w), height(h), length_in_bytes(w * h)
@@ -14,8 +15,7 @@ CellMap::~CellMap()
 
 void CellMap::changeCellState(unsigned int c, unsigned int l, int toAlive)
 {
-	unsigned int w = width, h = height;
-	Cell* cell_ptr = cells + (l * w) + c;
+	Cell* cell_ptr = cells + (l * width) + c;
 
 	if (toAlive)
 		*(cell_ptr) |= 0b01;
@@ -42,7 +42,7 @@ void CellMap::nextGeneration()
 		{
 			if (*cell_ptr != 0)
 			{
-				neighbours = *cell_ptr >> 1;
+				unsigned int neighbours = *cell_ptr >> 1;
 				if (*cell_ptr & 0b01)
 				{
 					// TODO: adapt the game's rules
@@ -69,6 +69,7 @@ void CellMap::nextGeneration()
 void CellMap::updateNeighbourCount()
 {
 	Cell* cell_ptr;
+	unsigned int w = width, h = height;
 
 	// we clear previous neighbour calculations
 	cell_ptr = cells;

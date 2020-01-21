@@ -1,7 +1,12 @@
 #ifndef __CELLMAP_H
 #define __CELLMAP_H
 
+#include <cstdint>
+#include <cstring>
+
 typedef uint8_t Cell;
+
+class Game;
 
 /*
  * Cells are a byte long.
@@ -14,8 +19,6 @@ typedef uint8_t Cell;
  * count is only calculated when making up a new generation.
  * This allows us to not use the temp_cells array.
  */
-
-class Game;
 
 class CellMap
 {

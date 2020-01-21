@@ -16,5 +16,5 @@ void Game::drawCell(unsigned int x, unsigned int y, int alive)
 void Game::nextGeneration()
 {
 	++generation;
-	map.nextGeneration();
+	map->nextGeneration();
 }

@@ -12,7 +12,7 @@ public:
 	void nextGeneration();
 
 private:
-	CellMap map;
+	CellMap* map;
 	unsigned long generation;
 };
 
