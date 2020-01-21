@@ -82,7 +82,7 @@ void CellMap::updateNeighbourCount()
 	cell_ptr = cells;
 	for (unsigned int l = 0; l < h; ++l)
 	{
-		for (unsigned int c = 0; c < w; ++w)
+		for (unsigned int c = 0; c < w; ++c)
 		{
 			if (c > 0 && l > 0)
 				*(cell_ptr - w - 1) += 0b10; // top left
