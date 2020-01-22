@@ -3,5 +3,6 @@ CMakeFiles/
 cmake_install.cmake
 Hashlife_autogen/
 Hashlife
+.vscode/
 **.o
 **.swp
