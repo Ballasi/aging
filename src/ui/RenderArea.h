@@ -3,6 +3,7 @@
 
 #include "../logic/Universe.h"
 #include "../gameoflife/Game.h"
+#include "Camera2D.h"
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
@@ -29,6 +30,7 @@ private:
 	GLuint m_matrixUniform;
 
 	QOpenGLShaderProgram *m_program;
+	Camera2D *camera;
 };
 
 #endif /* UI_RENDERAREA_H_ */
