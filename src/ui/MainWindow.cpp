@@ -1,16 +1,26 @@
 #include "MainWindow.h"
-#include "RenderArea.h"
 #include "../logic/Universe.h"
 
+#include <iostream>
+
 MainWindow::MainWindow() {
-	this->resize(1280, 720);
+	this->resize(1000, 1000);
 
-	Universe *universe = new Universe();
+	this->setFocusPolicy(Qt::FocusPolicy::ClickFocus);
 
-	RenderArea *r_area = new RenderArea(this,universe);
+	CellMap *map = new CellMap(100,100);
+	for (size_t c = 0; c < map->getWidth(); ++c)
+    	for (size_t l = 0; l < map->getHeight(); ++l)
+      		map->changeCellState(c,l,(c + l) % 2);
+
+	r_area = new RenderArea(this,map);
 	this->setCentralWidget(r_area);
 }
 
 MainWindow::~MainWindow() {
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event){
+	r_area->handleInput(event);
 }
 

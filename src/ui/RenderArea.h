@@ -12,16 +12,18 @@
 class RenderArea : public QOpenGLWidget , protected QOpenGLFunctions {
 
 public:
-	RenderArea(QWidget *parent = 0, Universe *universe = 0);
+	RenderArea(QWidget *parent = 0, CellMap *map= 0);
+	void handleInput(QKeyEvent *event);
 
 protected:
 	void initializeGL() override;
 	void resizeGL(int w, int h) override;
 	void paintGL() override;
 	void wheelEvent(QWheelEvent *event) override;
+	void mousePressEvent(QMouseEvent *event);
 
 private:
-	Universe *universe;
+	CellMap *map;
 	std::string vertexShaderSource;
 	std::string fragmentShaderSource;
 

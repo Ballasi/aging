@@ -1,8 +1,9 @@
 #include "RenderArea.h"
 #include <iostream>
+#include <QSurfaceFormat>
 
-RenderArea::RenderArea(QWidget *parent, Universe *universe)
-	:QOpenGLWidget(parent), universe(universe)
+RenderArea::RenderArea(QWidget *parent, CellMap *map)
+	:QOpenGLWidget(parent), map(map)
 {
 
 }
@@ -22,7 +23,7 @@ void RenderArea::initializeGL() {
 	this->fragmentShaderSource = 
 		"varying lowp vec4 col;\n"
 		"void main() {\n"
-		"	gl_FragColor = col;\n"
+		"	gl_FragColor = vec4(1.0f,1.0f,1.0f,1.0f);\n"
 		"}\n";
 	
 
@@ -63,14 +64,16 @@ void RenderArea::paintGL() {
 	m_program->bind();
 
 	QMatrix4x4 matrix = camera->get_transformation();
-	//matrix.perspective(60.0f, 16.0f/9.0f, 0.1f, 100.0f);
 
-	m_program->setUniformValue(m_matrixUniform, matrix);
 
-	GLfloat vertices[] = {
-		0.0f, 1.0f,
-		-1.0f, -1.0f,
-		1.0f, -1.0f
+	float vertices[] = {
+    -0.5f,  0.5f,  // Top-left
+     0.5f,  0.5f,  // Top-right
+     0.5f, -0.5f,  // Bottom-right
+
+     0.5f, -0.5f,  // Bottom-right
+    -0.5f, -0.5f,  // Bottom-left
+    -0.5f,  0.5f,  // Top-left
 	};
 
 	GLfloat colors[] = {
@@ -79,18 +82,29 @@ void RenderArea::paintGL() {
 		0.0f, 0.0f, 1.0f
 	};
 
+	for(size_t c = 0; c< map->getWidth();c++) {
 
-	glVertexAttribPointer(m_posAttr, 2, GL_FLOAT, GL_FALSE, 0, vertices);
-	glVertexAttribPointer(m_colAttr, 3, GL_FLOAT, GL_FALSE, 0, colors);
+		matrix.translate(1.0f,0.0f,0.0f);
+		for(size_t l = 0; l< map->getHeight(); l++) {
+			matrix.translate(0.0f,-1.0f,0.0f);
+			if(map->isAlive(c,l)){
+				m_program->setUniformValue(m_matrixUniform, matrix);
 
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
+				glVertexAttribPointer(m_posAttr, 2, GL_FLOAT, GL_FALSE, 0, vertices);
+				glVertexAttribPointer(m_colAttr, 3, GL_FLOAT, GL_FALSE, 0, colors);
 
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+				glEnableVertexAttribArray(0);
+				glEnableVertexAttribArray(1);
 
-	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(0);
+				glDrawArrays(GL_TRIANGLES, 0, 6);
 
+				glDisableVertexAttribArray(1);
+				glDisableVertexAttribArray(0);
+			}
+		}
+		matrix.translate(0.0f,map->getHeight(),0.0f);
+
+	}
 	m_program->release();
 
 }
@@ -98,4 +112,34 @@ void RenderArea::paintGL() {
 void RenderArea::wheelEvent(QWheelEvent *event) {
 	camera->set_zoom(camera->get_zoom() - event->delta() / 100.0f);
 	update();
+}
+void RenderArea::mousePressEvent(QMouseEvent *event){
+	map->nextGeneration();
+	update();
+}
+
+void RenderArea::handleInput(QKeyEvent *event) {
+	switch (event->key())
+	{
+	case Qt::Key_Space:
+		map->nextGeneration();
+		break;
+	case Qt::Key_Z:
+		camera->pos.setY(camera->pos.y() + 0.05f);
+		break;
+	case Qt::Key_S:
+		camera->pos.setY(camera->pos.y() - 0.05f);
+		break;
+	case Qt::Key_Q:
+		camera->pos.setX(camera->pos.x() - 0.05f);
+		break;
+	case Qt::Key_D:
+		camera->pos.setX(camera->pos.x() + 0.05f);
+		break;
+	
+	default:
+		break;
+	}
+	update();
+
 }

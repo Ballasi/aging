@@ -2,7 +2,7 @@
 #include "CellMap.h"
 
 Game::Game() : generation(0) {
-  map = new CellMap(this, 50, 50);
+  //map = new CellMap(this, 50, 50);
 }
 
 Game::~Game() { }

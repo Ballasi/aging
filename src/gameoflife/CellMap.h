@@ -26,7 +26,8 @@ class Game;
 class CellMap
 {
 public:
-  CellMap(Game* g, size_t w, size_t h);
+  //CellMap(Game* g, size_t w, size_t h);
+  CellMap(size_t w, size_t h);
   ~CellMap();
   void changeCellState(size_t c, size_t l, int toAlive);
   int isAlive(size_t c, size_t l);
@@ -36,7 +37,7 @@ public:
   size_t getHeight();
 
 private:
-  Game* game;
+  //Game* game;
   Cell* cells;
   size_t width;
   size_t height;

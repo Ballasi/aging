@@ -37,6 +37,7 @@ void Camera2D::generate_transformation_matrix() {
     transform.update(pos,origin,zoom);
 
     transform.matrix.setToIdentity();
+    //transform.matrix.perspective(60.0f, 16.0f/9.0f, 0.1f, 100.0f);
 
     transform.matrix.translate(-pos.x(),-pos.y(),0);
     transform.matrix.scale(1.0f /zoom,1.0f /zoom,1);
