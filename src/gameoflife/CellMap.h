@@ -26,18 +26,18 @@ class Game;
 class CellMap
 {
 public:
-  //CellMap(Game* g, size_t w, size_t h);
+  CellMap(Game* g, size_t w, size_t h);
   CellMap(size_t w, size_t h);
   ~CellMap();
   void changeCellState(size_t c, size_t l, int toAlive);
   int isAlive(size_t c, size_t l);
   void nextGeneration();
-  void loadRLE();
   size_t getWidth();
   size_t getHeight();
+  void clear();
 
 private:
-  //Game* game;
+  Game* game;
   Cell* cells;
   size_t width;
   size_t height;

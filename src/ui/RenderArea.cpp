@@ -98,9 +98,6 @@ void RenderArea::mousePressEvent(QMouseEvent *event){
 void RenderArea::handleInput(QKeyEvent *event) {
 	switch (event->key())
 	{
-	case Qt::Key_Space:
-		map->nextGeneration();
-		break;
 	case Qt::Key_Z:
 		camera->pos.setY(camera->pos.y() + 0.05f);
 		break;

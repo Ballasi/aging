@@ -4,6 +4,8 @@ project (Hashlife)
 
 find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets 3DCore 3DExtras 3DRender 3DInput Charts)
 
+set(CMAKE_AUTOMOC ON)
+
 file(
     GLOB_RECURSE
 
