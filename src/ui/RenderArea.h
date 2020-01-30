@@ -28,11 +28,23 @@ private:
 	std::string fragmentShaderSource;
 
 	GLuint m_posAttr;
-	GLuint m_colAttr;
 	GLuint m_matrixUniform;
+
+	float square_vertices[8] = {
+		-0.5f,  0.5f,  // Top-left
+		0.5f,  0.5f,  // Top-right
+		0.5f, -0.5f,  // Bottom-right
+		-0.5f, -0.5f,  // Bottom-left
+	};
+	GLuint square_elements[6] = {
+		0,1,2,
+		2,3,0
+	};
+	GLuint square_ebo;
 
 	QOpenGLShaderProgram *m_program;
 	Camera2D *camera;
+
 };
 
 #endif /* UI_RENDERAREA_H_ */

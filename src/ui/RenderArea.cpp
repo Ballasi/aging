@@ -11,17 +11,13 @@ RenderArea::RenderArea(QWidget *parent, CellMap *map)
 void RenderArea::initializeGL() {
 
 	this->vertexShaderSource =
-		"attribute highp vec4 posAttr;\n"
-		"attribute lowp vec4 colAttr;\n"
-		"varying lowp vec4 col;\n"
-		"uniform highp mat4 matrix;\n"
+		"attribute lowp vec4 posAttr;\n"
+		"uniform lowp mat4 matrix;\n"
 		"void main() {\n"
-		"	col = colAttr;\n"
 		"	gl_Position = matrix * posAttr;\n"
 		"}\n";
 
 	this->fragmentShaderSource = 
-		"varying lowp vec4 col;\n"
 		"void main() {\n"
 		"	gl_FragColor = vec4(1.0f,1.0f,1.0f,1.0f);\n"
 		"}\n";
@@ -34,8 +30,11 @@ void RenderArea::initializeGL() {
 	m_program->addShaderFromSourceCode(QOpenGLShader::Fragment, fragmentShaderSource.c_str());
 	m_program->link();
 	m_posAttr = m_program->attributeLocation("posAttr");
-	m_colAttr = m_program->attributeLocation("colAttr");
 	m_matrixUniform = m_program->uniformLocation("matrix");
+
+	glGenBuffers(1,&square_ebo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,square_ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(square_elements), square_elements, GL_STATIC_DRAW);
 
 	camera = new Camera2D();
 	
@@ -66,22 +65,6 @@ void RenderArea::paintGL() {
 	QMatrix4x4 matrix = camera->get_transformation();
 
 
-	float vertices[] = {
-    -0.5f,  0.5f,  // Top-left
-     0.5f,  0.5f,  // Top-right
-     0.5f, -0.5f,  // Bottom-right
-
-     0.5f, -0.5f,  // Bottom-right
-    -0.5f, -0.5f,  // Bottom-left
-    -0.5f,  0.5f,  // Top-left
-	};
-
-	GLfloat colors[] = {
-		1.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 1.0f
-	};
-
 	for(size_t c = 0; c< map->getWidth();c++) {
 
 		matrix.translate(1.0f,0.0f,0.0f);
@@ -90,15 +73,10 @@ void RenderArea::paintGL() {
 			if(map->isAlive(c,l)){
 				m_program->setUniformValue(m_matrixUniform, matrix);
 
-				glVertexAttribPointer(m_posAttr, 2, GL_FLOAT, GL_FALSE, 0, vertices);
-				glVertexAttribPointer(m_colAttr, 3, GL_FLOAT, GL_FALSE, 0, colors);
-
+				glVertexAttribPointer(m_posAttr, 2, GL_FLOAT, GL_FALSE, 0, square_vertices);
 				glEnableVertexAttribArray(0);
-				glEnableVertexAttribArray(1);
-
-				glDrawArrays(GL_TRIANGLES, 0, 6);
-
-				glDisableVertexAttribArray(1);
+				
+				glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 				glDisableVertexAttribArray(0);
 			}
 		}
@@ -114,7 +92,6 @@ void RenderArea::wheelEvent(QWheelEvent *event) {
 	update();
 }
 void RenderArea::mousePressEvent(QMouseEvent *event){
-	map->nextGeneration();
 	update();
 }
 

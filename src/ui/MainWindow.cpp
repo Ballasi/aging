@@ -2,9 +2,10 @@
 #include "../logic/Universe.h"
 
 #include <iostream>
+#include <QToolBar>
 
 MainWindow::MainWindow() {
-	this->resize(1000, 1000);
+	this->resize(720, 720);
 
 	this->setFocusPolicy(Qt::FocusPolicy::ClickFocus);
 
@@ -15,6 +16,11 @@ MainWindow::MainWindow() {
 
 	r_area = new RenderArea(this,map);
 	this->setCentralWidget(r_area);
+	QToolBar *controlToolbar = this->addToolBar("Controls");
+	QIcon *playIcon = new QIcon("../res/icons/play.svg");
+	QAction *playAction = controlToolbar->addAction(*playIcon,"Play");
+	QIcon *pauseIcon = new QIcon("../res/icons/pause.svg");
+	QAction *pauseAction = controlToolbar->addAction(*pauseIcon,"Pause");
 }
 
 MainWindow::~MainWindow() {
