@@ -1,24 +1,25 @@
 #include "Game.h"
 #include "CellMap.h"
 
-Game::Game() : generation(0) {
-  map = new CellMap(this, 50, 50);
+Game::Game(std:: size_t width, std::size_t height) : generation(0) {
+  map = new CellMap(this, width, height);
 }
 
 Game::~Game() { }
 
-void Game::drawCell(size_t x, size_t y, int alive) {
-  // TODO
+std::size_t Game::getGeneration() {
+  return generation;
 }
 
-void Game::drawGrid() {
-  for (size_t c = 0; c < map->getWidth(); ++c)
-    for (size_t l = 0; l < map->getHeight(); ++l)
-      if (map->isAlive(c, l))
-        drawCell(c, l, 1);
+CellMap* Game::getMap() {
+  return map;
 }
 
 void Game::nextGeneration() {
   ++generation;
   map->nextGeneration();
 }
+
+void Game::loadRLE(QString filename){
+}
+

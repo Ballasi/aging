@@ -1,14 +1,27 @@
 #include "CellMap.h"
 #include "Game.h"
 
+
 CellMap::CellMap(Game* g, size_t w, size_t h)
   : game(g), width(w), height(h), length_in_bytes(w * h) {
   // Adding () calls constructor for every Cell in the array
   cells = new Cell[length_in_bytes]();
 }
 
+
+CellMap::CellMap(size_t w, size_t h)
+  :width(w), height(h), length_in_bytes(w * h) {
+  // Adding () calls constructor for every Cell in the array
+  cells = new Cell[length_in_bytes]();
+}
+
 CellMap::~CellMap() {
   delete[] cells;
+}
+
+void CellMap::clear(){
+  for(size_t i = 0; i < length_in_bytes; ++i)
+    cells[i] = 0;
 }
 
 void CellMap::changeCellState(size_t c, size_t l, int toAlive) {
@@ -44,7 +57,6 @@ void CellMap::nextGeneration() {
           if ((neighbours != 2) && (neighbours != 3))
           {
             changeCellState(c, l, 0);
-            game->drawCell(c, l, 0);
           }
         }
         else
@@ -53,7 +65,6 @@ void CellMap::nextGeneration() {
           if (neighbours == 3)
           {
             changeCellState(c, l, 1);
-            game->drawCell(c, l, 1);
           }
         }
       }
@@ -104,8 +115,6 @@ void CellMap::updateNeighbourCount() {
   }
 }
 
-void CellMap::loadRLE() {
-}
 
 size_t CellMap::getWidth() {
   return width;

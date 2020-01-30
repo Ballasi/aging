@@ -4,19 +4,21 @@
 #include "CellMap.h"
 
 #include <cstddef>
+#include <QString>
 
 class Game
 {
 public:
-  Game();
+  Game(std:: size_t width, std::size_t height);
   ~Game();
-  void drawCell(size_t x, size_t y, int alive);
-  void drawGrid();
   void nextGeneration();
+  CellMap* getMap();
+  std::size_t getGeneration() ;
+  void loadRLE(QString filename);
 
 private:
   CellMap* map;
-  unsigned long generation;
+  std::size_t generation;
 };
 
 #endif // __GAME_H
