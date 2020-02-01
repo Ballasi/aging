@@ -45,9 +45,14 @@ void RenderArea::initializeGL() {
 	camera->set_zoom(1.0f);
 
 	glClearColor(0.0f,0.0f,0.0f,1.0f);
+	glDepthMask(0);
 }
 
 void RenderArea::resizeGL(int w, int h) {
+	
+	const qreal retinaScale = devicePixelRatio();
+	glViewport(0, 0, width(), height() * retinaScale);
+	camera->set_aspect_ratio((float)w / (float) h);
 	update();
 }
 
@@ -56,14 +61,13 @@ void RenderArea::paintGL() {
 
 
 	const qreal retinaScale = devicePixelRatio();
-	glViewport(0, 0, width() * retinaScale, height() * retinaScale);
+	glViewport(0, 0, width(), height() * retinaScale);
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	m_program->bind();
 
-	QMatrix4x4 matrix = camera->get_transformation();
-
+	QMatrix4x4 matrix = camera->get_transformation((float)width(), (float) height());
 
 	for(size_t c = 0; c< map->getWidth();c++) {
 
@@ -99,16 +103,16 @@ void RenderArea::handleInput(QKeyEvent *event) {
 	switch (event->key())
 	{
 	case Qt::Key_Z:
-		camera->pos.setY(camera->pos.y() + 0.05f);
+		camera->pos.setY(camera->pos.y() + 0.08f);
 		break;
 	case Qt::Key_S:
-		camera->pos.setY(camera->pos.y() - 0.05f);
+		camera->pos.setY(camera->pos.y() - 0.08f);
 		break;
 	case Qt::Key_Q:
-		camera->pos.setX(camera->pos.x() - 0.05f);
+		camera->pos.setX(camera->pos.x() - 0.08f);
 		break;
 	case Qt::Key_D:
-		camera->pos.setX(camera->pos.x() + 0.05f);
+		camera->pos.setX(camera->pos.x() + 0.08f);
 		break;
 	
 	default:

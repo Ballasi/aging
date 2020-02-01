@@ -18,7 +18,7 @@ MainWindow::MainWindow() {
 	CellMap *map = game->getMap();
 	for (size_t c = 0; c < map->getWidth(); ++c)
 		for (size_t l = 0; l < map->getHeight(); ++l)
-			map->changeCellState(c,l,(c + l) % 2);
+			map->changeCellState(c,l,c % 3);
 
 	createUI();
 }
