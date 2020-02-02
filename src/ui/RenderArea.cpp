@@ -11,10 +11,10 @@ RenderArea::RenderArea(QWidget *parent, CellMap *map)
 void RenderArea::initializeGL() {
 
 	this->vertexShaderSource =
-		"attribute lowp vec4 posAttr;\n"
+		"attribute lowp vec2 posAttr;\n"
 		"uniform lowp mat4 matrix;\n"
 		"void main() {\n"
-		"	gl_Position = matrix * posAttr;\n"
+		"	gl_Position = matrix * vec4(posAttr,1,1);\n"
 		"}\n";
 
 	this->fragmentShaderSource = 
@@ -61,7 +61,7 @@ void RenderArea::paintGL() {
 
 
 	const qreal retinaScale = devicePixelRatio();
-	glViewport(0, 0, width(), height() * retinaScale);
+	glViewport(0, 0, width() * retinaScale, height() * retinaScale);
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -75,8 +75,8 @@ void RenderArea::paintGL() {
 		for(size_t l = 0; l< map->getHeight(); l++) {
 			matrix.translate(0.0f,-1.0f,0.0f);
 			if(map->isAlive(c,l)){
-				m_program->setUniformValue(m_matrixUniform, matrix);
 
+				m_program->setUniformValue(m_matrixUniform, matrix);
 				glVertexAttribPointer(m_posAttr, 2, GL_FLOAT, GL_FALSE, 0, square_vertices);
 				glEnableVertexAttribArray(0);
 				

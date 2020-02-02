@@ -2,7 +2,7 @@
 #include <iostream>
 
 Camera2D::Camera2D(void)
-:zoom(1), pos(50.0f,50.0f), origin(0.0f,0.0f), aspect_ratio(1.0f)
+:zoom(1), pos(0.0f,0.0f), origin(0.0f,0.0f), aspect_ratio(1.0f)
 {
     transform.update(pos,origin,zoom,aspect_ratio);
 

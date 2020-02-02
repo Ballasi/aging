@@ -2,6 +2,7 @@
 #define UI_MAINWINDOW_H_
 
 #include <QMainWindow>
+#include <QTimer>
 #include "RenderArea.h"
 
 class MainWindow : public QMainWindow {
@@ -14,6 +15,7 @@ public:
 public slots:
 	void stepSimulation();
 	void load();
+	void playPause();
 
 protected:
 	void keyPressEvent(QKeyEvent *event);
@@ -25,6 +27,9 @@ private:
 	void updateStatusBar();
 
 	bool simulationRunning;
+	QAction *playPauseAction;
+	QIcon *playIcon, *pauseIcon;
+	QTimer *stepTimer;
 
 };
 

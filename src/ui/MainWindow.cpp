@@ -21,6 +21,8 @@ MainWindow::MainWindow() {
 			map->changeCellState(c,l,c % 3);
 
 	createUI();
+	stepTimer = new QTimer(this);
+	connect(stepTimer, &QTimer::timeout, this, &MainWindow::stepSimulation);
 }
 
 void MainWindow::createUI() {
@@ -32,14 +34,13 @@ void MainWindow::createUI() {
 	//Simulation control tollbar
 	QToolBar *controlToolbar = addToolBar("Controls");
 	addToolBar(Qt::LeftToolBarArea, controlToolbar);
-	QIcon *playIcon = new QIcon("../res/icons/play.svg");
-	QAction *playAction = controlToolbar->addAction(*playIcon,"Play");
-	QIcon *pauseIcon = new QIcon("../res/icons/pause.svg");
-	QAction *pauseAction = controlToolbar->addAction(*pauseIcon,"Pause");
+	playIcon = new QIcon("../res/icons/play.svg");
+	pauseIcon = new QIcon("../res/icons/pause.svg");
+	playPauseAction = controlToolbar->addAction(*playIcon,"Play/Pause");
 	QIcon *stepIcon = new QIcon("../res/icons/step.svg");
 	QAction *stepAction = controlToolbar->addAction(*stepIcon,"Advance one step");
 
-	connect(stepAction, &QAction::triggered, this, &MainWindow::stepSimulation);
+	connect(playPauseAction, &QAction::triggered, this, &MainWindow::playPause);
 
 	updateStatusBar();
 
@@ -52,6 +53,18 @@ void MainWindow::createUI() {
 
 	menuBar()->addMenu(fileMenu);
 	menuBar()->addMenu(prefMenu);
+}
+
+void MainWindow::playPause(){
+	simulationRunning = !simulationRunning;
+	if(simulationRunning) {
+		playPauseAction->setIcon(*pauseIcon);
+		stepTimer->start(50);
+	}else{
+		playPauseAction->setIcon(*playIcon);
+		stepTimer->stop();
+	}
+
 }
 
 void MainWindow::updateStatusBar(){
