@@ -41,6 +41,7 @@ void MainWindow::createUI() {
 	QAction *stepAction = controlToolbar->addAction(*stepIcon,"Advance one step");
 
 	connect(playPauseAction, &QAction::triggered, this, &MainWindow::playPause);
+	connect(stepAction, &QAction::triggered, this, &MainWindow::stepSimulation);
 
 	updateStatusBar();
 

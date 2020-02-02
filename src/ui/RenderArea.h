@@ -36,9 +36,8 @@ private:
 		0.5f, -0.5f,  // Bottom-right
 		-0.5f, -0.5f,  // Bottom-left
 	};
-	GLuint square_elements[6] = {
-		0,1,2,
-		2,3,0
+	GLuint square_elements[4] = {
+		0,1,3,2,
 	};
 	GLuint square_ebo;
 

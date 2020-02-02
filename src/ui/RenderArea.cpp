@@ -38,8 +38,6 @@ void RenderArea::initializeGL() {
 
 	camera = new Camera2D();
 	
-	//camera->origin.setX(width() / 2.0f);
-	//camera->origin.setY(height() / 2.0f);
 	camera->pos.setX(0.0f);
 	camera->pos.setY(0.0f);
 	camera->set_zoom(1.0f);
@@ -66,6 +64,8 @@ void RenderArea::paintGL() {
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	m_program->bind();
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(m_posAttr, 2, GL_FLOAT, GL_FALSE, 0, square_vertices);
 
 	QMatrix4x4 matrix = camera->get_transformation((float)width(), (float) height());
 
@@ -75,18 +75,14 @@ void RenderArea::paintGL() {
 		for(size_t l = 0; l< map->getHeight(); l++) {
 			matrix.translate(0.0f,-1.0f,0.0f);
 			if(map->isAlive(c,l)){
-
 				m_program->setUniformValue(m_matrixUniform, matrix);
-				glVertexAttribPointer(m_posAttr, 2, GL_FLOAT, GL_FALSE, 0, square_vertices);
-				glEnableVertexAttribArray(0);
-				
-				glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-				glDisableVertexAttribArray(0);
+				glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0);
 			}
 		}
 		matrix.translate(0.0f,map->getHeight(),0.0f);
 
 	}
+	glDisableVertexAttribArray(0);
 	m_program->release();
 
 }

@@ -52,13 +52,4 @@ void Camera2D::generate_transformation_matrix(float width, float height) {
     transform.matrix.scale(1.0f /zoom,1.0f /zoom,1);
     transform.matrix.translate(origin.x(),origin.y(),0);
 
-    std::cout << "Matrix : " << "\n";
-    for(int i = 0 ; i < 4 ; ++i){
-        std::cout << "|";
-        for(int j = 0 ; j < 4 ; ++j){
-            std::cout << transform.matrix.column(j)[i];
-            std::cout << "|";
-        }
-        std::cout << '\n';
-    }
 }
