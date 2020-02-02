@@ -6,6 +6,7 @@
 #include <QStatusBar>
 #include <QMenuBar>
 #include <QFileDialog>
+#include <QToolButton>
 
 MainWindow::MainWindow() {
 	this->resize(720, 720);
@@ -27,12 +28,14 @@ MainWindow::MainWindow() {
 
 void MainWindow::createUI() {
 
+	updateStatusBar();
+
 	//Render Area
 	r_area = new RenderArea(this,game->getMap());
 	setCentralWidget(r_area);
 
-	//Simulation control tollbar
-	QToolBar *controlToolbar = addToolBar("Controls");
+	//Simulation control toolbar
+	QToolBar *controlToolbar = addToolBar("Simulation Controls");
 	addToolBar(Qt::LeftToolBarArea, controlToolbar);
 	playIcon = new QIcon("../res/icons/play.svg");
 	pauseIcon = new QIcon("../res/icons/pause.svg");
@@ -43,8 +46,32 @@ void MainWindow::createUI() {
 	connect(playPauseAction, &QAction::triggered, this, &MainWindow::playPause);
 	connect(stepAction, &QAction::triggered, this, &MainWindow::stepSimulation);
 
-	updateStatusBar();
+	//Control toolbox
+	QToolBar *toolboxToolbar = addToolBar("Toolbox");
+	addToolBar(Qt::LeftToolBarArea, toolboxToolbar);
 
+	QToolButton *pencilButton = new QToolButton(toolboxToolbar);
+	pencilButton->setIcon(QIcon("../res/icons/pencil.svg"));
+	pencilButton->setCheckable(true);	
+	toolboxToolbar->addWidget(pencilButton);
+
+	QToolButton *eraserButton = new QToolButton(toolboxToolbar);
+	eraserButton->setIcon(QIcon("../res/icons/eraser.svg"));
+	eraserButton->setCheckable(true);
+	toolboxToolbar->addWidget(eraserButton);
+
+	QToolButton *zoominButton = new QToolButton(toolboxToolbar);
+	zoominButton->setIcon(QIcon("../res/icons/zoom-in.svg"));
+	zoominButton->setCheckable(true);
+	toolboxToolbar->addWidget(zoominButton);
+
+	QToolButton *zoomoutButton = new QToolButton(toolboxToolbar);
+	zoomoutButton->setIcon(QIcon("../res/icons/zoom-out.svg"));
+	zoomoutButton->setCheckable(true);
+	toolboxToolbar->addWidget(zoomoutButton);
+
+
+	//Menu Bar
 	QMenu *fileMenu = new QMenu("File");
 	QMenu *prefMenu = new QMenu("Preferences");
 	QAction *loadAction = fileMenu->addAction("Load pattern");
