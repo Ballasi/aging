@@ -83,7 +83,9 @@ void MainWindow::stepSimulation(){
 
 void MainWindow::load(){
 	QString fileName = QFileDialog::getOpenFileName(this, "Open File","","Run Length Encoded (*.rle)");
+	game->loadRLE(fileName);
 	updateStatusBar();
+
 }
 
 MainWindow::~MainWindow() {

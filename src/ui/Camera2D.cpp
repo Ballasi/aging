@@ -46,9 +46,9 @@ void Camera2D::generate_transformation_matrix(float width, float height) {
     transform.update(pos,origin,zoom,aspect_ratio);
 
     transform.matrix.setToIdentity();
-    transform.matrix.ortho(QRectF(0.0f,0.0f,1.0f * aspect_ratio,1.0f));
+    transform.matrix.ortho(QRectF(0.0f,0.0f,1.0f * aspect_ratio,-1.0f));
 
-    transform.matrix.translate(-pos.x(),pos.y(),0);
+    transform.matrix.translate(-pos.x(),-pos.y(),0);
     transform.matrix.scale(1.0f /zoom,1.0f /zoom,1);
     transform.matrix.translate(origin.x(),origin.y(),0);
 
