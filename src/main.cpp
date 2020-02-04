@@ -1,13 +1,7 @@
-#include <QApplication>
+#include "logic/MacroCell.hpp"
 
-#include "logic/MacroCell.h"
-#include "ui/MainWindow.h"
+int main(int argc, char **arv) {
+  Quadrant* root = Quadrant::generate(2);
 
-using namespace std;
-
-int main(int argc, char **argv) {
-	QApplication app(argc,argv);
-	MainWindow window;
-	window.show();
-	return app.exec();
+ root->debug(2);
 }

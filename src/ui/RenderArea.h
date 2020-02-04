@@ -1,7 +1,7 @@
 #ifndef UI_RENDERAREA_H_
 #define UI_RENDERAREA_H_
 
-#include "../logic/Universe.h"
+#include "../logic/Universe.hpp"
 #include "../gameoflife/Game.h"
 #include "Camera2D.h"
 #include <QOpenGLWidget>
