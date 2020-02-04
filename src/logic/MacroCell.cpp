@@ -1,32 +1,19 @@
 #include "MacroCell.hpp"
 
-Quadrant* MiniCell::create(AtomicCell nw, AtomicCell ne, AtomicCell sw, AtomicCell se) {
-  MiniCell *minicell = (MiniCell*) malloc(sizeof(MiniCell));
-  minicell->next = nullptr;
-  minicell->nw = nw;
-  minicell->ne = ne;
-  minicell->sw = sw;
-  minicell->se = se;
-  return (Quadrant*) minicell;
-}
+MiniCell::MiniCell()
+  : next(nullptr), nw(), ne(), se(), sw() {}
 
-Quadrant* MacroCell::create(Quadrant *nw, Quadrant *ne, Quadrant *sw,
-                            Quadrant *se) {
-  MacroCell *macrocell = (MacroCell *)malloc(sizeof(MacroCell));
-  macrocell->next = nullptr;
-  macrocell->result = nullptr;
-  macrocell->nw = (Quadrant *)nw;
-  macrocell->ne = (Quadrant *)ne;
-  macrocell->sw = (Quadrant *)sw;
-  macrocell->se = (Quadrant *)se;
-  return (Quadrant *)macrocell;
-}
+MiniCell::MiniCell(AtomicCell nw, AtomicCell ne, AtomicCell sw, AtomicCell se)
+  : next(nullptr), nw(nw), ne(ne), se(se), sw(sw) {}
+
+MacroCell::MacroCell(Quadrant *nw, Quadrant *ne, Quadrant *sw, Quadrant *se)
+  : next(nullptr), nw(nw), ne(ne), sw(sw), se(se) {}
 
 Quadrant* Quadrant::generate(size_t level) {
   if (level <= 1) {
-    return (Quadrant*) MiniCell::create(0, 0, 0, 0);
+    return (Quadrant*) new MiniCell;
   } else {
-    return MacroCell::create(generate(level - 1), generate(level - 1),
+    return (Quadrant*)new MacroCell(generate(level - 1), generate(level - 1),
                              generate(level - 1), generate(level - 1));
   }
 }
