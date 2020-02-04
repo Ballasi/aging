@@ -6,7 +6,7 @@
 #include <cstdlib>
 #include <cstddef>
 #include <string>
-
+#include <random>
 
 
 typedef int AtomicCell;
@@ -14,7 +14,7 @@ union Quadrant;
 
 class MiniCell {
 public:
-  MiniCell();
+  MiniCell() = default;
   MiniCell(AtomicCell nw, AtomicCell ne, AtomicCell sw, AtomicCell se);
 
   MiniCell *next;
@@ -33,15 +33,18 @@ public:
 };
 
 union Quadrant {
-  void debug_rec(size_t level, std::string indentation);
-
-
-
 public :
   MiniCell minicell;
   MacroCell macrocell;
-  static Quadrant *generate(size_t level);
   void debug(size_t level);
+  static Quadrant *generate(size_t level);
+  static Quadrant *generate_random(size_t level, AtomicCell max_value);
+
+private:
+  void debug_rec(size_t level, std::string indentation);
+  static Quadrant *raw_generate_random(size_t level,
+                                       std::default_random_engine random_engine,
+                                       std::uniform_int_distribution<AtomicCell> range);
 };
 
 

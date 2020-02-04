@@ -1,7 +1,5 @@
 #include "MacroCell.hpp"
-
-MiniCell::MiniCell()
-  : next(nullptr), nw(), ne(), se(), sw() {}
+#include <random>
 
 MiniCell::MiniCell(AtomicCell nw, AtomicCell ne, AtomicCell sw, AtomicCell se)
   : next(nullptr), nw(nw), ne(ne), se(se), sw(sw) {}
@@ -14,31 +12,47 @@ Quadrant* Quadrant::generate(size_t level) {
     return (Quadrant*) new MiniCell;
   } else {
     return (Quadrant*)new MacroCell(generate(level - 1), generate(level - 1),
-                             generate(level - 1), generate(level - 1));
+                                    generate(level - 1), generate(level - 1));
   }
 }
 
+Quadrant *Quadrant::generate_random(size_t level, AtomicCell max_value) {
+  std::random_device undeterministic_generator;
+  std::default_random_engine deterministic_generator(undeterministic_generator());
+  std::uniform_int_distribution<AtomicCell> range(0, max_value);
+  return raw_generate_random(level, deterministic_generator, range);
+}
+
+Quadrant *Quadrant::raw_generate_random(size_t level,
+                                        std::default_random_engine random_engine,
+                                        std::uniform_int_distribution<AtomicCell> range) {
+  if (level <= 1) {
+    return (Quadrant *)new MiniCell(range(random_engine), range(random_engine),
+                                    range(random_engine), range(random_engine));
+  } else {
+    return (Quadrant *)new MacroCell(raw_generate_random(level - 1, random_engine, range),
+                                     raw_generate_random(level - 1, random_engine, range),
+                                     raw_generate_random(level - 1, random_engine, range),
+                                     raw_generate_random(level - 1, random_engine, range));
+  }
+}
 
 void Quadrant::debug_rec(size_t level, std::string indentation) {
   if (level == 1) {
-    std::cout << indentation << "MiniCell::create(" << minicell.nw << ", " << minicell.ne
-         << ", " << minicell.sw << ", " <<  minicell.se << ")";
+    std::cout << indentation << "(Quadrant *) new MiniCell(" << minicell.nw << ", "
+              << minicell.ne << ", " << minicell.sw << ", " << minicell.se
+              << ")";
   } else {
-    std::cout << indentation << "MacroCell::create(\n";
-    macrocell.nw->debug_rec(level - 1, indentation + "\t");
-    std::cout <<",\n" ;
-    macrocell.ne->debug_rec(level - 1, indentation + "\t");
-    std::cout <<",\n" ;
-    macrocell.sw->debug_rec(level - 1, indentation + "\t");
-    std::cout <<",\n" ;
-    macrocell.se->debug_rec(level - 1, indentation + "\t");
+    std::cout << indentation << "(Quadrant *) new MacroCell(\n";
+    macrocell.nw->debug_rec(level - 1, indentation + "  ");
+    std::cout << ",\n";
+    macrocell.ne->debug_rec(level - 1, indentation + "  ");
+    std::cout << ",\n";
+    macrocell.sw->debug_rec(level - 1, indentation + "  ");
+    std::cout << ",\n";
+    macrocell.se->debug_rec(level - 1, indentation + "  ");
     std::cout << "\n" << indentation << ")";
   }
 }
 
-void Quadrant::debug(size_t level) {
-  Quadrant::debug_rec(level, "");
-}
-
-
-
+void Quadrant::debug(size_t level) { Quadrant::debug_rec(level, ""); }
