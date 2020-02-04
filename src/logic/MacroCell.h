@@ -1,39 +1,32 @@
-#ifndef MACROCELL_H_
-#define MACROCELL_H_
+#ifndef MACROCELL_H
+#define MACROCELL_H
 
 #include <stdlib.h>
+#include <stdio.h>
+#include <stddef.h>
 
-class MacroCell {
 
-public:
+typedef int AtomicCell;
+struct SMacroCell;
+union UQuadrant;
+struct SMiniCell;
 
-	MacroCell(bool alive);
-	MacroCell(MacroCell *nw_, MacroCell *ne_, MacroCell *sw_, MacroCell *se_);
+typedef struct SMiniCell {
+  struct SMiniCell* next;
+  AtomicCell nw, ne;
+  AtomicCell sw, se;
+} MiniCell;
 
-	MacroCell* create(bool alive);
-	MacroCell* create(MacroCell *nw_, MacroCell *ne_, MacroCell *sw_, MacroCell *se_);
-	static MacroCell* createNew();
+typedef struct SMacroCell {
+  struct SMacroCell* next;
+  union UQuadrant *result;
+  union UQuadrant *nw, *ne;
+  union UQuadrant *sw, *se;
+} MacroCell;
 
-	MacroCell* setBit(long x, long y);
-	bool getBit(long x, long y);
+typedef union UQuadrant {
+  MiniCell minicell;
+  struct SMacroCell macrocell;
+} Quadrant;
 
-	MacroCell* emptyTree(int level);
-	MacroCell* expandUniverse();
-
-	MacroCell* oneGeneration(int bitmask);
-	MacroCell* naiveSimulation();
-
-	MacroCell* centeredSubCell();
-	MacroCell* centeredHorizontal(MacroCell *w, MacroCell *e);
-	MacroCell* centeredVertical(MacroCell *n, MacroCell *s);
-	MacroCell* centeredSubSubCell();
-
-	MacroCell* nextStep();
-
-	MacroCell *nw, *ne, *sw, *se;
-	bool alive;
-	int level;
-	std::size_t population;
-};
-
-#endif /* MACROCELL_H_ */
+#endif // MACROCELL_H

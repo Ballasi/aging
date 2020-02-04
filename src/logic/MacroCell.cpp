@@ -1,182 +1,164 @@
 #include "MacroCell.h"
 
-/* Constructor for a single cell */
-MacroCell::MacroCell(bool living)
-: alive(living),level(0),nw(nullptr),ne(nullptr),sw(nullptr),se(nullptr), population(alive ? 1 : 0)
-{
+Quadrant* MacroCell_new(Quadrant* nw, Quadrant* ne,
+                        Quadrant* sw, Quadrant* se) {
+  MacroCell* macro_cell = (MacroCell*) malloc(sizeof(MacroCell));
+  macro_cell->nw = (Quadrant*)nw;
+  macro_cell->ne = (Quadrant*)ne;
+  macro_cell->sw = (Quadrant*)sw;
+  macro_cell->se = (Quadrant*)se;
+  return (Quadrant*) macro_cell;
 }
 
-/* General case constructor for a MacroCell using its four children */
-MacroCell::MacroCell(MacroCell *nw_, MacroCell *ne_, MacroCell *sw_, MacroCell *se_)
-: nw(nw_), ne(ne_),sw(sw_),se(se_),level(nw->level + 1),
-  population(nw->population + ne->population + sw->population + se->population),
-  alive(population > 0)
-{
+Quadrant* MiniCell_new(AtomicCell nw, AtomicCell ne,
+                       AtomicCell sw, AtomicCell se) {
+  MiniCell *mini_cell = (MiniCell*) malloc(sizeof(MiniCell));
+  mini_cell->nw = nw;
+  mini_cell->ne = ne;
+  mini_cell->sw = sw;
+  mini_cell->se = se;
+  return (Quadrant*)mini_cell;
 }
 
-MacroCell* MacroCell::create(MacroCell *nw_, MacroCell *ne_, MacroCell *sw_, MacroCell *se_) {
-	return new MacroCell(nw_,ne_,sw_,se_);
+
+void MacroCell_debug(size_t level, Quadrant* quadrant) { 
+  if (level == 1) {
+    printf("MiniCell_new(%d,%d,%d,%d)", 
+      quadrant->mini_cell.nw, quadrant->mini_cell.ne,
+      quadrant->mini_cell.sw, quadrant->mini_cell.se);
+  } else {
+    printf("MacroCell_new(");
+    MacroCell_debug(level-1, quadrant->macro_cell.nw);
+    printf(",");
+    MacroCell_debug(level-1, quadrant->macro_cell.ne);
+    printf(",");
+    MacroCell_debug(level-1, quadrant->macro_cell.sw);
+    printf(",");
+    MacroCell_debug(level-1, quadrant->macro_cell.se);
+    printf(")");
+  }
 }
 
-MacroCell* MacroCell::create(bool alive) {
-	return new MacroCell(alive);
+
+Quadrant* MacroCell_generate(size_t level) {
+  if (level <= 1) {
+    return MiniCell_new(0,0,0,0);
+  } else {
+    return MacroCell_new(MacroCell_generate(level-1),MacroCell_generate(level-1)
+                         MacroCell_generate(level-1),MacroCell_generate(level-1));
+  }
 }
 
-MacroCell* MacroCell::createNew()
-{
-	return (new MacroCell(false))->emptyTree(3);
-}
 
-MacroCell* MacroCell::centeredSubCell() {
-	return create((MacroCell*)nw->se,
-	              (MacroCell*)ne->sw,
-	              (MacroCell*)sw->ne,
-	              (MacroCell*)se->nw);
-}
+Quadrant* MacroCell_result(size_t level, Quadrant* quadrant) {
 
-MacroCell* MacroCell::centeredHorizontal(MacroCell *w, MacroCell *e) {
-	return create((MacroCell*)w->ne->se,
-	              (MacroCell*)e->nw->sw,
-	              (MacroCell*)w->se->ne,
-	              (MacroCell*)e->sw->nw);
-}
 
-MacroCell* MacroCell::centeredVertical(MacroCell *n, MacroCell *s) {
-	return create((MacroCell*)n->sw->se,
-	              (MacroCell*)n->se->sw,
-	              (MacroCell*)s->nw->ne,
-	              (MacroCell*)s->ne->nw);
-}
 
-MacroCell* MacroCell::centeredSubSubCell() {
-	return create((MacroCell*)nw->se->se,
-	              (MacroCell*)ne->sw->sw,
-	              (MacroCell*)sw->ne->ne,
-	              (MacroCell*)se->nw->nw);
-}
 /*
- * Main recursion of the Hashlife algorithm
- * The RESULT of the current MacroCell is computed using
- * nine lower level MacroCells.
- */
-MacroCell* MacroCell::nextStep() {
-	if(population == 0)
-		return nw;
-	if(level == 2)
-		return naiveSimulation();
+  temp_nw = MacroCell_result(level-1, self.nw )
+  temp_n  = MacroCell_result(level-1, MacroCell_new(self.nw.ne,self.ne.nw,self.nw.se,self.ne.sw) )
+  temp_ne = MacroCell_result(level-1, self.ne )
+  
+  temp_w  = MacroCell_result(level-1, MacroCell_new(self.nw.sw,self.nw.se,self.sw.nw,self.sw.ne) )
+  temp_c  = MacroCell_result(level-1, MacroCell_new(self.nw.se,self.ne.sw,self.sw.ne,self.se.nw) )
+  temp_e  = MacroCell_result(level-1, MacroCell_new(self.ne.sw,self.ne.se,self.se.nw,self.se.ne) )
+  
+  temp_sw = MacroCell_result(level-1, self.sw )
+  temp_s  = MacroCell_result(level-1, MacroCell_new(self.sw.ne,self.se.nw,self.sw.se,self.se.sw) )
+  temp_se = MacroCell_result(level-1, self.se )
+    
+ 
+  res_nw = MacroCell_result( Macro_cell_new(temp_nw,temp_n,temp_w,temp_c,self.size-1) )
+  res_ne = MacroCell_result( Macro_cell_new(temp_n,temp_ne,temp_c,temp_e,self.size-1) )
+  res_sw = MacroCell_result( Macro_cell_new(temp_w,temp_c,temp_sw,temp_s,self.size-1) )
+  res_se = MacroCell_result( Macro_cell_new(temp_c,temp_e,temp_s,temp_se,self.size-1) )
 
-	MacroCell* m00 = ((MacroCell*) nw)->centeredSubCell();
-	MacroCell* m01 = centeredHorizontal((MacroCell*) nw,(MacroCell*) ne);
-	MacroCell* m02 = ((MacroCell*) ne)->centeredSubCell();
+  new_cell = MacroCell_new(res_nw,res_ne,res_sw,res_se,self.size-1)
+*/ 
 
-	MacroCell* m10 = centeredVertical((MacroCell*) nw,(MacroCell*) sw);
-	MacroCell* m11 = centeredSubSubCell();
-	MacroCell* m12 = centeredVertical((MacroCell*) ne,(MacroCell*) se);
-
-	MacroCell* m20 = ((MacroCell*) sw)->centeredSubCell();
-	MacroCell* m21 = centeredHorizontal((MacroCell*) sw,(MacroCell*) se);
-	MacroCell* m22 = ((MacroCell*) se)->centeredSubCell();
-
-	return create(create(m00,m01,m10,m11)->nextStep(),
-	              create(m01,m02,m11,m12)->nextStep(),
-	              create(m10,m11,m20,m21)->nextStep(),
-	              create(m11,m12,m21,m22)->nextStep());
 
 }
 
-/* Computes the next state of a single cell using
- * a bitmask to represent the states of neighboring cells.
- *
- * [8][9][10]
- * [4](5)[6]
- * [1][2][3]
- *
- *	Bit n°5 is the state of the current cell
- */
-MacroCell* MacroCell::oneGeneration(int bitmask) {
-	if(bitmask == 0)
-		return create(false);
 
-	int self_state = (bitmask >> 5) & 1;
-	bitmask &= 0x757;
-	int neighbors = 0;
-	while(bitmask != 0) {
-		neighbors++;
-		bitmask &= bitmask - 1;
-	}
-	if(neighbors == 3 || (neighbors == 2 && self_state != 0))
-		return create(true);
-	else
-		return create(false);
-}
 
-/* Uses naive simulation to compute the next state
- * of the four center cells at level 2 (4x4 MacroCell)
- */
-MacroCell* MacroCell::naiveSimulation() {
-	int allbits = 0;
-	for(int y = -2; y < 2; y++)
-		for(int x = -2; x < 2; x++)
-			allbits = (allbits << 1) + this->getBit(x, y);
-	return create(oneGeneration(allbits >> 5),
-	              oneGeneration(allbits >> 4),
-	              oneGeneration(allbits >> 1),
-	              oneGeneration(allbits));
-}
 
-/* Recursive method making the single cell at coordinates (x,y) alive */
-MacroCell* MacroCell::setBit(long x, long y) {
-	if(level == 0)
-		return new MacroCell(true);
-	long offset = 1 << (level - 2);
-	if(x < 0)
-	{
-		if(y < 0)
-			return create(((MacroCell*)nw)->setBit(x+offset, y+offset),(MacroCell*)ne,(MacroCell*)sw,(MacroCell*)se);
-		else
-			return create((MacroCell*)nw, (MacroCell*)ne, ((MacroCell*)sw)->setBit(x+offset, y-offset), (MacroCell*)se);
-	} else {
-		if (y < 0)
-			return create((MacroCell*)nw, ((MacroCell*)ne)->setBit(x-offset, y+offset), (MacroCell*)sw, (MacroCell*)se) ;
-		else
-			return create((MacroCell*)nw, (MacroCell*)ne, (MacroCell*)sw, ((MacroCell*)se)->setBit(x-offset, y-offset)) ;
-	}
-}
 
-bool MacroCell::getBit(long x, long y)
-{
-	if(level == 0)
-		return alive;
-	long offset = 1 << (level - 2);
-	if(x < 0)
-		{
-			if(y < 0)
-				return ((MacroCell*)nw)->getBit(x+offset, y+offset);
-			else
-				return ((MacroCell*)sw)->getBit(x+offset, y-offset);
-		} else {
-			if (y < 0)
-				return ((MacroCell*)ne)->getBit(x-offset, y+offset);
-			else
-				return ((MacroCell*)se)->getBit(x-offset, y-offset) ;
-		}
-}
 
-MacroCell* MacroCell::emptyTree(int level) {
-	if(level == 0)
-		return create(false);
-	MacroCell *m = emptyTree(level - 1);
-	return create(m,m,m,m);
-}
 
-/* Creates a new MacroCell a level higher with
- * the current MacroCell at its center.
- */
-MacroCell* MacroCell::expandUniverse() {
-	MacroCell *border = emptyTree(level - 1);
-	return create(create(border, border, border, (MacroCell*) nw),
-	              create(border, border, (MacroCell*) ne, border),
-	              create(border, (MacroCell*) sw, border, border),
-	              create((MacroCell*) se, border, border, border));
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
