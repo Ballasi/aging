@@ -1,5 +1,5 @@
 #include "MainWindow.h"
-#include "../logic/Universe.h"
+#include "../logic/Universe.hpp"
 
 #include <iostream>
 #include <QToolBar>
