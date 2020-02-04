@@ -5,6 +5,8 @@
 
 #include <cstdlib>
 #include <cstddef>
+#include <string>
+
 
 
 typedef int AtomicCell;
@@ -30,9 +32,13 @@ public:
 };
 
 union Quadrant {
+  void debug_rec(size_t level, std::string indentation);
+
+
+
+public :
   MiniCell minicell;
   MacroCell macrocell;
-
   static Quadrant *generate(size_t level);
   void debug(size_t level);
 };
