@@ -31,18 +31,27 @@ Quadrant* Quadrant::generate(size_t level) {
   }
 }
 
-void Quadrant::debug(size_t level) {
+
+void Quadrant::debug_rec(size_t level, std::string indentation) {
   if (level == 1) {
-    std::cout << "MiniCell::create(" << minicell.nw << ", " << minicell.ne
+    std::cout << indentation << "MiniCell::create(" << minicell.nw << ", " << minicell.ne
          << ", " << minicell.sw << ", " <<  minicell.se << ")";
   } else {
-    std::cout << "MacroCell::create(";
-    macrocell.nw->debug(level - 1);
-    std::cout << ", ";
-    macrocell.ne->debug(level - 1);
-    std::cout << ", ";
-    macrocell.sw->debug(level - 1);
-    std::cout << ", ";
-    macrocell.se->debug(level - 1);
+    std::cout << indentation << "MacroCell::create(\n";
+    macrocell.nw->debug_rec(level - 1, indentation + "\t");
+    std::cout <<",\n" ;
+    macrocell.ne->debug_rec(level - 1, indentation + "\t");
+    std::cout <<",\n" ;
+    macrocell.sw->debug_rec(level - 1, indentation + "\t");
+    std::cout <<",\n" ;
+    macrocell.se->debug_rec(level - 1, indentation + "\t");
+    std::cout << "\n" << indentation << ")";
   }
 }
+
+void Quadrant::debug(size_t level) {
+  Quadrant::debug_rec(level, "");
+}
+
+
+
