@@ -12,21 +12,22 @@ union Quadrant;
 
 class MiniCell {
 public:
+  MiniCell();
+  MiniCell(AtomicCell nw, AtomicCell ne, AtomicCell sw, AtomicCell se);
+
   MiniCell *next;
   AtomicCell nw, ne;
   AtomicCell sw, se;
-
-  static Quadrant* create(AtomicCell nw, AtomicCell ne, AtomicCell sw, AtomicCell se);
 };
 
 class MacroCell {
 public:
+  MacroCell(Quadrant *nw, Quadrant *ne, Quadrant *sw, Quadrant *se);
+
   MacroCell *next;
   Quadrant *result;
   Quadrant *nw, *ne;
   Quadrant *sw, *se;
-
-  static Quadrant* create(Quadrant *nw, Quadrant *ne, Quadrant *sw, Quadrant *se);
 };
 
 union Quadrant {
