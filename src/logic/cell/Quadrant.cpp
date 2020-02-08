@@ -1,13 +1,6 @@
-#include "MacroCell.hpp"
-#include <random>
+#include "Quadrant.hpp"
 
-MiniCell::MiniCell(AtomicCell nw, AtomicCell ne, AtomicCell sw, AtomicCell se)
-  : next(nullptr), nw(nw), ne(ne), se(se), sw(sw) {}
-
-MacroCell::MacroCell(Quadrant *nw, Quadrant *ne, Quadrant *sw, Quadrant *se)
-  : next(nullptr), nw(nw), ne(ne), sw(sw), se(se) {}
-
-Quadrant* Quadrant::generate(size_t level) {
+Quadrant *Quadrant::generate(size_t level) {
   if (level <= 1) {
     return (Quadrant*) new MiniCell;
   } else {
