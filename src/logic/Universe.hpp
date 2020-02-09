@@ -17,6 +17,7 @@ public:
   size_t step();
   const CellState get(Coord coord) const;
   void set(Coord coord, CellState state);
+  void debug();
 
 private:
   size_t top_level;

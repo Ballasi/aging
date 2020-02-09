@@ -1,4 +1,5 @@
 #include "Universe.hpp"
+#include "cell/MiniCell.hpp"
 
 Universe::Universe(size_t level): Universe(Coord(), level) {}
 
@@ -13,6 +14,10 @@ Universe::Universe(Coord top_left, size_t top_level)
   root = quadrant(top_level);
 }
 
+void Universe::debug() {
+  root->debug(top_level);
+}
+
 size_t Universe::step() {
   // TODO
   return 0;
@@ -22,7 +27,7 @@ const CellState Universe::get(Coord coord) const {
   return *find(coord);
 }
 
-void set(Coord coord, CellState state) {
+void Universe::set(Coord coord, CellState state) {
   // TODO
 }
 
@@ -130,7 +135,7 @@ MacroCell *Universe::macrocell(size_t level) {
 MacroCell *Universe::macrocell(size_t level,
                                Quadrant *nw, Quadrant *ne,
                                Quadrant *sw, Quadrant *se) {
-  return (MacroCell*) &*macrocell_sets[level].emplace(nw, ne, sw, se).first;
+  return (MacroCell*) &*macrocell_sets[level - 1].emplace(nw, ne, sw, se).first;
 }
 
 Quadrant *Universe::quadrant(size_t level) {
