@@ -6,6 +6,7 @@
 
 #include "cell.hpp"
 #include "Coord.hpp"
+#include "cell/MiniCell.hpp"
 
 using namespace std;
 
@@ -16,7 +17,7 @@ public:
 
   size_t step();
   const CellState get(Coord coord) const;
-  void set(Coord coord, CellState state);
+  void set(Coord target, CellState state);
   void debug();
 
   Coord get_top_left();
@@ -30,6 +31,9 @@ private:
   vector<unordered_set<MacroCell>> macrocell_sets;
   unordered_set<MiniCell> minicells;
   vector<Quadrant*> zeros;
+
+  // Recursive setter
+  Quadrant *set_rec(Coord current, size_t level, Quadrant *cell, Coord target, CellState state);
 
   // Finding
   CellState *find(Coord) const;
