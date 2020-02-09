@@ -21,15 +21,17 @@ MainWindow::MainWindow() {
 		for (size_t l = 0; l < map->getHeight(); ++l)
 			map->changeCellState(c,l,c % 3);
 	*/
-	hashlife_universe = new Universe(Coord(0,0),4);
-	/*
-	hashlife_universe->set(Coord(1,0),1);
-	hashlife_universe->set(Coord(2,1),1);
-	hashlife_universe->set(Coord(0,2),1);
-	hashlife_universe->set(Coord(0,2),1);
-	hashlife_universe->set(Coord(0,2),1);
-	*/
+	hashlife_universe = new Universe(Coord(0,0),3);
 
+	hashlife_universe->debug();
+
+	hashlife_universe->set(Coord(0,0),1);
+	hashlife_universe->set(Coord(1,0),1);
+	hashlife_universe->set(Coord(2,0),1);
+	hashlife_universe->set(Coord(3,0),1);
+	hashlife_universe->set(Coord(4,0),1);
+
+	hashlife_universe->debug();
 
 	createUI();
 	stepTimer = new QTimer(this);
@@ -108,7 +110,7 @@ void MainWindow::playPause(){
 void MainWindow::updateStatusBar(){
 	std::string s;
 	s += "Generation : ";
-	s += std::to_string(game->getGeneration());
+	//s += std::to_string(game->getGeneration());
 	statusBar()->showMessage(QString(s.c_str()));
 }
 

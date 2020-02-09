@@ -3,12 +3,12 @@
 #include <QSurfaceFormat>
 
 RenderArea::RenderArea(QWidget *parent, CellMap *gol_map)
-	:QOpenGLWidget(parent), gol_map(gol_map)
+	:QOpenGLWidget(parent), gol_map(gol_map), hashlife_universe(nullptr)
 {
 
 }
 RenderArea::RenderArea(QWidget *parent, Universe *hashlife_universe)
-	:QOpenGLWidget(parent), hashlife_universe(hashlife_universe)
+	:QOpenGLWidget(parent), hashlife_universe(hashlife_universe), gol_map(nullptr)
 {
 
 }
@@ -73,12 +73,13 @@ void RenderArea::paintGL() {
 
 	QMatrix4x4 matrix = camera->get_transformation((float)width(), (float) height());
 
-	if(gol_map != nullptr)
+	if(gol_map != nullptr) {
 		render_gol(matrix);
-	else if(hashlife_universe != nullptr)
+	} else if(hashlife_universe != nullptr) {
 		render_hashlife(matrix);
-	else
+	} else {
 		std::cout << "Error : No Universe detected" << std::endl;
+	}
 
 	glDisableVertexAttribArray(0);
 	m_program->release();
@@ -105,22 +106,21 @@ void RenderArea::render_gol(QMatrix4x4 &matrix) {
 
 void RenderArea::render_hashlife(QMatrix4x4 &matrix) {
 
-	std::cout << "Test" << std::endl;
-
 	Coord top_left = hashlife_universe->get_top_left();
 	size_t level = hashlife_universe->get_top_level();
 
-	for(size_t c = 0; c < (1 << level) - 1;c++) {
+	for(size_t c = 0; c < (1 << level);c++) {
 
 		matrix.translate(1.0f,0.0f,0.0f);
-		for(size_t l = 0; l < (1 << level) - 1; l++) {
+		for(size_t l = 0; l < (1 << level); l++) {
 			matrix.translate(0.0f,-1.0f,0.0f);
-			if(hashlife_universe->get(Coord(c,l))){
+			if(hashlife_universe->get(Coord(c,l)) == 1){
+				std::cout << "Alive cell at : (" << c << "," << l << ")" << '\n';
 				m_program->setUniformValue(m_matrixUniform, matrix);
 				glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0);
 			}
 		}
-		matrix.translate(0.0f,(1 << level) - 1,0.0f);
+		matrix.translate(0.0f,(1 << level),0.0f);
 	}
 }
 
