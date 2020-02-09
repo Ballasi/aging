@@ -1,7 +1,5 @@
-#include "logic/MacroCell.hpp"
+#include "logic/Universe.hpp"
 
-int main(int argc, char **arv) {
-  Quadrant* root = Quadrant::generate(2);
-
- root->debug(2);
+int main(int argc, char **argv) {
+  Universe universe(3);
 }
