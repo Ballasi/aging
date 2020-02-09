@@ -1,7 +1,12 @@
-#include "logic/Universe.hpp"
+#include "ui/MainWindow.h"
+#include <QApplication>
+
 
 int main(int argc, char **argv) {
-  Universe universe(3);
 
-  universe.debug();
+  QApplication app(argc,argv);
+  MainWindow window;
+  window.show();
+  return app.exec();
+
 }

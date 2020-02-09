@@ -12,7 +12,8 @@
 class RenderArea : public QOpenGLWidget , protected QOpenGLFunctions {
 
 public:
-	RenderArea(QWidget *parent = 0, CellMap *map= 0);
+	RenderArea(QWidget *parent = 0, CellMap *gol_map= 0);
+	RenderArea(QWidget *parent = 0, Universe *hashlife_universe = 0);
 	void handleInput(QKeyEvent *event);
 
 protected:
@@ -23,7 +24,8 @@ protected:
 	void mousePressEvent(QMouseEvent *event);
 
 private:
-	CellMap *map;
+	CellMap *gol_map;
+	Universe *hashlife_universe;
 	std::string vertexShaderSource;
 	std::string fragmentShaderSource;
 
@@ -36,14 +38,16 @@ private:
 		0.5f, -0.5f,  // Bottom-right
 		-0.5f, -0.5f,  // Bottom-left
 	};
-	GLuint square_elements[6] = {
-		0,1,2,
-		2,3,0
+	GLuint square_elements[4] = {
+		0,1,3,2,
 	};
 	GLuint square_ebo;
 
 	QOpenGLShaderProgram *m_program;
 	Camera2D *camera;
+
+	void render_gol(QMatrix4x4 &matrix);
+	void render_hashlife(QMatrix4x4 &matrix);
 
 };
 
