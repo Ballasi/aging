@@ -13,7 +13,6 @@ class Universe {
 public:
   Universe(size_t top_level);
   Universe(Coord top_left, size_t top_level);
-  ~Universe();
 
   size_t step();
   const CellState get(Coord coord) const;
@@ -34,14 +33,14 @@ private:
 
   // Minicells
   MiniCell *minicell();
-  MiniCell *minicell(const CellState nw, const CellState ne,
-                     const CellState sw, const CellState se);
+  MiniCell *minicell(CellState nw, CellState ne,
+                     CellState sw, CellState se);
 
   // Macrocells
   MacroCell *macrocell(size_t level);
   MacroCell *macrocell(size_t level,
-                       const Quadrant *nw, const Quadrant *ne,
-                       const Quadrant *sw, const Quadrant *se);
+                       Quadrant *nw, Quadrant *ne,
+                       Quadrant *sw, Quadrant *se);
 
   // Quadrant
   Quadrant *quadrant(size_t level);

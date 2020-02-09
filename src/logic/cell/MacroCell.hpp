@@ -12,7 +12,7 @@ public:
   MacroCell(Quadrant *nw, Quadrant *ne,
             Quadrant *sw, Quadrant *se);
 
-  bool operator== (MacroCell other);
+  bool operator==(const MacroCell other) const;
   friend std::hash<MacroCell>;
   friend Quadrant;
 
@@ -26,7 +26,7 @@ public:
 namespace std {
   template <>
   struct hash<MacroCell> {
-    size_t operator()(const MacroCell &macrocell) {
+    size_t operator()(const MacroCell &macrocell) const {
       hash<Quadrant*> hasher;
       return hasher(macrocell.nw) ^ hasher(macrocell.ne) ^
         hasher(macrocell.sw) ^ hasher(macrocell.se);

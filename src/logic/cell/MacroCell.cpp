@@ -5,7 +5,7 @@ MacroCell::MacroCell(Quadrant *nw, Quadrant *ne,
   : nw(nw), ne(ne), sw(sw), se(se) {}
 
 
-bool MacroCell::operator==(MacroCell other) {
+bool MacroCell::operator==(const MacroCell other) const {
   return nw == other.nw && ne == other.ne && sw == other.sw && se == other.se;
 }
 

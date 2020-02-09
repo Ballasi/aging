@@ -114,8 +114,8 @@ MiniCell *Universe::minicell() {
   return (MiniCell *)&*minicells.emplace().first;
 }
 
-MiniCell *Universe::minicell(const CellState nw, const CellState ne,
-                             const CellState sw, const CellState se) {
+MiniCell *Universe::minicell(CellState nw, CellState ne,
+                             CellState sw, CellState se) {
   return (MiniCell*) &*minicells.emplace(nw, ne, sw, se).first;
 }
 
@@ -127,8 +127,8 @@ MacroCell *Universe::macrocell(size_t level) {
 }
 
 MacroCell *Universe::macrocell(size_t level,
-                               const Quadrant *nw, const Quadrant *ne,
-                               const Quadrant *sw, const Quadrant *se) {
+                               Quadrant *nw, Quadrant *ne,
+                               Quadrant *sw, Quadrant *se) {
   return (MacroCell*) &*macrocell_sets[level].emplace(nw, ne, sw, se).first;
 }
 
