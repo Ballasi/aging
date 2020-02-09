@@ -20,6 +20,9 @@ public:
   void set(Coord target, CellState state);
   void debug();
 
+  Coord get_top_left();
+  size_t get_top_level();
+
 private:
   size_t top_level;
   Coord top_left;

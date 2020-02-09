@@ -194,3 +194,11 @@ Quadrant *Universe::quadrant(size_t level) {
                                  quadrant(level - 1), quadrant(level - 1));
   }
 }
+
+size_t Universe::get_top_level() {
+  return top_level;
+}
+
+Coord Universe::get_top_left(){
+  return top_left;
+}
