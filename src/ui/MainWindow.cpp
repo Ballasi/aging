@@ -7,6 +7,7 @@
 #include <QMenuBar>
 #include <QFileDialog>
 #include <QToolButton>
+#include <QButtonGroup>
 
 MainWindow::MainWindow() {
 	this->resize(720, 720);
@@ -26,10 +27,9 @@ MainWindow::MainWindow() {
 	hashlife_universe->debug();
 
 	hashlife_universe->set(Coord(0,0),1);
-	hashlife_universe->set(Coord(1,0),1);
-	hashlife_universe->set(Coord(2,0),1);
-	hashlife_universe->set(Coord(3,0),1);
-	hashlife_universe->set(Coord(4,0),1);
+	hashlife_universe->set(Coord(0,7),1);
+	hashlife_universe->set(Coord(7,0),1);
+	hashlife_universe->set(Coord(7,7),1);
 
 	hashlife_universe->debug();
 
@@ -60,26 +60,32 @@ void MainWindow::createUI() {
 
 	//Control toolbox
 	QToolBar *toolboxToolbar = addToolBar("Toolbox");
+	QButtonGroup *toolboxGroup = new QButtonGroup();
+	toolboxGroup->setExclusive(true);
 	addToolBar(Qt::LeftToolBarArea, toolboxToolbar);
 
 	QToolButton *pencilButton = new QToolButton(toolboxToolbar);
 	pencilButton->setIcon(QIcon("../res/icons/pencil.svg"));
-	pencilButton->setCheckable(true);	
+	pencilButton->setCheckable(true);
+	toolboxGroup->addButton(pencilButton);
 	toolboxToolbar->addWidget(pencilButton);
 
 	QToolButton *eraserButton = new QToolButton(toolboxToolbar);
 	eraserButton->setIcon(QIcon("../res/icons/eraser.svg"));
 	eraserButton->setCheckable(true);
+	toolboxGroup->addButton(eraserButton);
 	toolboxToolbar->addWidget(eraserButton);
 
 	QToolButton *zoominButton = new QToolButton(toolboxToolbar);
 	zoominButton->setIcon(QIcon("../res/icons/zoom-in.svg"));
 	zoominButton->setCheckable(true);
+	toolboxGroup->addButton(zoominButton);
 	toolboxToolbar->addWidget(zoominButton);
 
 	QToolButton *zoomoutButton = new QToolButton(toolboxToolbar);
 	zoomoutButton->setIcon(QIcon("../res/icons/zoom-out.svg"));
 	zoomoutButton->setCheckable(true);
+	toolboxGroup->addButton(zoomoutButton);
 	toolboxToolbar->addWidget(zoomoutButton);
 
 
