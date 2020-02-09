@@ -24,10 +24,7 @@ size_t Universe::step() {
   return 0;
 }
 
-
-const CellState Universe::get(Coord coord) const {
-  return *find(coord);
-}
+const CellState Universe::get(Coord target) const { return *find(target); }
 
 void Universe::set(Coord target, CellState state) {
   root = set_rec(top_left, top_level, root, target, state);
@@ -63,19 +60,19 @@ Quadrant *Universe::set_rec(Coord current, size_t level, Quadrant *cell, Coord t
                                       set_rec(current, level, cell->macrocell.nw , target, state),
                                       cell->macrocell.ne, cell->macrocell.sw, cell->macrocell.se);
       else {
-        current.x += size.x;
+        current.x = center.x;
         return (Quadrant *) macrocell(level, cell->macrocell.nw,
                                       set_rec(current, level, cell->macrocell.ne, target, state),
                                       cell->macrocell.sw, cell->macrocell.se);
       }
     } else {
-      current.y += size.y;
+      current.y = center.y;
       if (target.x < center.x)
         return (Quadrant *) macrocell(level, cell->macrocell.nw, cell->macrocell.ne,
                                       set_rec(current, level, cell->macrocell.sw , target, state),
                                       cell->macrocell.se);
       else {
-        current.x += size.x;
+        current.x = center.x;
         return (Quadrant *) macrocell(level, cell->macrocell.nw, cell->macrocell.ne, cell->macrocell.sw,
                                       set_rec(current, level, cell->macrocell.se, target, state));
       }
@@ -83,25 +80,25 @@ Quadrant *Universe::set_rec(Coord current, size_t level, Quadrant *cell, Coord t
   }
 }
 
-CellState *Universe::find(Coord coord) const {
+CellState *Universe::find(Coord target) const {
   Quadrant *cell = root;
   Coord size(top_level - 1);
   Coord current(top_left);
   Coord center = current + size;
   for (size_t level = top_level; level > 1; --level) {
-    if (coord.x < center.x) {
-      if (coord.y < center.y) {
+    if (target.y < center.y) {
+      if (target.x < center.x) {
         cell = cell->macrocell.nw;
       } else {
-        current.y += size.y;
+        current.x = center.x;
         cell = cell->macrocell.ne;
       }
     } else {
-      current.x += size.x;
-      if (coord.y < center.y) {
+      current.y = center.y;
+      if (target.x < center.x) {
         cell = cell->macrocell.sw;
       } else {
-        current.y += size.y;
+        current.x = center.x;
         cell = cell->macrocell.se;
       }
     }
@@ -109,14 +106,13 @@ CellState *Universe::find(Coord coord) const {
     center = current + size;
   }
 
-
-  if (coord.y < center.y) {
-    if (coord.x < center.x) {
+  if (target.y < center.y) {
+    if (target.x < center.x) {
       return &cell->minicell.nw;
     }
     return &cell->minicell.ne;
   } else {
-    if (coord.x < center.x) {
+    if (target.x < center.x) {
       return &cell->minicell.sw;
     }
     return &cell->minicell.se;
@@ -194,6 +190,7 @@ Quadrant *Universe::quadrant(size_t level) {
                                  quadrant(level - 1), quadrant(level - 1));
   }
 }
+
 
 size_t Universe::get_top_level() {
   return top_level;
