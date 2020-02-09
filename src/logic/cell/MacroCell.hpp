@@ -27,10 +27,10 @@ namespace std {
   template <>
   struct hash<MacroCell> {
     size_t operator()(const MacroCell &macrocell) const {
-      hash<Quadrant*> hasher;
       return hasher(macrocell.nw) ^ hasher(macrocell.ne) ^
         hasher(macrocell.sw) ^ hasher(macrocell.se);
     }
+    hash<Quadrant *> hasher;
   };
 }
 
