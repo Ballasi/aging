@@ -8,10 +8,10 @@ Universe::Universe(Coord top_left, size_t top_level)
   // Starting with one extra level
   macrocell_sets.resize(top_level);
   zeros.push_back((Quadrant*) minicell());
-  for (size_t i = 0; i < top_level; ++i) {
+  for (size_t i = 1; i < top_level; ++i) {
     zeros.push_back((Quadrant*) macrocell(i));
   }
-  root = quadrant(top_level);
+  root = zeros.back();
 }
 
 void Universe::debug() {
@@ -22,6 +22,7 @@ size_t Universe::step() {
   // TODO
   return 0;
 }
+
 
 const CellState Universe::get(Coord coord) const {
   return *find(coord);
@@ -135,7 +136,7 @@ MacroCell *Universe::macrocell(size_t level) {
 MacroCell *Universe::macrocell(size_t level,
                                Quadrant *nw, Quadrant *ne,
                                Quadrant *sw, Quadrant *se) {
-  return (MacroCell*) &*macrocell_sets[level - 1].emplace(nw, ne, sw, se).first;
+  return (MacroCell*) &*macrocell_sets[level].emplace(nw, ne, sw, se).first;
 }
 
 Quadrant *Universe::quadrant(size_t level) {
