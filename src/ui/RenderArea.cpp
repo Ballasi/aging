@@ -2,8 +2,13 @@
 #include <iostream>
 #include <QSurfaceFormat>
 
-RenderArea::RenderArea(QWidget *parent, CellMap *map)
-	:QOpenGLWidget(parent), map(map)
+RenderArea::RenderArea(QWidget *parent, CellMap *gol_map)
+	:QOpenGLWidget(parent), gol_map(gol_map)
+{
+
+}
+RenderArea::RenderArea(QWidget *parent, Universe *hashlife_universe)
+	:QOpenGLWidget(parent), hashlife_universe(hashlife_universe)
 {
 
 }
@@ -57,7 +62,6 @@ void RenderArea::resizeGL(int w, int h) {
 void RenderArea::paintGL() {
 	std::cout << "Refreshed OpenGL display" << '\n';
 
-
 	const qreal retinaScale = devicePixelRatio();
 	glViewport(0, 0, width() * retinaScale, height() * retinaScale);
 
@@ -69,22 +73,55 @@ void RenderArea::paintGL() {
 
 	QMatrix4x4 matrix = camera->get_transformation((float)width(), (float) height());
 
-	for(size_t c = 0; c< map->getWidth();c++) {
+	if(gol_map != nullptr)
+		render_gol(matrix);
+	else if(hashlife_universe != nullptr)
+		render_hashlife(matrix);
+	else
+		std::cout << "Error : No Universe detected" << std::endl;
+
+	glDisableVertexAttribArray(0);
+	m_program->release();
+	
+}
+
+void RenderArea::render_gol(QMatrix4x4 &matrix) {
+
+	for(size_t c = 0; c< gol_map->getWidth();c++) {
 
 		matrix.translate(1.0f,0.0f,0.0f);
-		for(size_t l = 0; l< map->getHeight(); l++) {
+		for(size_t l = 0; l< gol_map->getHeight(); l++) {
 			matrix.translate(0.0f,-1.0f,0.0f);
-			if(map->isAlive(c,l)){
+			if(gol_map->isAlive(c,l)){
 				m_program->setUniformValue(m_matrixUniform, matrix);
 				glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0);
 			}
 		}
-		matrix.translate(0.0f,map->getHeight(),0.0f);
+		matrix.translate(0.0f,gol_map->getHeight(),0.0f);
 
 	}
-	glDisableVertexAttribArray(0);
-	m_program->release();
 
+}
+
+void RenderArea::render_hashlife(QMatrix4x4 &matrix) {
+
+	std::cout << "Test" << std::endl;
+
+	Coord top_left = hashlife_universe->get_top_left();
+	size_t level = hashlife_universe->get_top_level();
+
+	for(size_t c = 0; c < (1 << level) - 1;c++) {
+
+		matrix.translate(1.0f,0.0f,0.0f);
+		for(size_t l = 0; l < (1 << level) - 1; l++) {
+			matrix.translate(0.0f,-1.0f,0.0f);
+			if(hashlife_universe->get(Coord(c,l))){
+				m_program->setUniformValue(m_matrixUniform, matrix);
+				glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0);
+			}
+		}
+		matrix.translate(0.0f,(1 << level) - 1,0.0f);
+	}
 }
 
 void RenderArea::wheelEvent(QWheelEvent *event) {
@@ -109,6 +146,12 @@ void RenderArea::handleInput(QKeyEvent *event) {
 		break;
 	case Qt::Key_D:
 		camera->pos.setX(camera->pos.x() + 0.08f);
+		break;
+	case Qt::Key_Plus:
+		camera->set_zoom(camera->get_zoom() / 2);
+		break;
+	case Qt::Key_Minus:
+		camera->set_zoom(camera->get_zoom() * 2);
 		break;
 	
 	default:

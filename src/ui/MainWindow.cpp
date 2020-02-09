@@ -13,13 +13,23 @@ MainWindow::MainWindow() {
 	this->setFocusPolicy(Qt::FocusPolicy::ClickFocus);
 
 	simulationRunning = false;
-
+	/*
 	game = new Game(100,100);
 
 	CellMap *map = game->getMap();
 	for (size_t c = 0; c < map->getWidth(); ++c)
 		for (size_t l = 0; l < map->getHeight(); ++l)
 			map->changeCellState(c,l,c % 3);
+	*/
+	hashlife_universe = new Universe(Coord(0,0),4);
+	/*
+	hashlife_universe->set(Coord(1,0),1);
+	hashlife_universe->set(Coord(2,1),1);
+	hashlife_universe->set(Coord(0,2),1);
+	hashlife_universe->set(Coord(0,2),1);
+	hashlife_universe->set(Coord(0,2),1);
+	*/
+
 
 	createUI();
 	stepTimer = new QTimer(this);
@@ -31,7 +41,7 @@ void MainWindow::createUI() {
 	updateStatusBar();
 
 	//Render Area
-	r_area = new RenderArea(this,game->getMap());
+	r_area = new RenderArea(this,hashlife_universe);
 	setCentralWidget(r_area);
 
 	//Simulation control toolbar

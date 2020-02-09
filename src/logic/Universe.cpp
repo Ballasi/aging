@@ -21,8 +21,48 @@ const CellState Universe::get(Coord coord) const {
   return *find(coord);
 }
 
-void set(Coord coord, CellState state) {
-  // TODO
+void Universe::set(Coord coord, CellState state) {
+  Quadrant *cell = root;
+  Coord size(top_level);
+  Coord current(top_left);
+  Coord center;
+  for (size_t level = top_level; level > 1; --level) {
+    center = current + size;
+    if (coord.x < center.x) {
+      coord.x += size.x;
+      if (coord.y < top_left.y) {
+        coord.y += size.y;
+        cell = cell->macrocell.nw;
+      }
+      else {
+        cell = cell->macrocell.ne;
+      }
+      }
+    else {
+      if (coord.y < top_left.y) {
+        coord.y += size.y;
+        cell = cell->macrocell.sw;
+      }
+      else {
+        cell = cell->macrocell.se;
+      }
+    }
+    size <<= 1;
+  }
+
+  center = current + size;
+  if (coord.x < center.x) {
+    if (coord.y < center.y) {
+      cell->minicell.nw = state;
+    }
+    cell->minicell.ne = state;
+  }
+  else {
+    if (coord.y < center.y) {
+      cell->minicell.sw = state;
+    }
+    cell->minicell.se = state;
+  }
 }
 
 CellState *Universe::find(Coord coord) const {
@@ -140,4 +180,12 @@ Quadrant *Universe::quadrant(size_t level) {
                                  quadrant(level - 1), quadrant(level - 1),
                                  quadrant(level - 1), quadrant(level - 1));
   }
+}
+
+size_t Universe::get_top_level() {
+  return top_level;
+}
+
+Coord Universe::get_top_left(){
+  return top_left;
 }

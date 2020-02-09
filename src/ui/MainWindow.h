@@ -23,6 +23,7 @@ protected:
 private:
 	RenderArea *r_area;
 	Game *game;
+	Universe *hashlife_universe;
 	void createUI();
 	void updateStatusBar();
 
