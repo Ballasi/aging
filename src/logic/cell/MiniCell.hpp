@@ -3,21 +3,20 @@
 
 #include <functional>
 
-typedef int AtomicCell;
+typedef int CellState;
 union Quadrant;
 
 class MiniCell {
 public:
   MiniCell() = default;
-  MiniCell(AtomicCell nw, AtomicCell ne, AtomicCell sw, AtomicCell se);
+  MiniCell(CellState nw, CellState ne, CellState sw, CellState se);
 
   bool operator==(MiniCell other);
   friend std::hash<MiniCell>;
   friend Quadrant;
 
-private:
-  AtomicCell nw, ne;
-  AtomicCell sw, se;
+  CellState nw, ne;
+  CellState sw, se;
 };
 
 namespace std {
@@ -26,11 +25,11 @@ namespace std {
     hash() = default;
 
     size_t operator()(const MiniCell &minicell) const {
-      return hasher(minicell.nw) ^ hasher(minicell.ne) ^ hasher(minicell.sw) ^
-            hasher(minicell.se);
+      return hasher(minicell.nw) ^ hasher(minicell.ne)
+        ^ hasher(minicell.sw) ^ hasher(minicell.se);
     }
 
-    hash<AtomicCell> hasher;
+    hash<CellState> hasher;
   };
 } // namespace std
 

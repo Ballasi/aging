@@ -1,6 +1,6 @@
 #include "MiniCell.hpp"
 
-MiniCell::MiniCell(AtomicCell nw, AtomicCell ne, AtomicCell sw, AtomicCell se)
+MiniCell::MiniCell(CellState nw, CellState ne, CellState sw, CellState se)
     :  nw(nw), ne(ne), se(se), sw(sw) {}
 
 bool MiniCell::operator==(MiniCell other) {

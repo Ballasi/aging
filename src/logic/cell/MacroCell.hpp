@@ -9,13 +9,13 @@ union Quadrant;
 
 class MacroCell {
 public:
-  MacroCell(Quadrant *nw, Quadrant *ne, Quadrant *sw, Quadrant *se);
+  MacroCell(Quadrant *nw, Quadrant *ne,
+            Quadrant *sw, Quadrant *se);
 
   bool operator== (MacroCell other);
   friend std::hash<MacroCell>;
   friend Quadrant;
 
-private:
   Quadrant *result;
   Quadrant *nw, *ne;
   Quadrant *sw, *se;

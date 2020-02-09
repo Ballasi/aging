@@ -9,16 +9,16 @@ Quadrant *Quadrant::generate(size_t level) {
   }
 }
 
-Quadrant *Quadrant::generate_random(size_t level, AtomicCell max_value) {
+Quadrant *Quadrant::generate_random(size_t level, CellState max_value) {
   std::random_device undeterministic_generator;
   std::default_random_engine deterministic_generator(undeterministic_generator());
-  std::uniform_int_distribution<AtomicCell> range(0, max_value);
+  std::uniform_int_distribution<CellState> range(0, max_value);
   return raw_generate_random(level, deterministic_generator, range);
 }
 
 Quadrant *Quadrant::raw_generate_random(size_t level,
                                         std::default_random_engine random_engine,
-                                        std::uniform_int_distribution<AtomicCell> range) {
+                                        std::uniform_int_distribution<CellState> range) {
   if (level <= 1) {
     return (Quadrant *)new MiniCell(range(random_engine), range(random_engine),
                                     range(random_engine), range(random_engine));
