@@ -99,6 +99,7 @@ void MainWindow::createUI() {
 }
 
 void MainWindow::playPause(){
+
 	simulationRunning = !simulationRunning;
 	if(simulationRunning) {
 		playPauseAction->setIcon(*pauseIcon);
@@ -124,7 +125,7 @@ void MainWindow::stepSimulation(){
 	if(game != nullptr)
 		game->nextGeneration();
 	else if(hashlife_universe != nullptr)
-		//TODO: Step hashlife universe
+		hashlife_universe->step();
 	r_area->update();
 	updateStatusBar();
 }
