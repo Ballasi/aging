@@ -28,7 +28,7 @@ Universe::Universe(QString filename,Coord top_left)
   for (size_t i = 1; i < top_level; ++i) {
     zeros.push_back((Quadrant*) macrocell(i));
   }
-  root = zeros.back();
+  root = (MacroCell*) zeros.back();
 
   read_rle_data(file,boundingbox);
 }
