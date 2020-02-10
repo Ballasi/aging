@@ -37,7 +37,7 @@ void Universe::debug() {
   root->debug(top_level);
 }
 
-Coord Universe::read_rle_size(QFile &file){
+Coord Universe::read_rle_size(QFile &file) {
   while(!file.atEnd())
   {
     QByteArray line = file.readLine();

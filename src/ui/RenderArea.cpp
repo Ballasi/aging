@@ -45,7 +45,8 @@ void RenderArea::initializeGL() {
 	
 	camera->pos.setX(0.0f);
 	camera->pos.setY(0.0f);
-	camera->set_zoom(1.0f);
+	if(hashlife_universe != nullptr)
+		camera->set_zoom(1 << (hashlife_universe->get_top_level() + 1));
 
 	glClearColor(0.0f,0.0f,0.0f,1.0f);
 	glDepthMask(0);
