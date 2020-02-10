@@ -28,14 +28,19 @@ public:
 private:
   size_t top_level;
   Coord top_left;
-  Quadrant *root;
+  MacroCell *root;
 
   vector<unordered_set<MacroCell>> macrocell_sets;
   unordered_set<MiniCell> minicells;
   vector<Quadrant*> zeros;
 
+
   Coord read_rle_size(QFile &file);
   void read_rle_data(QFile &file, Coord boundingbox);
+
+  MacroCell* crown(size_t level);
+  Quadrant* result(size_t level, MacroCell* macrocell_tmp);
+
 
   // Recursive setter
   Quadrant *set_rec(Coord current, size_t level, Quadrant *cell, Coord target, CellState state);
