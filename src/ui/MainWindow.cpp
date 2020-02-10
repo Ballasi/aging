@@ -22,16 +22,13 @@ MainWindow::MainWindow() {
 		for (size_t l = 0; l < map->getHeight(); ++l)
 			map->changeCellState(c,l,c % 3);
 	*/
-	hashlife_universe = new Universe(Coord(0,0),3);
-
-	hashlife_universe->debug();
+	game = nullptr;
+	hashlife_universe = new Universe(3);
 
 	hashlife_universe->set(Coord(0,0),1);
 	hashlife_universe->set(Coord(0,7),1);
 	hashlife_universe->set(Coord(7,0),1);
 	hashlife_universe->set(Coord(7,7),1);
-
-	hashlife_universe->debug();
 
 	createUI();
 	stepTimer = new QTimer(this);
@@ -116,19 +113,33 @@ void MainWindow::playPause(){
 void MainWindow::updateStatusBar(){
 	std::string s;
 	s += "Generation : ";
-	//s += std::to_string(game->getGeneration());
+	if(game != nullptr)
+		s += std::to_string(game->getGeneration());
+	else if(hashlife_universe != nullptr)
+		//TODO: Show number of generations
 	statusBar()->showMessage(QString(s.c_str()));
 }
 
 void MainWindow::stepSimulation(){
-	game->nextGeneration();
+	if(game != nullptr)
+		game->nextGeneration();
+	else if(hashlife_universe != nullptr)
+		//TODO: Step hashlife universe
 	r_area->update();
 	updateStatusBar();
 }
 
 void MainWindow::load(){
 	QString fileName = QFileDialog::getOpenFileName(this, "Open File","","Run Length Encoded (*.rle)");
-	game->loadRLE(fileName);
+	if(game != nullptr) {
+		game->loadRLE(fileName);
+	} else if(hashlife_universe != nullptr) {
+		delete hashlife_universe;
+		hashlife_universe = new Universe(fileName);
+		delete r_area;
+		r_area = new RenderArea(this,hashlife_universe);
+		setCentralWidget(r_area);
+	}
 	updateStatusBar();
 
 }

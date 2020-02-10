@@ -2,9 +2,8 @@
 #include "cell/MiniCell.hpp"
 #include <vector>
 
-Universe::Universe(size_t level): Universe(Coord(), level) {}
 
-Universe::Universe(Coord top_left, size_t top_level)
+Universe::Universe(size_t top_level, Coord top_left)
   : top_left(top_left), top_level(top_level) {
   // Starting with one extra level
   macrocell_sets.resize(top_level);
@@ -15,8 +14,88 @@ Universe::Universe(Coord top_left, size_t top_level)
   root = (MacroCell*) zeros.back();
 }
 
+Universe::Universe(QString filename,Coord top_left)
+: top_left(top_left) {
+
+  QFile file(filename);
+  if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) return;
+
+  Coord boundingbox = read_rle_size(file);
+  cout << "Creating a new hashlife universe of level " << top_level << '\n';
+  // Starting with one extra level
+  macrocell_sets.resize(top_level);
+  zeros.push_back((Quadrant*) minicell());
+  for (size_t i = 1; i < top_level; ++i) {
+    zeros.push_back((Quadrant*) macrocell(i));
+  }
+  root = zeros.back();
+
+  read_rle_data(file,boundingbox);
+}
+
 void Universe::debug() {
   ((Quadrant*)root)->debug(top_level);
+}
+
+Coord Universe::read_rle_size(QFile &file) {
+  while(!file.atEnd())
+  {
+    QByteArray line = file.readLine();
+    if(line[0] == '#'){
+      continue;
+    }
+    if(line[0] == 'x'){
+      QList<QByteArray> list = line.split(',');
+      int width = ((list[0].split('='))[1].simplified()).toInt();
+      int height = ((list[1].split('='))[1].simplified()).toInt();
+      top_level = (width > height) ? (size_t) log2(width) + 1 : (size_t) log2(height) + 1;
+      return Coord(width,height);
+    }
+  }
+  return 6;
+}
+void Universe::read_rle_data(QFile &file, Coord boundingbox){
+  
+  QByteArray data("");
+  while(!file.atEnd()) {
+    QByteArray line = file.readLine();
+    cout << line.toStdString() << '\n';
+    data.append(line);
+  }
+  
+  data = data.simplified();
+
+  int init_x = (1 << (top_level - 1)) - (int) boundingbox.x/2;
+  int init_y = (1 << (top_level - 1)) - (int) boundingbox.y/2;
+  int curr_x = init_x;
+  int curr_y = init_y;
+
+  QByteArray qs("");
+  for(int i = 0; i < data.length(); ++i)
+  {
+    if(data[i] == '\0')
+      continue;
+    int q;
+    if(data[i] == '$'){
+      q = qs.isEmpty() ? 1 : qs.toInt();
+      curr_y += q;
+      curr_x = init_x;
+      qs.clear();
+    }
+    if(data[i] >= '0' && data[i] <= '9'){
+      qs.append(data[i]);
+    }
+    if(data[i] == 'o' || data[i] == 'b'){
+      q = qs.isEmpty() ? 1 : qs.toInt();
+      for (int n = 0; n < q; n++) {
+        set(Coord(curr_x,curr_y),data[i] == 'o');
+        curr_x++;
+      }
+      qs.clear();
+    }
+    if(data[i] == '!')
+      break;
+  }
 }
 
 size_t Universe::step() {
@@ -195,7 +274,6 @@ Quadrant *Universe::quadrant(size_t level) {
                                  quadrant(level - 1), quadrant(level - 1));
   }
 }
-
 
 size_t Universe::get_top_level() {
   return top_level;
