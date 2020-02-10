@@ -12,22 +12,27 @@ Universe::Universe(Coord top_left, size_t top_level)
   for (size_t i = 1; i < top_level; ++i) {
     zeros.push_back((Quadrant*) macrocell(i));
   }
-  root = zeros.back();
+  root = (MacroCell*) zeros.back();
 }
 
 void Universe::debug() {
-  root->debug(top_level);
+  ((Quadrant*)root)->debug(top_level);
 }
 
 size_t Universe::step() {
-  // TODO
+  // Add of crown of empty cell
+  root = crown(top_level);
+  // Calculate result of universe
+  Quadrant *new_root = result(top_level, root);
+  // update attributes of universe
+  root = (MacroCell *)new_root;
   return 0;
 }
 
 const CellState Universe::get(Coord target) const { return *find(target); }
 
 void Universe::set(Coord target, CellState state) {
-  root = set_rec(top_left, top_level, root, target, state);
+  root = (MacroCell*) set_rec(top_left, top_level, (Quadrant*) root, target, state);
 }
 
 
@@ -81,7 +86,7 @@ Quadrant *Universe::set_rec(Coord current, size_t level, Quadrant *cell, Coord t
 }
 
 CellState *Universe::find(Coord target) const {
-  Quadrant *cell = root;
+  Quadrant *cell = (Quadrant*) root;
   Coord size(top_level - 1);
   Coord current(top_left);
   Coord center = current + size;
@@ -120,7 +125,7 @@ CellState *Universe::find(Coord target) const {
 }
 
 CellState *Universe::find_path(Coord coord, vector<Quadrant*> &path) const {
-  Quadrant *cell = root;
+  Quadrant *cell = (Quadrant*) root;
   Coord size(top_level - 1);
   Coord current(top_left);
   Coord center = current + size;
@@ -199,3 +204,85 @@ size_t Universe::get_top_level() {
 Coord Universe::get_top_left(){
   return top_left;
 }
+
+MacroCell *Universe::crown(size_t level) {
+
+  Quadrant* zero = zeros[level - 1];
+
+  MacroCell* nw = macrocell(level, zero, zero, zero, root->nw);
+  MacroCell* ne = macrocell(level, zero, zero, root->ne, zero);
+  MacroCell *sw = macrocell(level, zero, root->sw, zero, zero);
+  MacroCell *se = macrocell(level, root->se, zero, zero, zero);
+
+  return macrocell(level+1, (Quadrant *) nw, (Quadrant *) ne,
+                            (Quadrant *) sw, (Quadrant *) se);
+}
+
+Quadrant *Universe::result(size_t level, MacroCell* macrocell_tmp) {
+
+  if (macrocell_tmp->result != nullptr) return macrocell_tmp->result;
+
+  if (level <= 2) {
+    // Calcule la mini-Cell de 2x2
+    // a partir d'une macroCell de 4x4
+    // en naif
+    // TODO
+
+    return (Quadrant*) minicell();
+  } else {
+
+    // voir figure 4 de : https://www.drdobbs.com/jvm/an-algorithm-for-compressing-space-and-t/184406478
+
+    // a partir de ma macroCell de taille n,
+    // je vais faire 6 assemblages différents de macroCell de taille n-2
+    // afin de pouvoir avoir les 4 carrés centraux (de taille n-2), puis reconstruire la cellules centrale (n-1).
+    Quadrant* temp_nw = result(level-1, (MacroCell*) macrocell_tmp->nw);
+
+    Quadrant* temp_n  = result(level-1,  macrocell(level-1,
+                                                   macrocell_tmp->nw->macrocell.ne,
+                                                   macrocell_tmp->ne->macrocell.nw,
+                                                   macrocell_tmp->nw->macrocell.se,
+                                                   macrocell_tmp->ne->macrocell.sw));
+    Quadrant* temp_ne = result(level-1, (MacroCell*) macrocell_tmp->ne);
+
+    Quadrant* temp_w  = result(level-1, macrocell(level-1,
+                                                  macrocell_tmp->nw->macrocell.sw,
+                                                  macrocell_tmp->nw->macrocell.se,
+                                                  macrocell_tmp->sw->macrocell.nw,
+                                                  macrocell_tmp->sw->macrocell.ne ));
+
+    Quadrant* temp_c  = result(level-1, macrocell(level-1,
+                                                  macrocell_tmp->nw->macrocell.se,
+                                                  macrocell_tmp->ne->macrocell.sw,
+                                                  macrocell_tmp->sw->macrocell.ne,
+                                                  macrocell_tmp->se->macrocell.nw ));
+
+    Quadrant* temp_e  = result(level-1, macrocell(level-1,
+                                                  macrocell_tmp->ne->macrocell.sw,
+                                                  macrocell_tmp->ne->macrocell.se,
+                                                  macrocell_tmp->se->macrocell.nw,
+                                                  macrocell_tmp->se->macrocell.ne ));
+
+    Quadrant* temp_sw = result(level-1, (MacroCell*) macrocell_tmp->sw);
+
+    Quadrant* temp_s  = result(level-1, macrocell(level-1,
+                                                  macrocell_tmp->sw->macrocell.ne,
+                                                  macrocell_tmp->se->macrocell.nw,
+                                                  macrocell_tmp->sw->macrocell.se,
+                                                  macrocell_tmp->se->macrocell.sw ));
+
+    Quadrant* temp_se = result(level-1, (MacroCell*) macrocell_tmp->se);
+
+    Quadrant* res_nw = result(level-1, macrocell(level-1, temp_nw, temp_n , temp_w , temp_c ));
+    Quadrant* res_ne = result(level-1, macrocell(level-1, temp_n , temp_ne, temp_c , temp_e ));
+    Quadrant* res_sw = result(level-1, macrocell(level-1, temp_w , temp_c , temp_sw, temp_s ));
+    Quadrant* res_se = result(level-1, macrocell(level-1, temp_c , temp_e , temp_s , temp_se));
+
+    macrocell_tmp->result = (Quadrant*) macrocell(level-1, res_nw, res_ne, res_sw, res_se);
+
+    return macrocell_tmp->result;
+  }
+}
+
+
+
