@@ -7,13 +7,15 @@
 #include "cell.hpp"
 #include "Coord.hpp"
 #include "cell/MiniCell.hpp"
+#include <QString>
+#include <QFile>
 
 using namespace std;
 
 class Universe {
 public:
-  Universe(size_t top_level);
-  Universe(Coord top_left, size_t top_level);
+  Universe(size_t top_level, Coord top_left = Coord());
+  Universe(QString filename,Coord top_left = Coord());
 
   size_t step();
   const CellState get(Coord coord) const;
@@ -31,6 +33,9 @@ private:
   vector<unordered_set<MacroCell>> macrocell_sets;
   unordered_set<MiniCell> minicells;
   vector<Quadrant*> zeros;
+
+  Coord read_rle_size(QFile &file);
+  void read_rle_data(QFile &file, Coord boundingbox);
 
   // Recursive setter
   Quadrant *set_rec(Coord current, size_t level, Quadrant *cell, Coord target, CellState state);
@@ -52,6 +57,7 @@ private:
 
   // Quadrant
   Quadrant *quadrant(size_t level);
+
 };
 
 #endif // UNIVERSE_HPP
