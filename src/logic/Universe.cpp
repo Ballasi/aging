@@ -31,6 +31,7 @@ Universe::Universe(QString filename,Coord top_left)
   root = (MacroCell*) zeros.back();
 
   read_rle_data(file,boundingbox);
+  file.close();
 }
 
 void Universe::debug() {
@@ -102,10 +103,10 @@ size_t Universe::step() {
   // Add of crown of empty cell
   root = crown(top_level);
   // Calculate result of universe
-  Quadrant *new_root = result(top_level, root);
+  Quadrant *new_root = result(top_level + 1, root);
   // update attributes of universe
   root = (MacroCell *)new_root;
-  return 0;
+  return 1 << top_level;
 }
 
 const CellState Universe::get(Coord target) const { return *find(target); }

@@ -43,6 +43,8 @@ void MainWindow::createUI() {
 	r_area = new RenderArea(this,hashlife_universe);
 	setCentralWidget(r_area);
 
+	r_area->setCursor(Qt::ArrowCursor);
+
 	//Simulation control toolbar
 	QToolBar *controlToolbar = addToolBar("Simulation Controls");
 	addToolBar(Qt::LeftToolBarArea, controlToolbar);
@@ -73,13 +75,13 @@ void MainWindow::createUI() {
 	toolboxGroup->addButton(eraserButton);
 	toolboxToolbar->addWidget(eraserButton);
 
-	QToolButton *zoominButton = new QToolButton(toolboxToolbar);
+	zoominButton = new QToolButton(toolboxToolbar);
 	zoominButton->setIcon(QIcon("../res/icons/zoom-in.svg"));
 	zoominButton->setCheckable(true);
 	toolboxGroup->addButton(zoominButton);
 	toolboxToolbar->addWidget(zoominButton);
 
-	QToolButton *zoomoutButton = new QToolButton(toolboxToolbar);
+	zoomoutButton = new QToolButton(toolboxToolbar);
 	zoomoutButton->setIcon(QIcon("../res/icons/zoom-out.svg"));
 	zoomoutButton->setCheckable(true);
 	toolboxGroup->addButton(zoomoutButton);
@@ -152,5 +154,16 @@ MainWindow::~MainWindow() {
 
 void MainWindow::keyPressEvent(QKeyEvent *event){
 	r_area->handleInput(event);
+}
+
+void MainWindow::mousePressEvent(QMouseEvent *event) {
+	if(r_area->underMouse()){
+		QPoint pos = event->pos();
+		if(zoominButton->isChecked())
+			r_area->zoomin_event(r_area->mapFromParent(pos));
+		else if(zoomoutButton->isChecked())
+			r_area->zoomout_event(r_area->mapFromParent(pos));
+		r_area->update();
+	}
 }
 

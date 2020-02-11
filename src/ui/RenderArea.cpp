@@ -129,8 +129,11 @@ void RenderArea::wheelEvent(QWheelEvent *event) {
 	camera->set_zoom(camera->get_zoom() - event->delta() / 100.0f);
 	update();
 }
-void RenderArea::mousePressEvent(QMouseEvent *event){
-	update();
+void RenderArea::zoomin_event(QPoint origin) {
+	camera->set_zoom(camera->get_zoom() / 2);
+}
+void RenderArea::zoomout_event(QPoint origin) {
+	camera->set_zoom(camera->get_zoom() * 2);
 }
 
 void RenderArea::handleInput(QKeyEvent *event) {
@@ -149,10 +152,10 @@ void RenderArea::handleInput(QKeyEvent *event) {
 		camera->pos.setX(camera->pos.x() + 0.08f);
 		break;
 	case Qt::Key_Plus:
-		camera->set_zoom(camera->get_zoom() / 2);
+		zoomin_event(QPoint(0,0));
 		break;
 	case Qt::Key_Minus:
-		camera->set_zoom(camera->get_zoom() * 2);
+		zoomout_event(QPoint(0,0));
 		break;
 	
 	default:
