@@ -131,9 +131,11 @@ void RenderArea::wheelEvent(QWheelEvent *event) {
 }
 void RenderArea::zoomin_event(QPoint origin) {
 	camera->set_zoom(camera->get_zoom() / 2);
+	update();
 }
 void RenderArea::zoomout_event(QPoint origin) {
 	camera->set_zoom(camera->get_zoom() * 2);
+	update();
 }
 
 void RenderArea::handleInput(QKeyEvent *event) {

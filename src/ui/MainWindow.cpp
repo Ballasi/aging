@@ -163,7 +163,6 @@ void MainWindow::mousePressEvent(QMouseEvent *event) {
 			r_area->zoomin_event(r_area->mapFromParent(pos));
 		else if(zoomoutButton->isChecked())
 			r_area->zoomout_event(r_area->mapFromParent(pos));
-		r_area->update();
 	}
 }
 
