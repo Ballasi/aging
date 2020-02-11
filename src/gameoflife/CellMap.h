@@ -5,22 +5,13 @@
 #include <cstdint>
 #include <cstring>
 
-#define LIVING_BIT          0b01
-#define NEIGHBOR_COUNT_BITS 0b10
 typedef uint8_t Cell;
 
 class Game;
 
 /*
- * Cells are a byte long.
- * They are defined as followed:
- *    ...a aaab
- * where .s are not used,
- *       as are the neighbour count,
- *       b  is the state of the cell (1 means alive).
- * The difference between this version and the old one is that the neighbour
- * count is only calculated when making up a new generation.
- * This allows us to not use the temp_cells array.
+  Cells are memorized in a 8 bit type format.
+  Each bits of this byte corresponds to the living state of the cell.
  */
 
 class CellMap
@@ -42,7 +33,7 @@ private:
   size_t width;
   size_t height;
   size_t length_in_bytes;
-  void updateNeighbourCount();
+  void updateNeighbourCount(uint8_t* neighbour_count);
 };
 
 #endif // __CELLMAP_H

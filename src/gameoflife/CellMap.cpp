@@ -1,16 +1,14 @@
 #include "CellMap.h"
 #include "Game.h"
 
-
 CellMap::CellMap(Game* g, size_t w, size_t h)
-  : game(g), width(w), height(h), length_in_bytes(w * h) {
+  : game(g), width(w + 8 - w % 8), height(h), length_in_bytes((w + 7) * h / 8) {
   // Adding () calls constructor for every Cell in the array
   cells = new Cell[length_in_bytes]();
 }
 
-
 CellMap::CellMap(size_t w, size_t h)
-  :width(w), height(h), length_in_bytes(w * h) {
+  : width(w + w % 8), height(h), length_in_bytes((w + 7) * h / 8) {
   // Adding () calls constructor for every Cell in the array
   cells = new Cell[length_in_bytes]();
 }
@@ -19,107 +17,82 @@ CellMap::~CellMap() {
   delete[] cells;
 }
 
-void CellMap::clear(){
+void CellMap::clear() {
   for(size_t i = 0; i < length_in_bytes; ++i)
     cells[i] = 0;
 }
 
 void CellMap::changeCellState(size_t c, size_t l, int toAlive) {
-  Cell* cell_ptr = cells + (l * width) + c;
+  Cell* cell_ptr = cells + (l * width / 8) + (c + 7) / 8;
 
   if (toAlive)
-    *(cell_ptr) |= LIVING_BIT;
+    *(cell_ptr) |= 1 << (c % 8);
   else
-    *(cell_ptr) &= ~LIVING_BIT;
+    *(cell_ptr) &= ~(1 << (c % 8));
 }
 
 int CellMap::isAlive(size_t c, size_t l) {
-  return *(cells + (l * width) + c) & LIVING_BIT;
+  return (*(cells + l * width / 8 + (c + 7) / 8) >> (c % 8)) & 0b01;
 }
 
 void CellMap::nextGeneration() {
-  updateNeighbourCount();
+  uint8_t neighbour_count[(width + 1) * height / 2];
+  memset(neighbour_count, 0, (width + 1) * height / 2);
+  updateNeighbourCount(neighbour_count);
 
   size_t w = width, h = height;
-  Cell* cell_ptr;
 
-  cell_ptr = cells;
+  uint8_t* count_ptr = neighbour_count;
   for (size_t l = 0; l < h; ++l)
   {
     for (size_t c = 0; c < w; ++c)
     {
-      if (*cell_ptr != 0)
+      size_t neighbours = *(neighbour_count + l * width / 2 + (c + 1) / 2) >> ((c % 2) * 4) & 0b1111;
+      if (isAlive(c, l))
       {
-        size_t neighbours = *cell_ptr >> 1;
-        if (*cell_ptr & LIVING_BIT)
-        {
-          // TODO: adapt the game's rules
-          if ((neighbours != 2) && (neighbours != 3))
-          {
-            changeCellState(c, l, 0);
-          }
-        }
-        else
-        {
-          // TODO: adapt the game's rules
-          if (neighbours == 3)
-          {
-            changeCellState(c, l, 1);
-          }
-        }
+        if ((neighbours != 2) && (neighbours != 3))
+          changeCellState(c, l, 0);
       }
-      ++cell_ptr;
+      else
+      {
+        if (neighbours == 3)
+          changeCellState(c, l, 1);
+      }
     }
   }
 }
 
-void CellMap::updateNeighbourCount() {
-  Cell* cell_ptr;
+void CellMap::updateNeighbourCount(uint8_t* neighbour_count) {
   size_t w = width, h = height;
 
-  // we clear previous neighbour calculations
-  cell_ptr = cells;
-  for (size_t i = 0; i < length_in_bytes; ++i)
-  {
-    *(cell_ptr) &= LIVING_BIT;
-    ++cell_ptr;
-  }
-
-  // and we calculate the neighbour count
-  cell_ptr = cells;
   for (size_t l = 0; l < h; ++l)
   {
     for (size_t c = 0; c < w; ++c)
     {
-      if (*cell_ptr & LIVING_BIT)
+      if (isAlive(c, l))
       {
-        if (c > 0 && l > 0)
-          *(cell_ptr - w - 1) += NEIGHBOR_COUNT_BITS; // top left
-        if (l > 0)
-          *(cell_ptr - w) += NEIGHBOR_COUNT_BITS; // top
-        if (c < w - 1 && l > 0)
-          *(cell_ptr - w + 1) += NEIGHBOR_COUNT_BITS; // top right
-        if (c > 0)
-          *(cell_ptr - 1) += NEIGHBOR_COUNT_BITS; // left
-        if (c < w - 1)
-          *(cell_ptr + 1) += NEIGHBOR_COUNT_BITS; // right
-        if (c > 0 && l < h - 1)
-          *(cell_ptr + w - 1) += NEIGHBOR_COUNT_BITS; // below left
-        if (l < h - 1)
-          *(cell_ptr + w) += NEIGHBOR_COUNT_BITS; // below
-        if (c < w - 1 && l < h - 1)
-          *(cell_ptr + w + 1) += NEIGHBOR_COUNT_BITS; // below right
+        size_t count = 0;
+        if (c > 0 && l > 0) // top left
+          *(neighbour_count + (l - 1) * w / 2 + c / 2) += 1 << (((c + 1) % 2) * 4);
+        if (l > 0) // top
+          *(neighbour_count + (l - 1) * w / 2 + (c + 1) / 2) += 1 << ((c % 2) * 4);
+        if (c < w - 1 && l > 0) // top right
+          *(neighbour_count + (l - 1) * w / 2 + c / 2 + 1) += 1 << (((c + 1) % 2) * 4);
+        if (c > 0) // left
+          *(neighbour_count + l * w / 2 + c / 2) += 1 << (((c + 1) % 2) * 4);
+        if (c < w - 1) // right
+          *(neighbour_count + l * w / 2 + c / 2 + 1) += 1 << (((c + 1) % 2) * 4);
+        if (c > 0 && l < h - 1) // below left
+          *(neighbour_count + (l + 1) * w / 2 + c / 2) += 1 << (((c + 1) % 2) * 4);
+        if (l < h - 1) // below
+          *(neighbour_count + (l + 1) * w / 2 + (c + 1) / 2) += 1 << ((c % 2) * 4);
+        if (c < w - 1 && l < h - 1) // below right
+          *(neighbour_count + (l + 1) * w / 2 + c / 2 + 1) += 1 << (((c + 1) % 2) * 4);
       }
-      ++cell_ptr;
     }
   }
 }
 
+size_t CellMap::getWidth() { return width; }
 
-size_t CellMap::getWidth() {
-  return width;
-}
-
-size_t CellMap::getHeight() {
-  return height;
-}
+size_t CellMap::getHeight() { return height; }
