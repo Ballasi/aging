@@ -32,13 +32,19 @@ private:
 
   vector<unordered_set<MacroCell>> macrocell_sets;
   unordered_set<MiniCell> minicells;
+  // TODO: Decide if we keep or not
   vector<Quadrant*> zeros;
 
 
+  // File loading
   Coord read_rle_size(QFile &file);
   void read_rle_data(QFile &file, Coord boundingbox);
 
-  MacroCell* crown(size_t level);
+  // TODO find good name
+  void assert_handles(size_t asserted_level);
+
+  // Step helpers
+  MacroCell* crown();
   Quadrant* result(size_t level, MacroCell* macrocell_tmp);
 
 
@@ -62,7 +68,6 @@ private:
 
   // Quadrant
   Quadrant *quadrant(size_t level);
-
 };
 
 #endif // UNIVERSE_HPP

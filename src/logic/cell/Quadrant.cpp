@@ -31,7 +31,7 @@ Quadrant *Quadrant::raw_generate_random(size_t level,
 }
 
 void Quadrant::debug_rec(size_t level, std::string indentation) {
-  if (level == 1) {
+  if (level <= 1) {
     std::cout << indentation << "(Quadrant *) new MiniCell(" << minicell.nw << ", "
               << minicell.ne << ", " << minicell.sw << ", " << minicell.se
               << ")";

@@ -124,9 +124,12 @@ void MainWindow::updateStatusBar(){
 void MainWindow::stepSimulation(){
 	if(game != nullptr)
 		game->nextGeneration();
-	else if(hashlife_universe != nullptr)
-		hashlife_universe->step();
-	r_area->update();
+	else if(hashlife_universe != nullptr) {
+    hashlife_universe->debug();
+    hashlife_universe->step();
+    hashlife_universe->debug();
+  }
+  r_area->update();
 	updateStatusBar();
 }
 
