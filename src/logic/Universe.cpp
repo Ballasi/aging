@@ -1,5 +1,4 @@
 #include "Universe.hpp"
-#include "cell/MiniCell.hpp"
 #include <unordered_set>
 #include <vector>
 
@@ -32,7 +31,8 @@ Universe::Universe(QString filename, Coord top_left)
   }
   root = (MacroCell*) zeros.back();
 
-  read_rle_data(file, boundingbox);
+  read_rle_data(file,boundingbox);
+  file.close();
 }
 
 void Universe::debug() {
@@ -316,6 +316,7 @@ Quadrant *Universe::result(size_t level, MacroCell* macrocell_tmp) {
 
   if (level <= 2) {
     cout << "0" << endl;
+    ( (Quadrant*)macrocell_tmp )->debug(level);
     int nb_nw =  macrocell_tmp->nw->minicell.nw + macrocell_tmp->nw->minicell.ne + macrocell_tmp->ne->minicell.nw  +
                  macrocell_tmp->nw->minicell.sw +                                  macrocell_tmp->ne->minicell.sw  +
                  macrocell_tmp->sw->minicell.nw + macrocell_tmp->sw->minicell.ne + macrocell_tmp->se->minicell.nw;
