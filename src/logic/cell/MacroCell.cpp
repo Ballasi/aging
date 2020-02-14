@@ -2,7 +2,7 @@
 
 MacroCell::MacroCell(Quadrant *nw, Quadrant *ne,
                      Quadrant *sw, Quadrant *se)
-  : nw(nw), ne(ne), sw(sw), se(se) {}
+  : nw(nw), ne(ne), sw(sw), se(se), result() {}
 
 
 bool MacroCell::operator==(const MacroCell other) const {
