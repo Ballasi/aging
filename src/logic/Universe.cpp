@@ -314,28 +314,24 @@ Quadrant *Universe::result(size_t level, MacroCell *macrocell_tmp) {
 
   if (level == 2) {
     int nb_nw =
-        macrocell_tmp->nw->minicell.nw + macrocell_tmp->nw->minicell.ne +
-        macrocell_tmp->ne->minicell.nw + macrocell_tmp->nw->minicell.sw +
-        macrocell_tmp->ne->minicell.sw + macrocell_tmp->sw->minicell.nw +
-        macrocell_tmp->sw->minicell.ne + macrocell_tmp->se->minicell.nw;
+        macrocell_tmp->nw->minicell.nw + macrocell_tmp->nw->minicell.ne + macrocell_tmp->ne->minicell.nw +
+        macrocell_tmp->nw->minicell.sw +                                  macrocell_tmp->ne->minicell.sw +
+        macrocell_tmp->sw->minicell.nw + macrocell_tmp->sw->minicell.ne + macrocell_tmp->se->minicell.nw;
 
     int nb_ne =
-        macrocell_tmp->nw->minicell.ne + macrocell_tmp->ne->minicell.nw +
-        macrocell_tmp->ne->minicell.ne + macrocell_tmp->nw->minicell.se +
-        macrocell_tmp->ne->minicell.se + macrocell_tmp->sw->minicell.ne +
-        macrocell_tmp->se->minicell.nw + macrocell_tmp->se->minicell.ne;
+        macrocell_tmp->nw->minicell.ne + macrocell_tmp->ne->minicell.nw + macrocell_tmp->ne->minicell.ne +
+        macrocell_tmp->nw->minicell.se +                                  macrocell_tmp->ne->minicell.se +
+        macrocell_tmp->sw->minicell.ne + macrocell_tmp->se->minicell.nw + macrocell_tmp->se->minicell.ne;
 
     int nb_sw =
-        macrocell_tmp->nw->minicell.sw + macrocell_tmp->nw->minicell.se +
-        macrocell_tmp->ne->minicell.sw + macrocell_tmp->sw->minicell.nw +
-        macrocell_tmp->se->minicell.nw + macrocell_tmp->sw->minicell.sw +
-        macrocell_tmp->sw->minicell.se + macrocell_tmp->se->minicell.sw;
+        macrocell_tmp->nw->minicell.sw + macrocell_tmp->nw->minicell.se + macrocell_tmp->ne->minicell.sw +
+        macrocell_tmp->sw->minicell.nw +                                  macrocell_tmp->se->minicell.nw +
+        macrocell_tmp->sw->minicell.sw + macrocell_tmp->sw->minicell.se + macrocell_tmp->se->minicell.sw;
 
     int nb_se =
-        macrocell_tmp->nw->minicell.se + macrocell_tmp->ne->minicell.sw +
-        macrocell_tmp->ne->minicell.se + macrocell_tmp->sw->minicell.ne +
-        macrocell_tmp->se->minicell.ne + macrocell_tmp->sw->minicell.se +
-        macrocell_tmp->se->minicell.sw + macrocell_tmp->se->minicell.se;
+        macrocell_tmp->nw->minicell.se + macrocell_tmp->ne->minicell.sw + macrocell_tmp->ne->minicell.se +
+        macrocell_tmp->sw->minicell.ne +                                  macrocell_tmp->se->minicell.ne +
+        macrocell_tmp->sw->minicell.se + macrocell_tmp->se->minicell.sw + macrocell_tmp->se->minicell.se;
 
     CellState new_nw;
     CellState new_ne;
@@ -410,7 +406,7 @@ Quadrant *Universe::result(size_t level, MacroCell *macrocell_tmp) {
     }
 
     macrocell_tmp->result =
-        (Quadrant *)minicell(new_nw, new_ne, new_se, new_sw);
+        (Quadrant *)minicell(new_nw, new_ne, new_sw, new_se);
     return macrocell_tmp->result;
   } else {
 
