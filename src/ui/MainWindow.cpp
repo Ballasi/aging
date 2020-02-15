@@ -1,5 +1,6 @@
 #include "MainWindow.h"
 #include "../logic/Universe.hpp"
+#include "../logic/HashlifeUniverse/HashlifeUniverse.hpp"
 
 #include <iostream>
 #include <QToolBar>
@@ -23,7 +24,7 @@ MainWindow::MainWindow() {
 			map->changeCellState(c,l,c % 3);
 	*/
 	game = nullptr;
-	hashlife_universe = new Universe(3);
+	hashlife_universe = new HashlifeUniverse(3);
 
 	hashlife_universe->set(Coord(0,0),1);
 	hashlife_universe->set(Coord(0,7),1);
@@ -100,7 +101,7 @@ void MainWindow::createUI() {
 	menuBar()->addMenu(prefMenu);
 }
 
-void MainWindow::playPause(){
+void MainWindow::playPause() {
 
 	simulationRunning = !simulationRunning;
 	if(simulationRunning) {
@@ -113,7 +114,7 @@ void MainWindow::playPause(){
 
 }
 
-void MainWindow::updateStatusBar(){
+void MainWindow::updateStatusBar() {
 	std::string s;
 	s += "Generation : ";
 	if(game != nullptr)
@@ -123,25 +124,23 @@ void MainWindow::updateStatusBar(){
 	statusBar()->showMessage(QString(s.c_str()));
 }
 
-void MainWindow::stepSimulation(){
+void MainWindow::stepSimulation() {
 	if(game != nullptr)
-		game->nextGeneration();
+		 game->nextGeneration();
 	else if(hashlife_universe != nullptr) {
-    hashlife_universe->debug();
-    hashlife_universe->step();
-    hashlife_universe->debug();
+      hashlife_universe->step();
   }
   r_area->update();
 	updateStatusBar();
 }
 
-void MainWindow::load(){
+void MainWindow::load() {
 	QString fileName = QFileDialog::getOpenFileName(this, "Open File","","Run Length Encoded (*.rle)");
 	if(game != nullptr) {
 		game->loadRLE(fileName);
 	} else if(hashlife_universe != nullptr) {
 		delete hashlife_universe;
-		hashlife_universe = new Universe(fileName);
+		hashlife_universe = new HashlifeUniverse(fileName);
 		delete r_area;
 		r_area = new RenderArea(this,hashlife_universe);
 		setCentralWidget(r_area);
@@ -155,7 +154,7 @@ MainWindow::~MainWindow() {
 }
 
 
-void MainWindow::keyPressEvent(QKeyEvent *event){
+void MainWindow::keyPressEvent(QKeyEvent *event) {
 	r_area->handleInput(event);
 }
 

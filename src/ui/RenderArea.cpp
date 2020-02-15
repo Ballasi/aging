@@ -61,7 +61,6 @@ void RenderArea::resizeGL(int w, int h) {
 }
 
 void RenderArea::paintGL() {
-	std::cout << "Refreshed OpenGL display" << '\n';
 
 	const qreal retinaScale = devicePixelRatio();
 	glViewport(0, 0, width() * retinaScale, height() * retinaScale);
@@ -84,7 +83,6 @@ void RenderArea::paintGL() {
 
 	glDisableVertexAttribArray(0);
 	m_program->release();
-	
 }
 
 void RenderArea::render_gol(QMatrix4x4 &matrix) {
@@ -116,7 +114,6 @@ void RenderArea::render_hashlife(QMatrix4x4 &matrix) {
 		for(size_t l = 0; l < (1 << level); l++) {
 			matrix.translate(0.0f,-1.0f,0.0f);
 			if(hashlife_universe->get(Coord(c,l)) == 1){
-				std::cout << "Alive cell at : (" << c << "," << l << ")" << '\n';
 				m_program->setUniformValue(m_matrixUniform, matrix);
 				glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0);
 			}
