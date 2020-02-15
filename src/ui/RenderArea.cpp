@@ -113,7 +113,7 @@ void RenderArea::render_hashlife(QMatrix4x4 &matrix) {
 		matrix.translate(1.0f,0.0f,0.0f);
 		for(size_t l = 0; l < (1 << level); l++) {
 			matrix.translate(0.0f,-1.0f,0.0f);
-			if(hashlife_universe->get(Coord(c,l)) == 1){
+			if(hashlife_universe->get(Coord(c,l)) == 1) {
 				m_program->setUniformValue(m_matrixUniform, matrix);
 				glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0);
 			}

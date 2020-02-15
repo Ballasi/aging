@@ -13,6 +13,8 @@ public:
   MiniCell(CellState nw, CellState ne, CellState sw, CellState se);
 
   bool operator==(const MiniCell other) const;
+  CellState operator[](const size_t index) const;
+
   friend std::hash<MiniCell>;
   friend Quadrant;
 

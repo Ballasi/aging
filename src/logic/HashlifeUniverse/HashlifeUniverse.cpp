@@ -103,22 +103,42 @@ void HashlifeUniverse::assert_handles(size_t asserted_level) {
     size_t previous_asserted_level = macrocell_sets.size() - 1;
 
     macrocell_sets.resize(asserted_level + 1);
-    for (size_t level = previous_asserted_level + 1; level <= asserted_level;
-         ++level)
+    for (size_t level = previous_asserted_level + 1;
+         level <= asserted_level; ++level)
       zeros.push_back((Quadrant *)macrocell(level));
   }
 }
 
 void HashlifeUniverse::step() {
   // Assert that the creation of higher level is possible
-  assert_handles(top_level + 1);
+  assert_handles(top_level + 2);
   // Add of crown of empty cell
-  root = crown();
+  crown();
+  crown();
   // Calculate result of universe
-  Quadrant *new_root = result(top_level + 1, root);
+  root = (MacroCell *)result(top_level--, root);
 
-  // update attributes of universe
-  root = (MacroCell *)new_root;
+  Quadrant *z = zeros[top_level - 2];
+
+  // Checking for crown
+  if (root->nw->macrocell.se == z &&
+      root->nw->macrocell.nw == z &&
+      root->nw->macrocell.ne == z &&
+      root->ne->macrocell.nw == z &&
+      root->ne->macrocell.ne == z &&
+      root->ne->macrocell.se == z &&
+      root->se->macrocell.ne == z &&
+      root->se->macrocell.se == z &&
+      root->se->macrocell.sw == z &&
+      root->sw->macrocell.se == z &&
+      root->sw->macrocell.sw == z &&
+      root->sw->macrocell.nw == z) {
+    top_level--;
+    root = macrocell(top_level, root->nw->macrocell.se, root->ne->macrocell.sw,
+                     root->sw->macrocell.ne, root->se->macrocell.nw);
+  } else {
+    top_left -= Coord(top_level - 2);
+  }
 }
 
 const CellState HashlifeUniverse::get(Coord target) const { return *find(target); }
@@ -294,7 +314,7 @@ size_t HashlifeUniverse::get_top_level() { return top_level; }
 
 Coord HashlifeUniverse::get_top_left() { return top_left; }
 
-MacroCell *HashlifeUniverse::crown() {
+void HashlifeUniverse::crown() {
 
   Quadrant *zero = zeros[top_level - 1];
 
@@ -303,7 +323,10 @@ MacroCell *HashlifeUniverse::crown() {
   MacroCell *sw = macrocell(top_level, zero, root->sw, zero, zero);
   MacroCell *se = macrocell(top_level, root->se, zero, zero, zero);
 
-  return macrocell(top_level + 1, (Quadrant *)nw, (Quadrant *)ne,
+
+  top_level ++;
+  root = macrocell(top_level,
+                   (Quadrant *)nw, (Quadrant *)ne,
                    (Quadrant *)sw, (Quadrant *)se);
 }
 

@@ -10,6 +10,7 @@
 #include "../Universe.hpp"
 
 #include "../Coord.hpp"
+#include "../Rect.hpp"
 #include "cell/MiniCell.hpp"
 #include "cell/MacroCell.hpp"
 #include "cell/Quadrant.hpp"
@@ -19,15 +20,19 @@ using namespace std;
 class HashlifeUniverse: public Universe {
 public:
   HashlifeUniverse(size_t top_level, Coord top_left = Coord());
-  HashlifeUniverse(QString filename,Coord top_left = Coord());
+  HashlifeUniverse(QString filename, Coord top_left = Coord());
 
   void step();
   const CellState get(Coord coord) const;
   void set(Coord target, CellState state);
   void debug();
 
+  class Iterator;
+  Iterator iter(Rect bounds);
+
   Coord get_top_left();
   size_t get_top_level();
+
 
 private:
   size_t top_level;
@@ -36,7 +41,6 @@ private:
 
   vector<unordered_set<MacroCell>> macrocell_sets;
   unordered_set<MiniCell> minicells;
-  // TODO: Decide if we keep or not
   vector<Quadrant*> zeros;
 
 
@@ -48,7 +52,7 @@ private:
   void assert_handles(size_t asserted_level);
 
   // Step helpers
-  MacroCell* crown();
+  void crown();
   Quadrant* result(size_t level, MacroCell* macrocell_tmp);
 
 
