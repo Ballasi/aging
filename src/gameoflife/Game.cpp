@@ -33,7 +33,6 @@ void Game::loadRLE(QString filename){
       return;
     int width = 0;
     int height = 0;
-    int nb = 0;
     QByteArray data("");
     while(!file.atEnd())
     {
@@ -43,8 +42,8 @@ void Game::loadRLE(QString filename){
       }
       if(line[0] == 'x'){
         QList<QByteArray> list = line.split(',');
-        int width = ((list[0].split('='))[1].simplified()).toInt();
-        int height = ((list[1].split('='))[1].simplified()).toInt();
+        width = ((list[0].split('='))[1].simplified()).toInt();
+        height = ((list[1].split('='))[1].simplified()).toInt();
         continue;
       }
       data.append(line);

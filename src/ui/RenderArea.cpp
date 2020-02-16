@@ -45,7 +45,8 @@ void RenderArea::initializeGL() {
 	
 	camera->pos.setX(0.0f);
 	camera->pos.setY(0.0f);
-	camera->set_zoom(1.0f);
+	if(hashlife_universe != nullptr)
+		camera->set_zoom(1 << (hashlife_universe->get_top_level() + 1));
 
 	glClearColor(0.0f,0.0f,0.0f,1.0f);
 	glDepthMask(0);
@@ -60,7 +61,6 @@ void RenderArea::resizeGL(int w, int h) {
 }
 
 void RenderArea::paintGL() {
-	std::cout << "Refreshed OpenGL display" << '\n';
 
 	const qreal retinaScale = devicePixelRatio();
 	glViewport(0, 0, width() * retinaScale, height() * retinaScale);
@@ -83,7 +83,6 @@ void RenderArea::paintGL() {
 
 	glDisableVertexAttribArray(0);
 	m_program->release();
-	
 }
 
 void RenderArea::render_gol(QMatrix4x4 &matrix) {
@@ -114,8 +113,7 @@ void RenderArea::render_hashlife(QMatrix4x4 &matrix) {
 		matrix.translate(1.0f,0.0f,0.0f);
 		for(size_t l = 0; l < (1 << level); l++) {
 			matrix.translate(0.0f,-1.0f,0.0f);
-			if(hashlife_universe->get(Coord(c,l)) == 1){
-				std::cout << "Alive cell at : (" << c << "," << l << ")" << '\n';
+			if(hashlife_universe->get(Coord(c,l)) == 1) {
 				m_program->setUniformValue(m_matrixUniform, matrix);
 				glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0);
 			}
@@ -128,7 +126,12 @@ void RenderArea::wheelEvent(QWheelEvent *event) {
 	camera->set_zoom(camera->get_zoom() - event->delta() / 100.0f);
 	update();
 }
-void RenderArea::mousePressEvent(QMouseEvent *event){
+void RenderArea::zoomin_event(QPoint origin) {
+	camera->set_zoom(camera->get_zoom() / 2);
+	update();
+}
+void RenderArea::zoomout_event(QPoint origin) {
+	camera->set_zoom(camera->get_zoom() * 2);
 	update();
 }
 
@@ -148,10 +151,10 @@ void RenderArea::handleInput(QKeyEvent *event) {
 		camera->pos.setX(camera->pos.x() + 0.08f);
 		break;
 	case Qt::Key_Plus:
-		camera->set_zoom(camera->get_zoom() / 2);
+		zoomin_event(QPoint(0,0));
 		break;
 	case Qt::Key_Minus:
-		camera->set_zoom(camera->get_zoom() * 2);
+		zoomout_event(QPoint(0,0));
 		break;
 	
 	default:

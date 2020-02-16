@@ -1,57 +1,33 @@
 #ifndef UNIVERSE_HPP
 #define UNIVERSE_HPP
 
-#include <unordered_set>
-#include <vector>
-
-#include "cell.hpp"
 #include "Coord.hpp"
-#include "cell/MiniCell.hpp"
+#include "RLE.hpp"
+#include "CellState.hpp"
 
-using namespace std;
+#include <QString>
 
+// Universal Universe interface
 class Universe {
 public:
-  Universe(size_t top_level);
-  Universe(Coord top_left, size_t top_level);
+  Universe(size_t top_level, Coord top_left) {};
+  Universe(QString filename, Coord top_left = Coord()) {}
 
-  size_t step();
-  const CellState get(Coord coord) const;
-  void set(Coord target, CellState state);
-  void debug();
+  // To use in the futur
+  // Universe(RLE rle, Coord top_left = 0) {}
 
-  Coord get_top_left();
-  size_t get_top_level();
+  // Makes a step in the simulation
+  virtual void step() = 0;
 
-private:
-  size_t top_level;
-  Coord top_left;
-  Quadrant *root;
 
-  vector<unordered_set<MacroCell>> macrocell_sets;
-  unordered_set<MiniCell> minicells;
-  vector<Quadrant*> zeros;
+  virtual const CellState get(Coord coord) const = 0;
+  virtual void set(Coord, CellState) = 0;
 
-  // Recursive setter
-  Quadrant *set_rec(Coord current, size_t level, Quadrant *cell, Coord target, CellState state);
+  virtual Coord get_top_left() = 0;
+  virtual size_t get_top_level() = 0;
 
-  // Finding
-  CellState *find(Coord) const;
-  CellState *find_path(Coord coord, vector<Quadrant*> &path) const;
-
-  // Minicells
-  MiniCell *minicell();
-  MiniCell *minicell(CellState nw, CellState ne,
-                     CellState sw, CellState se);
-
-  // Macrocells
-  MacroCell *macrocell(size_t level);
-  MacroCell *macrocell(size_t level,
-                       Quadrant *nw, Quadrant *ne,
-                       Quadrant *sw, Quadrant *se);
-
-  // Quadrant
-  Quadrant *quadrant(size_t level);
+  // // Returns the generatoion count
+  // virtual BigInt get_generation() = 0;
 };
 
 #endif // UNIVERSE_HPP

@@ -1,5 +1,6 @@
 #include "MainWindow.h"
 #include "../logic/Universe.hpp"
+#include "../logic/HashlifeUniverse/HashlifeUniverse.hpp"
 
 #include <iostream>
 #include <QToolBar>
@@ -22,16 +23,13 @@ MainWindow::MainWindow() {
 		for (size_t l = 0; l < map->getHeight(); ++l)
 			map->changeCellState(c,l,c % 3);
 	*/
-	hashlife_universe = new Universe(Coord(0,0),3);
-
-	hashlife_universe->debug();
+	game = nullptr;
+	hashlife_universe = new HashlifeUniverse(3);
 
 	hashlife_universe->set(Coord(0,0),1);
 	hashlife_universe->set(Coord(0,7),1);
 	hashlife_universe->set(Coord(7,0),1);
 	hashlife_universe->set(Coord(7,7),1);
-
-	hashlife_universe->debug();
 
 	createUI();
 	stepTimer = new QTimer(this);
@@ -45,6 +43,8 @@ void MainWindow::createUI() {
 	//Render Area
 	r_area = new RenderArea(this,hashlife_universe);
 	setCentralWidget(r_area);
+
+	r_area->setCursor(Qt::ArrowCursor);
 
 	//Simulation control toolbar
 	QToolBar *controlToolbar = addToolBar("Simulation Controls");
@@ -76,13 +76,13 @@ void MainWindow::createUI() {
 	toolboxGroup->addButton(eraserButton);
 	toolboxToolbar->addWidget(eraserButton);
 
-	QToolButton *zoominButton = new QToolButton(toolboxToolbar);
+	zoominButton = new QToolButton(toolboxToolbar);
 	zoominButton->setIcon(QIcon("../res/icons/zoom-in.svg"));
 	zoominButton->setCheckable(true);
 	toolboxGroup->addButton(zoominButton);
 	toolboxToolbar->addWidget(zoominButton);
 
-	QToolButton *zoomoutButton = new QToolButton(toolboxToolbar);
+	zoomoutButton = new QToolButton(toolboxToolbar);
 	zoomoutButton->setIcon(QIcon("../res/icons/zoom-out.svg"));
 	zoomoutButton->setCheckable(true);
 	toolboxGroup->addButton(zoomoutButton);
@@ -101,7 +101,8 @@ void MainWindow::createUI() {
 	menuBar()->addMenu(prefMenu);
 }
 
-void MainWindow::playPause(){
+void MainWindow::playPause() {
+
 	simulationRunning = !simulationRunning;
 	if(simulationRunning) {
 		playPauseAction->setIcon(*pauseIcon);
@@ -113,22 +114,37 @@ void MainWindow::playPause(){
 
 }
 
-void MainWindow::updateStatusBar(){
+void MainWindow::updateStatusBar() {
 	std::string s;
 	s += "Generation : ";
-	//s += std::to_string(game->getGeneration());
+	if(game != nullptr)
+		s += std::to_string(game->getGeneration());
+	else if(hashlife_universe != nullptr)
+		//TODO: Show number of generations
 	statusBar()->showMessage(QString(s.c_str()));
 }
 
-void MainWindow::stepSimulation(){
-	game->nextGeneration();
-	r_area->update();
+void MainWindow::stepSimulation() {
+	if(game != nullptr)
+		 game->nextGeneration();
+	else if(hashlife_universe != nullptr) {
+      hashlife_universe->step();
+  }
+  r_area->update();
 	updateStatusBar();
 }
 
-void MainWindow::load(){
+void MainWindow::load() {
 	QString fileName = QFileDialog::getOpenFileName(this, "Open File","","Run Length Encoded (*.rle)");
-	game->loadRLE(fileName);
+	if(game != nullptr) {
+		game->loadRLE(fileName);
+	} else if(hashlife_universe != nullptr) {
+		delete hashlife_universe;
+		hashlife_universe = new HashlifeUniverse(fileName);
+		delete r_area;
+		r_area = new RenderArea(this,hashlife_universe);
+		setCentralWidget(r_area);
+	}
 	updateStatusBar();
 
 }
@@ -138,7 +154,17 @@ MainWindow::~MainWindow() {
 }
 
 
-void MainWindow::keyPressEvent(QKeyEvent *event){
+void MainWindow::keyPressEvent(QKeyEvent *event) {
 	r_area->handleInput(event);
+}
+
+void MainWindow::mousePressEvent(QMouseEvent *event) {
+	if(r_area->underMouse()){
+		QPoint pos = event->pos();
+		if(zoominButton->isChecked())
+			r_area->zoomin_event(r_area->mapFromParent(pos));
+		else if(zoomoutButton->isChecked())
+			r_area->zoomout_event(r_area->mapFromParent(pos));
+	}
 }
 

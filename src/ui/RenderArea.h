@@ -15,13 +15,14 @@ public:
 	RenderArea(QWidget *parent = 0, CellMap *gol_map= 0);
 	RenderArea(QWidget *parent = 0, Universe *hashlife_universe = 0);
 	void handleInput(QKeyEvent *event);
+	void zoomin_event(QPoint origin);
+	void zoomout_event(QPoint origin);
 
 protected:
 	void initializeGL() override;
 	void resizeGL(int w, int h) override;
 	void paintGL() override;
 	void wheelEvent(QWheelEvent *event) override;
-	void mousePressEvent(QMouseEvent *event);
 
 private:
 	CellMap *gol_map;
