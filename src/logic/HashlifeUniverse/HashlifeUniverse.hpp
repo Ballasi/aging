@@ -34,6 +34,8 @@ public:
   size_t get_top_level();
 
 
+  void grid(int *L, int width, Quadrant* r, int level, int x, int y);
+  void print_grid(Quadrant* r, size_t level);
 private:
   size_t top_level;
   Coord top_left;
