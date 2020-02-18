@@ -492,3 +492,38 @@ Quadrant *HashlifeUniverse::result(size_t level, MacroCell *macrocell_tmp) {
     return macrocell_tmp->result;
   }
 }
+
+
+void HashlifeUniverse::grid(int *L, int width, Quadrant* r, int level, int x, int y) {
+  if (level == 1) {
+    L[(x  ) + (width)*(y  )] = r->minicell.nw;
+    L[(x+1) + (width)*(y  )] = r->minicell.ne;
+    L[(x  ) + (width)*(y+1)] = r->minicell.sw;
+    L[(x+1) + (width)*(y+1)] = r->minicell.se;
+  } else {
+    int dec = 1 << (level-1);
+    grid(L,width,r->macrocell.nw,level-1,x    ,y    );
+    grid(L,width,r->macrocell.ne,level-1,x+dec,y    );
+    grid(L,width,r->macrocell.sw,level-1,x    ,y+dec);
+    grid(L,width,r->macrocell.se,level-1,x+dec,y+dec);
+  }
+}
+
+
+void HashlifeUniverse::print_grid(Quadrant* r, size_t level) {
+  int cote = 1 << level;
+  int T[cote*cote];
+
+  grid(T, cote ,r, (int) level, 0, 0);
+
+  for (int i = 0; i < cote; ++i) {
+    for (int j = 0; j < cote; ++j) {
+      if (1) {
+        if (T[i*cote +j]) {  printf("# "); } else { printf(". "); }
+      } else {
+        if (T[i*cote +j]) {  printf("█▉"); } else { printf("╶╴"); }
+      }
+    }
+    printf("\n");
+  }
+}
