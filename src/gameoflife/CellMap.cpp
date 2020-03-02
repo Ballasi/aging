@@ -8,7 +8,7 @@ CellMap::CellMap(Game* g, size_t w, size_t h)
 }
 
 CellMap::CellMap(size_t w, size_t h)
-  : width(w + w % 8), height(h), length_in_bytes((w + 7) * h / 8) {
+  : width(w + 8 - w % 8), height(h), length_in_bytes((w + 7) * h / 8) {
   // Adding () calls constructor for every Cell in the array
   cells = new Cell[length_in_bytes]();
 }
