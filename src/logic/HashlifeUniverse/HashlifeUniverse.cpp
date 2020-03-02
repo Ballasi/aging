@@ -239,7 +239,7 @@ CellState *HashlifeUniverse::find(Coord target) const {
   }
 }
 
-CellState *HashlifeUniverse::find_path(Coord coord, vector<Quadrant *> &path) const {
+CellState *HashlifeUniverse::find_path(Coord coord, vector<Quadrant*> &path) const {
   Quadrant *cell = (Quadrant *)root;
   Coord size(top_level - 1);
   Coord current(top_left);

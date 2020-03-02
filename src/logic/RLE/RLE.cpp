@@ -1,15 +1,14 @@
 #include "RLE.hpp"
 
-RLE::RLE(QString filename) : filename(filename) {
-  QFile file(filename);
-
+RLE::RLE(QFile *_file): file(_file) {
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     throw "File could not be opened";
 
+  // TODO Check for errors
   while (!file.atEnd()) {
     QByteArray line = file.readLine();
     if (line[0] == '#') {
-      continue;
+      comment.append(line);
     }
     if (line[0] == 'x') {
       QList<QByteArray> list = line.split(',');
@@ -19,6 +18,12 @@ RLE::RLE(QString filename) : filename(filename) {
       size = Coord(width, height);
     }
   }
+
+  file.close();
+}
+
+RLE::Iterator RLE::iterate() {
+  return RLE::Iterator(*this);
 }
 
 QString RLE::get_comment() const {
@@ -27,4 +32,9 @@ QString RLE::get_comment() const {
 
 Coord RLE::get_size() const {
   return size;
+}
+
+QFile RLE::get_file_at_data() {
+  if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    throw "File could not be opened";
 }

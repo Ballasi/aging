@@ -1,10 +1,10 @@
-#include "Rule.hpp"
-#include "CellState.hpp"
+#include "RLERule.hpp"
+#include "../CellState.hpp"
 #include <cstddef>
 
 enum ReadingState { B_SEARCH, B_VALUES, S_SEARCH, S_VALUES };
 
-QString Rule::to_qstring() const {
+QString RLERule::to_qstring() const {
   QString str;
 
   str.append("B");
@@ -24,7 +24,7 @@ QString Rule::to_qstring() const {
   return str;
 }
 
-Rule::Rule(QString rule_string) {
+RLERule::RLERule(QString rule_string) {
   ReadingState state = B_SEARCH;
   for (size_t cursor = 0; cursor < rule_string.length(); ++cursor) {
     QChar c = rule_string.at(cursor);
@@ -32,7 +32,7 @@ Rule::Rule(QString rule_string) {
     case B_SEARCH:
       if (c == 'B')
         state = B_VALUES;
-      else throw "Rule strings should start with B";
+      else throw "RLERule strings should start with B";
       break;
 
     case B_VALUES:
@@ -50,7 +50,7 @@ Rule::Rule(QString rule_string) {
       if (c == 'S')
         state = S_VALUES;
       else
-        throw "Rule strings should have S after \'/\'";
+        throw "RLERule strings should have S after \'/\'";
       break;
 
     case S_VALUES:
@@ -67,6 +67,6 @@ Rule::Rule(QString rule_string) {
 }
 
 
-CellState Rule::apply(CellState state, size_t neighbour_count) const {
+CellState RLERule::apply(CellState state, size_t neighbour_count) const {
   return transition[state][neighbour_count];
 }
