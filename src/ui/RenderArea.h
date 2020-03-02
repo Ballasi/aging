@@ -31,7 +31,11 @@ private:
 	std::string fragmentShaderSource;
 
 	GLuint m_posAttr;
-	GLuint m_matrixUniform;
+	GLuint m_modelUniform;
+	GLuint m_viewUniform;
+	GLuint m_projectionUniform;
+
+	QMatrix4x4 projectionMatrix;
 
 	float square_vertices[8] = {
 		-0.5f,  0.5f,  // Top-left
