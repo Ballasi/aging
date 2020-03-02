@@ -5,6 +5,9 @@
 #include "Coord.hpp"
 #include "LifeFile.hpp"
 #include "Rect.hpp"
+#include <vector>
+
+using namespace std;
 
 // Universal Universe interface
 class Universe {
@@ -20,11 +23,15 @@ public:
   virtual void set(Coord, CellState) = 0;
   virtual const CellState get(Coord coord) const = 0;
 
+  virtual void get_cell_in_bounds(Rect bounds, vector<Coord> coords, vector<CellState> cell_states) const = 0;
+
+/*
   class Iterator {
     virtual bool next(Coord &coord, CellState &state) = 0;
   };
 
   virtual Iterator iterate(Rect bounds) const = 0;
+*/
 
   // Getters
   Rect get_bounds() const;
