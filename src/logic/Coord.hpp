@@ -12,7 +12,7 @@ public:
   Coord(size_t level);
   Coord(BigInt x, BigInt y);
 
-  bool operator==(const Coord& coord);
+  bool operator==(const Coord &coord);
   Coord operator+(const Coord &coord);
   void operator+=(const Coord &coord);
   Coord operator-(const Coord &coord);

@@ -1,5 +1,5 @@
 #include "HashlifeUniverse.hpp"
-#include <iterator>
+// #include <iterator>
 #include <unordered_set>
 #include <vector>
 
@@ -17,9 +17,8 @@ HashlifeUniverse::HashlifeUniverse(size_t top_level, Coord top_left)
   root = (MacroCell *)zeros.back();
 }
 
-HashlifeUniverse::HashlifeUniverse(QString filename, Coord top_left)
-    : Universe(filename, top_left), top_left(top_left)
-{
+HashlifeUniverse::HashlifeUniverse(LifeFile life_file, Coord top_left)
+  : Universe(filename, top_left), top_left(top_left) {
 
   QFile file(filename);
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -295,8 +294,7 @@ CellState *HashlifeUniverse::find(Coord target) const
   }
 }
 
-CellState *HashlifeUniverse::find_path(Coord coord, vector<Quadrant *> &path) const
-{
+CellState *HashlifeUniverse::find_path(Coord coord, vector<Quadrant*> &path) const {
   Quadrant *cell = (Quadrant *)root;
   Coord size(top_level - 1);
   Coord current(top_left);
@@ -669,3 +667,80 @@ void HashlifeUniverse::print_grid(Quadrant *r, size_t level)
     printf("\n");
   }
 }
+
+
+
+
+void Universe::get_cell_in_bounds_rec(Rect bounds, vector<Coord> coords, vector<CellState> cell_states, size_t current_level, Quadrant* current_cell, Coord current_coord) const {
+  
+  x = current_level.x;
+  y = current_level.y;
+  
+  if (current_level == 1) {
+    minicell = current_cell->minicell;
+    if (bounds.is_in( {x    ,y    } )) {
+       cell_states.push_back(minicell.nw);
+       coords.push_back({x    ,y    });
+    }
+
+    if (bounds.is_in( {x+1,y    } )) {
+       cell_states.push_back(minicell.ne);
+       coords.push_back({x+1,y    });
+    }
+
+    if (bounds.is_in( {x    ,y+1} )) {
+       cell_states.push_back(minicell.sw);
+       coords.push_back({x    ,y+1});
+    }
+    
+    if (bounds.is_in( {x+1,y+1} )) {
+       cell_states.push_back(minicell.se);
+       coords.push_back({x+1,y+1});
+    }
+
+
+  } else {
+    size_t size = 1 << (level-1);
+    macrocell = current_cell->macrocell;
+    if (bounds.collides({{x     ,y     }, {x  +size,y  +size}}  )) {
+      get_cell_in_bounds_rec(bounds, coords, cell_states, current_level-1, macrocell.nw, {x     ,y     } )
+    }
+
+    if (bounds.collides({{x+size,y     }, {x+2*size,y  +size}}  )) {
+      get_cell_in_bounds_rec(bounds, coords, cell_states, current_level-1, macrocell.ne, {x+size,y     } )
+    }
+
+    if (bounds.collides({{x     ,y+size}, {x  +size,y+2*size}}  )) {
+      get_cell_in_bounds_rec(bounds, coords, cell_states, current_level-1, macrocell.sw, {x     ,y+size} )
+    }
+
+    if (bounds.collides({{x+size,y+size}, {x+2*size,y+2*size}}  )) {
+      get_cell_in_bounds_rec(bounds, coords, cell_states, current_level-1, macrocell.se, {x+size,y+size} )
+    }
+  }
+
+}
+
+
+
+void Universe::get_cell_in_bounds(Rect bounds, vector<Coord> coords, vector<CellState> cell_states) const {
+  get_cell_in_bounds_rec(bounds, coords, cell_states, top_level, (Quadrant*) root, top_left);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

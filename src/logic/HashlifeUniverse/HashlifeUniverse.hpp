@@ -3,7 +3,7 @@
 
 #include <QFile>
 #include <QString>
-#include <iterator>
+// #include <iterator>
 #include <unordered_set>
 #include <vector>
 
@@ -20,15 +20,20 @@ using namespace std;
 class HashlifeUniverse: public Universe {
 public:
   HashlifeUniverse(size_t top_level, Coord top_left = Coord());
-  HashlifeUniverse(QString filename, Coord top_left = Coord());
+  HashlifeUniverse(LifeFile life_file, Coord top_left = Coord());
 
   void step();
   const CellState get(Coord coord) const;
   void set(Coord target, CellState state);
   void debug();
+  
 
+  void get_cell_in_bounds(Rect bounds, vector<Coord> coords, vector<CellState> cell_states) const;
+/*
   class Iterator;
   Iterator iter(Rect bounds);
+*/
+
 
   Coord get_top_left();
   size_t get_top_level();
@@ -78,6 +83,9 @@ private:
 
   // Quadrant
   Quadrant *quadrant(size_t level);
+
+
+  void get_cell_in_bounds_rec(Rect bounds, vector<Coord> coords, vector<CellState> cell_states, size_t current_level, Quadrant* current_cell, Coord current_coord) const;
 };
 
 #endif // HASHLIFE_UNIVERSE_HPP
