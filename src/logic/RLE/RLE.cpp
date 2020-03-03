@@ -1,3 +1,5 @@
+
+/*
 #include "RLE.hpp"
 
 RLE::RLE(QFile *_file): file(_file) {
@@ -38,3 +40,4 @@ QFile RLE::get_file_at_data() {
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     throw "File could not be opened";
 }
+*/

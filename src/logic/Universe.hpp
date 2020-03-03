@@ -6,6 +6,7 @@
 #include "LifeFile.hpp"
 #include "Rect.hpp"
 #include <vector>
+#include "RLE/RLE.hpp"
 
 using namespace std;
 
@@ -13,8 +14,9 @@ using namespace std;
 class Universe {
 public:
   Universe(Rect bounds);
-  Universe(LifeFile life_file, Coord top_left = 0);
+  Universe(QString filename, Coord top_left = 0);
   Universe(Coord size = Coord(8, 8));
+  Universe(size_t top_level, Coord top_left);
 
   // Makes a step in the simulation
   virtual void step() = 0;
@@ -23,7 +25,7 @@ public:
   virtual void set(Coord, CellState) = 0;
   virtual const CellState get(Coord coord) const = 0;
 
-  virtual void get_cell_in_bounds(Rect bounds, vector<Coord> coords, vector<CellState> cell_states) const = 0;
+  //virtual void get_cell_in_bounds(Rect bounds, vector<Coord> coords, vector<CellState> cell_states) const = 0;
 
 /*
   class Iterator {

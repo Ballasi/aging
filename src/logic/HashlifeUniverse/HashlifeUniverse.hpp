@@ -20,7 +20,7 @@ using namespace std;
 class HashlifeUniverse: public Universe {
 public:
   HashlifeUniverse(size_t top_level, Coord top_left = Coord());
-  HashlifeUniverse(LifeFile life_file, Coord top_left = Coord());
+  HashlifeUniverse(QString filename, Coord top_left = Coord());
 
   void step();
   const CellState get(Coord coord) const;
@@ -28,7 +28,7 @@ public:
   void debug();
   
 
-  void get_cell_in_bounds(Rect bounds, vector<Coord> coords, vector<CellState> cell_states) const;
+  void get_cell_in_bounds(Rect bounds, vector<Coord> &coords, vector<CellState> &cell_states) const;
 /*
   class Iterator;
   Iterator iter(Rect bounds);
@@ -85,7 +85,7 @@ private:
   Quadrant *quadrant(size_t level);
 
 
-  void get_cell_in_bounds_rec(Rect bounds, vector<Coord> coords, vector<CellState> cell_states, size_t current_level, Quadrant* current_cell, Coord current_coord) const;
+  void get_cell_in_bounds_rec(Rect bounds, vector<Coord> &coords, vector<CellState> &cell_states, size_t current_level, Quadrant* current_cell, Coord current_coord) const;
 };
 
 #endif // HASHLIFE_UNIVERSE_HPP
