@@ -3,6 +3,8 @@
 
 #include <qmatrix4x4.h>
 #include <qvector2d.h>
+#include "../logic/Rect.hpp"
+#include "../logic/Universe.hpp"
 
 class Camera2D {
 
@@ -12,6 +14,7 @@ public:
     int get_zoom() const;
     QMatrix4x4 get_view();
 
+    Rect get_view_bounds(float aspect_ratio, Universe *universe);
     QVector2D pos;
     QVector2D origin;
     

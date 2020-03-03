@@ -4,11 +4,13 @@
 #include <vector>
 
 HashlifeUniverse::HashlifeUniverse(size_t top_level, Coord top_left)
-  : Universe(top_level, top_left), top_left(top_left), top_level(top_level) {
+    : Universe(top_level, top_left), top_left(top_left), top_level(top_level)
+{
   macrocell_sets.resize(top_level + 1);
   zeros.push_back(nullptr);
   zeros.push_back((Quadrant *)minicell());
-  for (size_t i = 2; i <= top_level; ++i) {
+  for (size_t i = 2; i <= top_level; ++i)
+  {
     zeros.push_back((Quadrant *)macrocell(i));
   }
 
@@ -16,7 +18,8 @@ HashlifeUniverse::HashlifeUniverse(size_t top_level, Coord top_left)
 }
 
 HashlifeUniverse::HashlifeUniverse(QString filename, Coord top_left)
-  : Universe(filename, top_left), top_left(top_left) {
+    : Universe(filename, top_left), top_left(top_left)
+{
 
   QFile file(filename);
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -27,7 +30,8 @@ HashlifeUniverse::HashlifeUniverse(QString filename, Coord top_left)
   macrocell_sets.resize(top_level + 1);
   zeros.push_back(nullptr);
   zeros.push_back((Quadrant *)minicell());
-  for (size_t i = 2; i <= top_level; ++i) {
+  for (size_t i = 2; i <= top_level; ++i)
+  {
     zeros.push_back((Quadrant *)macrocell(i));
   }
   root = (MacroCell *)zeros.back();
@@ -38,13 +42,17 @@ HashlifeUniverse::HashlifeUniverse(QString filename, Coord top_left)
 
 void HashlifeUniverse::debug() { ((Quadrant *)root)->debug(top_level); }
 
-Coord HashlifeUniverse::read_rle_size(QFile &file) {
-  while (!file.atEnd()) {
+Coord HashlifeUniverse::read_rle_size(QFile &file)
+{
+  while (!file.atEnd())
+  {
     QByteArray line = file.readLine();
-    if (line[0] == '#') {
+    if (line[0] == '#')
+    {
       continue;
     }
-    if (line[0] == 'x') {
+    if (line[0] == 'x')
+    {
       QList<QByteArray> list = line.split(',');
       int width = ((list[0].split('='))[1].simplified()).toInt();
       int height = ((list[1].split('='))[1].simplified()).toInt();
@@ -56,10 +64,12 @@ Coord HashlifeUniverse::read_rle_size(QFile &file) {
   return 6;
 }
 
-void HashlifeUniverse::read_rle_data(QFile &file, Coord boundingbox) {
+void HashlifeUniverse::read_rle_data(QFile &file, Coord boundingbox)
+{
 
   QByteArray data("");
-  while (!file.atEnd()) {
+  while (!file.atEnd())
+  {
     QByteArray line = file.readLine();
     data.append(line);
   }
@@ -72,22 +82,27 @@ void HashlifeUniverse::read_rle_data(QFile &file, Coord boundingbox) {
   int curr_y = init_y;
 
   QByteArray qs("");
-  for (int i = 0; i < data.length(); ++i) {
+  for (int i = 0; i < data.length(); ++i)
+  {
     if (data[i] == '\0')
       continue;
     int q;
-    if (data[i] == '$') {
+    if (data[i] == '$')
+    {
       q = qs.isEmpty() ? 1 : qs.toInt();
       curr_y += q;
       curr_x = init_x;
       qs.clear();
     }
-    if (data[i] >= '0' && data[i] <= '9') {
+    if (data[i] >= '0' && data[i] <= '9')
+    {
       qs.append(data[i]);
     }
-    if (data[i] == 'o' || data[i] == 'b') {
+    if (data[i] == 'o' || data[i] == 'b')
+    {
       q = qs.isEmpty() ? 1 : qs.toInt();
-      for (int n = 0; n < q; n++) {
+      for (int n = 0; n < q; n++)
+      {
         set(Coord(curr_x, curr_y), data[i] == 'o');
         curr_x++;
       }
@@ -98,8 +113,10 @@ void HashlifeUniverse::read_rle_data(QFile &file, Coord boundingbox) {
   }
 }
 
-void HashlifeUniverse::assert_handles(size_t asserted_level) {
-  if (asserted_level >= macrocell_sets.size()) {
+void HashlifeUniverse::assert_handles(size_t asserted_level)
+{
+  if (asserted_level >= macrocell_sets.size())
+  {
     size_t previous_asserted_level = macrocell_sets.size() - 1;
 
     macrocell_sets.resize(asserted_level + 1);
@@ -109,7 +126,8 @@ void HashlifeUniverse::assert_handles(size_t asserted_level) {
   }
 }
 
-void HashlifeUniverse::step() {
+void HashlifeUniverse::step()
+{
   // Assert that the creation of higher level is possible
   assert_handles(top_level + 2);
   // Add of crown of empty cell
@@ -132,36 +150,51 @@ void HashlifeUniverse::step() {
       root->se->macrocell.sw == z &&
       root->sw->macrocell.se == z &&
       root->sw->macrocell.sw == z &&
-      root->sw->macrocell.nw == z) {
+      root->sw->macrocell.nw == z)
+  {
     top_level--;
     root = macrocell(top_level, root->nw->macrocell.se, root->ne->macrocell.sw,
                      root->sw->macrocell.ne, root->se->macrocell.nw);
-  } else {
+  }
+  else
+  {
     top_left -= Coord(top_level - 2);
   }
 }
 
-const CellState HashlifeUniverse::get(Coord target) const { return *find(target); }
+const CellState HashlifeUniverse::get(Coord target) const
+{
+  if (target.y >= top_left.y && target.y < top_left.y + (1 << top_level) && target.x >= top_left.x && target.x < top_left.x + (1 << top_level))
+    return *find(target);
+  else
+    return 0;
+}
 
-void HashlifeUniverse::set(Coord target, CellState state) {
+void HashlifeUniverse::set(Coord target, CellState state)
+{
   root = (MacroCell *)set_rec(top_left, top_level, (Quadrant *)root, target,
                               state);
 }
 
 Quadrant *HashlifeUniverse::set_rec(Coord current, size_t level, Quadrant *cell,
-                            Coord target, CellState state) {
+                                    Coord target, CellState state)
+{
   Coord size(level - 1);
   Coord center = current + size;
 
-  if (level == 1) {
-    if (target.y < center.y) {
+  if (level == 1)
+  {
+    if (target.y < center.y)
+    {
       if (target.x < center.x)
         return (Quadrant *)minicell(state, cell->minicell.ne, cell->minicell.sw,
                                     cell->minicell.se);
       else
         return (Quadrant *)minicell(cell->minicell.nw, state, cell->minicell.sw,
                                     cell->minicell.se);
-    } else {
+    }
+    else
+    {
       if (target.x < center.x)
         return (Quadrant *)minicell(cell->minicell.nw, cell->minicell.ne, state,
                                     cell->minicell.se);
@@ -169,28 +202,35 @@ Quadrant *HashlifeUniverse::set_rec(Coord current, size_t level, Quadrant *cell,
         return (Quadrant *)minicell(cell->minicell.nw, cell->minicell.ne,
                                     cell->minicell.sw, state);
     }
-  } else {
+  }
+  else
+  {
     level -= 1;
-    if (target.y < center.y) {
+    if (target.y < center.y)
+    {
       if (target.x < center.x)
         return (Quadrant *)macrocell(
             level, set_rec(current, level, cell->macrocell.nw, target, state),
             cell->macrocell.ne, cell->macrocell.sw, cell->macrocell.se);
-      else {
+      else
+      {
         current.x = center.x;
         return (Quadrant *)macrocell(
             level, cell->macrocell.nw,
             set_rec(current, level, cell->macrocell.ne, target, state),
             cell->macrocell.sw, cell->macrocell.se);
       }
-    } else {
+    }
+    else
+    {
       current.y = center.y;
       if (target.x < center.x)
         return (Quadrant *)macrocell(
             level, cell->macrocell.nw, cell->macrocell.ne,
             set_rec(current, level, cell->macrocell.sw, target, state),
             cell->macrocell.se);
-      else {
+      else
+      {
         current.x = center.x;
         return (Quadrant *)macrocell(
             level, cell->macrocell.nw, cell->macrocell.ne, cell->macrocell.sw,
@@ -200,24 +240,35 @@ Quadrant *HashlifeUniverse::set_rec(Coord current, size_t level, Quadrant *cell,
   }
 }
 
-CellState *HashlifeUniverse::find(Coord target) const {
+CellState *HashlifeUniverse::find(Coord target) const
+{
   Quadrant *cell = (Quadrant *)root;
   Coord size(top_level - 1);
   Coord current(top_left);
   Coord center = current + size;
-  for (size_t level = top_level; level > 1; --level) {
-    if (target.y < center.y) {
-      if (target.x < center.x) {
+  for (size_t level = top_level; level > 1; --level)
+  {
+    if (target.y < center.y)
+    {
+      if (target.x < center.x)
+      {
         cell = cell->macrocell.nw;
-      } else {
+      }
+      else
+      {
         current.x = center.x;
         cell = cell->macrocell.ne;
       }
-    } else {
+    }
+    else
+    {
       current.y = center.y;
-      if (target.x < center.x) {
+      if (target.x < center.x)
+      {
         cell = cell->macrocell.sw;
-      } else {
+      }
+      else
+      {
         current.x = center.x;
         cell = cell->macrocell.se;
       }
@@ -226,38 +277,54 @@ CellState *HashlifeUniverse::find(Coord target) const {
     center = current + size;
   }
 
-  if (target.y < center.y) {
-    if (target.x < center.x) {
+  if (target.y < center.y)
+  {
+    if (target.x < center.x)
+    {
       return &cell->minicell.nw;
     }
     return &cell->minicell.ne;
-  } else {
-    if (target.x < center.x) {
+  }
+  else
+  {
+    if (target.x < center.x)
+    {
       return &cell->minicell.sw;
     }
     return &cell->minicell.se;
   }
 }
 
-CellState *HashlifeUniverse::find_path(Coord coord, vector<Quadrant *> &path) const {
+CellState *HashlifeUniverse::find_path(Coord coord, vector<Quadrant *> &path) const
+{
   Quadrant *cell = (Quadrant *)root;
   Coord size(top_level - 1);
   Coord current(top_left);
   Coord center = current + size;
-  for (size_t level = top_level; level > 1; --level) {
+  for (size_t level = top_level; level > 1; --level)
+  {
     path.push_back(cell);
-    if (coord.x < center.x) {
-      if (coord.y < center.y) {
+    if (coord.x < center.x)
+    {
+      if (coord.y < center.y)
+      {
         cell = cell->macrocell.nw;
-      } else {
+      }
+      else
+      {
         current.y += size.y;
         cell = cell->macrocell.ne;
       }
-    } else {
+    }
+    else
+    {
       current.x += size.x;
-      if (coord.y < center.y) {
+      if (coord.y < center.y)
+      {
         cell = cell->macrocell.sw;
-      } else {
+      }
+      else
+      {
         current.y += size.y;
         cell = cell->macrocell.se;
       }
@@ -266,29 +333,37 @@ CellState *HashlifeUniverse::find_path(Coord coord, vector<Quadrant *> &path) co
     center = current + size;
   }
 
-  if (coord.y < center.y) {
-    if (coord.x < center.x) {
+  if (coord.y < center.y)
+  {
+    if (coord.x < center.x)
+    {
       return &cell->minicell.nw;
     }
     return &cell->minicell.ne;
-  } else {
-    if (coord.x < center.x) {
+  }
+  else
+  {
+    if (coord.x < center.x)
+    {
       return &cell->minicell.sw;
     }
     return &cell->minicell.se;
   }
 }
 
-MiniCell *HashlifeUniverse::minicell() {
+MiniCell *HashlifeUniverse::minicell()
+{
   return (MiniCell *)&*minicells.emplace().first;
 }
 
 MiniCell *HashlifeUniverse::minicell(CellState nw, CellState ne, CellState sw,
-                             CellState se) {
+                                     CellState se)
+{
   return (MiniCell *)&*minicells.emplace(nw, ne, sw, se).first;
 }
 
-MacroCell *HashlifeUniverse::macrocell(size_t level) {
+MacroCell *HashlifeUniverse::macrocell(size_t level)
+{
   return (MacroCell *)&*macrocell_sets[level]
       .emplace(zeros[level - 1], zeros[level - 1], zeros[level - 1],
                zeros[level - 1])
@@ -296,14 +371,19 @@ MacroCell *HashlifeUniverse::macrocell(size_t level) {
 }
 
 MacroCell *HashlifeUniverse::macrocell(size_t level, Quadrant *nw, Quadrant *ne,
-                               Quadrant *sw, Quadrant *se) {
+                                       Quadrant *sw, Quadrant *se)
+{
   return (MacroCell *)&*macrocell_sets[level].emplace(nw, ne, sw, se).first;
 }
 
-Quadrant *HashlifeUniverse::quadrant(size_t level) {
-  if (level <= 1) {
+Quadrant *HashlifeUniverse::quadrant(size_t level)
+{
+  if (level <= 1)
+  {
     return (Quadrant *)minicell();
-  } else {
+  }
+  else
+  {
     return (Quadrant *)macrocell(level, quadrant(level - 1),
                                  quadrant(level - 1), quadrant(level - 1),
                                  quadrant(level - 1));
@@ -314,7 +394,8 @@ size_t HashlifeUniverse::get_top_level() { return top_level; }
 
 Coord HashlifeUniverse::get_top_left() { return top_left; }
 
-void HashlifeUniverse::crown() {
+void HashlifeUniverse::crown()
+{
 
   Quadrant *zero = zeros[top_level - 1];
 
@@ -323,37 +404,38 @@ void HashlifeUniverse::crown() {
   MacroCell *sw = macrocell(top_level, zero, root->sw, zero, zero);
   MacroCell *se = macrocell(top_level, root->se, zero, zero, zero);
 
-
-  top_level ++;
+  top_level++;
   root = macrocell(top_level,
                    (Quadrant *)nw, (Quadrant *)ne,
                    (Quadrant *)sw, (Quadrant *)se);
 }
 
-Quadrant *HashlifeUniverse::result(size_t level, MacroCell *macrocell_tmp) {
+Quadrant *HashlifeUniverse::result(size_t level, MacroCell *macrocell_tmp)
+{
 
   if (macrocell_tmp->result != nullptr)
     return macrocell_tmp->result;
 
-  if (level == 2) {
+  if (level == 2)
+  {
     int nb_nw =
         macrocell_tmp->nw->minicell.nw + macrocell_tmp->nw->minicell.ne + macrocell_tmp->ne->minicell.nw +
-        macrocell_tmp->nw->minicell.sw +                                  macrocell_tmp->ne->minicell.sw +
+        macrocell_tmp->nw->minicell.sw + macrocell_tmp->ne->minicell.sw +
         macrocell_tmp->sw->minicell.nw + macrocell_tmp->sw->minicell.ne + macrocell_tmp->se->minicell.nw;
 
     int nb_ne =
         macrocell_tmp->nw->minicell.ne + macrocell_tmp->ne->minicell.nw + macrocell_tmp->ne->minicell.ne +
-        macrocell_tmp->nw->minicell.se +                                  macrocell_tmp->ne->minicell.se +
+        macrocell_tmp->nw->minicell.se + macrocell_tmp->ne->minicell.se +
         macrocell_tmp->sw->minicell.ne + macrocell_tmp->se->minicell.nw + macrocell_tmp->se->minicell.ne;
 
     int nb_sw =
         macrocell_tmp->nw->minicell.sw + macrocell_tmp->nw->minicell.se + macrocell_tmp->ne->minicell.sw +
-        macrocell_tmp->sw->minicell.nw +                                  macrocell_tmp->se->minicell.nw +
+        macrocell_tmp->sw->minicell.nw + macrocell_tmp->se->minicell.nw +
         macrocell_tmp->sw->minicell.sw + macrocell_tmp->sw->minicell.se + macrocell_tmp->se->minicell.sw;
 
     int nb_se =
         macrocell_tmp->nw->minicell.se + macrocell_tmp->ne->minicell.sw + macrocell_tmp->ne->minicell.se +
-        macrocell_tmp->sw->minicell.ne +                                  macrocell_tmp->se->minicell.ne +
+        macrocell_tmp->sw->minicell.ne + macrocell_tmp->se->minicell.ne +
         macrocell_tmp->sw->minicell.se + macrocell_tmp->se->minicell.sw + macrocell_tmp->se->minicell.se;
 
     CellState new_nw;
@@ -361,69 +443,105 @@ Quadrant *HashlifeUniverse::result(size_t level, MacroCell *macrocell_tmp) {
     CellState new_sw;
     CellState new_se;
     // I check if the cell is alive
-    if (macrocell_tmp->nw->minicell.se) {
+    if (macrocell_tmp->nw->minicell.se)
+    {
       // If the cell is alive, i check if cell survive
-      if ((nb_nw == 2) || (nb_nw == 3)) {
+      if ((nb_nw == 2) || (nb_nw == 3))
+      {
         new_nw = 1;
-      } else {
-        new_nw = 0;
       }
-    } else {
-      // if the cell is dead, i check if cell born
-      if (nb_nw == 3) {
-        new_nw = 1;
-      } else {
+      else
+      {
         new_nw = 0;
       }
     }
+    else
+    {
+      // if the cell is dead, i check if cell born
+      if (nb_nw == 3)
+      {
+        new_nw = 1;
+      }
+      else
+      {
+        new_nw = 0;
+      }
+    }
 
     // I check if the cell is alive
-    if (macrocell_tmp->ne->minicell.sw) {
+    if (macrocell_tmp->ne->minicell.sw)
+    {
       // If the cell is alive, i check if cell survive
-      if ((nb_ne == 2) || (nb_ne == 3)) {
+      if ((nb_ne == 2) || (nb_ne == 3))
+      {
         new_ne = 1;
-      } else {
+      }
+      else
+      {
         new_ne = 0;
       }
-    } else {
+    }
+    else
+    {
       // if the cell is dead, i check if cell born
-      if (nb_ne == 3) {
+      if (nb_ne == 3)
+      {
         new_ne = 1;
-      } else {
+      }
+      else
+      {
         new_ne = 0;
       }
     }
 
     // I check if the cell is alive
-    if (macrocell_tmp->sw->minicell.ne) {
+    if (macrocell_tmp->sw->minicell.ne)
+    {
       // If the cell is alive, i check if cell survive
-      if ((nb_sw == 2) || (nb_sw == 3)) {
+      if ((nb_sw == 2) || (nb_sw == 3))
+      {
         new_sw = 1;
-      } else {
+      }
+      else
+      {
         new_sw = 0;
       }
-    } else {
+    }
+    else
+    {
       // if the cell is dead, i check if cell born
-      if (nb_sw == 3) {
+      if (nb_sw == 3)
+      {
         new_sw = 1;
-      } else {
+      }
+      else
+      {
         new_sw = 0;
       }
     }
 
     // I check if the cell is alive
-    if (macrocell_tmp->se->minicell.nw) {
+    if (macrocell_tmp->se->minicell.nw)
+    {
       // If the cell is alive, i check if cell survive
-      if ((nb_se == 2) || (nb_se == 3)) {
+      if ((nb_se == 2) || (nb_se == 3))
+      {
         new_se = 1;
-      } else {
+      }
+      else
+      {
         new_se = 0;
       }
-    } else {
+    }
+    else
+    {
       // if the cell is dead, i check if cell born
-      if (nb_se == 3) {
+      if (nb_se == 3)
+      {
         new_se = 1;
-      } else {
+      }
+      else
+      {
         new_se = 0;
       }
     }
@@ -431,7 +549,9 @@ Quadrant *HashlifeUniverse::result(size_t level, MacroCell *macrocell_tmp) {
     macrocell_tmp->result =
         (Quadrant *)minicell(new_nw, new_ne, new_sw, new_se);
     return macrocell_tmp->result;
-  } else {
+  }
+  else
+  {
 
     // voir figure 4 de :
     // https://www.drdobbs.com/jvm/an-algorithm-for-compressing-space-and-t/184406478
@@ -493,35 +613,57 @@ Quadrant *HashlifeUniverse::result(size_t level, MacroCell *macrocell_tmp) {
   }
 }
 
-
-void HashlifeUniverse::grid(int *L, int width, Quadrant* r, int level, int x, int y) {
-  if (level == 1) {
-    L[(x  ) + (width)*(y  )] = r->minicell.nw;
-    L[(x+1) + (width)*(y  )] = r->minicell.ne;
-    L[(x  ) + (width)*(y+1)] = r->minicell.sw;
-    L[(x+1) + (width)*(y+1)] = r->minicell.se;
-  } else {
-    int dec = 1 << (level-1);
-    grid(L,width,r->macrocell.nw,level-1,x    ,y    );
-    grid(L,width,r->macrocell.ne,level-1,x+dec,y    );
-    grid(L,width,r->macrocell.sw,level-1,x    ,y+dec);
-    grid(L,width,r->macrocell.se,level-1,x+dec,y+dec);
+void HashlifeUniverse::grid(int *L, int width, Quadrant *r, int level, int x, int y)
+{
+  if (level == 1)
+  {
+    L[(x) + (width) * (y)] = r->minicell.nw;
+    L[(x + 1) + (width) * (y)] = r->minicell.ne;
+    L[(x) + (width) * (y + 1)] = r->minicell.sw;
+    L[(x + 1) + (width) * (y + 1)] = r->minicell.se;
+  }
+  else
+  {
+    int dec = 1 << (level - 1);
+    grid(L, width, r->macrocell.nw, level - 1, x, y);
+    grid(L, width, r->macrocell.ne, level - 1, x + dec, y);
+    grid(L, width, r->macrocell.sw, level - 1, x, y + dec);
+    grid(L, width, r->macrocell.se, level - 1, x + dec, y + dec);
   }
 }
 
-
-void HashlifeUniverse::print_grid(Quadrant* r, size_t level) {
+void HashlifeUniverse::print_grid(Quadrant *r, size_t level)
+{
   int cote = 1 << level;
-  int T[cote*cote];
+  int T[cote * cote];
 
-  grid(T, cote ,r, (int) level, 0, 0);
+  grid(T, cote, r, (int)level, 0, 0);
 
-  for (int i = 0; i < cote; ++i) {
-    for (int j = 0; j < cote; ++j) {
-      if (1) {
-        if (T[i*cote +j]) {  printf("# "); } else { printf(". "); }
-      } else {
-        if (T[i*cote +j]) {  printf("█▉"); } else { printf("╶╴"); }
+  for (int i = 0; i < cote; ++i)
+  {
+    for (int j = 0; j < cote; ++j)
+    {
+      if (1)
+      {
+        if (T[i * cote + j])
+        {
+          printf("# ");
+        }
+        else
+        {
+          printf(". ");
+        }
+      }
+      else
+      {
+        if (T[i * cote + j])
+        {
+          printf("█▉");
+        }
+        else
+        {
+          printf("╶╴");
+        }
       }
     }
     printf("\n");
