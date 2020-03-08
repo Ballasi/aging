@@ -61,7 +61,7 @@ void RenderArea::initializeGL()
 	camera->pos.setY(0.0f);
 
 	if (hashlife_universe != nullptr)
-		camera->set_zoom(1 << (((HashlifeUniverse *) hashlife_universe)->get_top_level() + 1));
+		camera->set_zoom(1 << (((HashlifeUniverse *)hashlife_universe)->get_top_level() + 1));
 }
 
 void RenderArea::resizeGL(int w, int h)
@@ -131,77 +131,31 @@ void RenderArea::render_gol(QMatrix4x4 &matrix)
 void RenderArea::render_hashlife(QMatrix4x4 &viewMatrix)
 {
 
-	Coord top_left = ((HashlifeUniverse *) hashlife_universe)->get_top_left();
-	size_t level = ((HashlifeUniverse *) hashlife_universe)->get_top_level();
+	Coord top_left = ((HashlifeUniverse *)hashlife_universe)->get_top_left();
+	size_t level = ((HashlifeUniverse *)hashlife_universe)->get_top_level();
 
 	Rect bounds = camera->get_view_bounds((float)width() / (float)height(), hashlife_universe);
 
-	Coord c(1,1);
-	Rect r(Coord(0,0), Coord(2,2));
-
-	std::cout <<"Collision : " <<  r.is_in(c) << '\n';
-
 	std::vector<Coord> coords;
-	std::vector<CellState> cellstates;
 
-	((HashlifeUniverse *) hashlife_universe)->get_cell_in_bounds(bounds,coords,cellstates);
-
-
-	//std::cout << top_left.x << ',' << top_left.y << '\n';
-
-	//std::cout << "Camera : " << camera->pos.x() << ',' << camera->pos.y() << '\n';
+	((HashlifeUniverse *)hashlife_universe)->get_cell_in_bounds(bounds, coords);
 
 	QMatrix4x4 modelMatrix;
 	modelMatrix.setToIdentity();
-	//modelMatrix.translate(top_left.x,-top_left.y,0);
 
 	m_program->setUniformValue(m_viewUniform, viewMatrix);
 	m_program->setUniformValue(m_projectionUniform, projectionMatrix);
 
-	/*
-
-	HashlifeUniverse::Iterator iterator((HashlifeUniverse *) hashlife_universe, bounds);
-	Coord current_coord;
-	CellState current_state;
-
-	while(iterator.next(current_coord,current_state)){
-		std::cout << current_coord.x << ',' << current_coord.y << '\n';
-	}
-	*/
-
 	std::cout << "Top left : " << bounds.top_left.x << ',' << bounds.top_left.y << '\n';
 	std::cout << "Bottom right : " << bounds.bottom_right.x << ',' << bounds.bottom_right.y << '\n';
-	
-	std::cout << coords.size() << "\n";
 
-	for(size_t i = 0; i < coords.size(); ++i){
-		if(cellstates[i]){
-			modelMatrix.setToIdentity();
-			modelMatrix.translate(coords[i].x,-coords[i].y,0);
-			m_program->setUniformValue(m_modelUniform, modelMatrix);
-			glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0);
-		}
-	}
-
-	/*
-	for (BigInt c = bounds.top_left.x; c <= bounds.bottom_right.x; c++)
+	for (size_t i = 0; i < coords.size(); ++i)
 	{
-		for (BigInt l = bounds.top_left.y; l >= bounds.bottom_right.y; l--)
-		{
-			//std::cout << "Checking at : " << c << "," << l;
-			if (hashlife_universe->get(Coord(c, l)) == 1)
-			{
-				modelMatrix.setToIdentity();
-				modelMatrix.translate(c,-l,0);
-				//std::cout << "Alive !";
-				m_program->setUniformValue(m_modelUniform, modelMatrix);
-				glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0);
-			}
-			//std::cout << '\n';
-		}
+		modelMatrix.setToIdentity();
+		modelMatrix.translate(coords[i].x, -coords[i].y, 0);
+		m_program->setUniformValue(m_modelUniform, modelMatrix);
+		glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0);
 	}
-
-	*/
 }
 
 void RenderArea::wheelEvent(QWheelEvent *event)
@@ -218,6 +172,17 @@ void RenderArea::zoomout_event(QPoint origin)
 {
 	camera->set_zoom(camera->get_zoom() * 2);
 	update();
+}
+
+Coord RenderArea::map_coords_from_mouse(QPoint mouseCoords)
+{
+	Rect view = camera->get_view_bounds((float)width() / (float)height(), hashlife_universe);
+
+	float x_relative = (float)mouseCoords.x() / (float) width();
+	float y_relative = (float)mouseCoords.y() / (float) height();
+
+	return Coord(view.top_left.x + x_relative * (view.bottom_right.x - view.top_left.x),
+                 view.top_left.y + y_relative * (view.bottom_right.y - view.top_left.y));
 }
 
 void RenderArea::handleInput(QKeyEvent *event)

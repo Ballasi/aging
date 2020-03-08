@@ -34,7 +34,7 @@ private:
 	QIcon *playIcon, *pauseIcon;
 	QTimer *stepTimer;
 
-	QToolButton *zoominButton, *zoomoutButton;
+	QToolButton *zoominButton, *zoomoutButton, *pencilButton, *eraserButton;
 
 };
 

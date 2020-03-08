@@ -64,13 +64,13 @@ void MainWindow::createUI() {
 	toolboxGroup->setExclusive(true);
 	addToolBar(Qt::LeftToolBarArea, toolboxToolbar);
 
-	QToolButton *pencilButton = new QToolButton(toolboxToolbar);
+	pencilButton = new QToolButton(toolboxToolbar);
 	pencilButton->setIcon(QIcon("../res/icons/pencil.svg"));
 	pencilButton->setCheckable(true);
 	toolboxGroup->addButton(pencilButton);
 	toolboxToolbar->addWidget(pencilButton);
 
-	QToolButton *eraserButton = new QToolButton(toolboxToolbar);
+	eraserButton = new QToolButton(toolboxToolbar);
 	eraserButton->setIcon(QIcon("../res/icons/eraser.svg"));
 	eraserButton->setCheckable(true);
 	toolboxGroup->addButton(eraserButton);
@@ -120,7 +120,7 @@ void MainWindow::updateStatusBar() {
 	if(game != nullptr)
 		s += std::to_string(game->getGeneration());
 	else if(hashlife_universe != nullptr)
-		//TODO: Show number of generations
+		s += std::to_string(hashlife_universe->get_generation());
 	statusBar()->showMessage(QString(s.c_str()));
 }
 
@@ -161,10 +161,19 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
 void MainWindow::mousePressEvent(QMouseEvent *event) {
 	if(r_area->underMouse()){
 		QPoint pos = event->pos();
-		if(zoominButton->isChecked())
+		if(zoominButton->isChecked()){
 			r_area->zoomin_event(r_area->mapFromParent(pos));
-		else if(zoomoutButton->isChecked())
+		}
+		else if(zoomoutButton->isChecked()){
 			r_area->zoomout_event(r_area->mapFromParent(pos));
+		}
+		else if(pencilButton->isChecked()){
+			Coord c = r_area->map_coords_from_mouse(r_area->mapFromParent(pos));
+			std::cout << "Coords : " << c.x << "," << c.y << "\n";
+		}
+		else if(eraserButton->isChecked()){
+
+		}	
 	}
 }
 

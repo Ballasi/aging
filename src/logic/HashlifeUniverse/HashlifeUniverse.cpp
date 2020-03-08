@@ -18,7 +18,8 @@ HashlifeUniverse::HashlifeUniverse(size_t top_level, Coord top_left)
 }
 
 HashlifeUniverse::HashlifeUniverse(QString filename, Coord top_left)
-  : Universe(filename, top_left), top_left(top_left) {
+    : Universe(filename, top_left), top_left(top_left)
+{
 
   QFile file(filename);
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -294,7 +295,8 @@ CellState *HashlifeUniverse::find(Coord target) const
   }
 }
 
-CellState *HashlifeUniverse::find_path(Coord coord, vector<Quadrant*> &path) const {
+CellState *HashlifeUniverse::find_path(Coord coord, vector<Quadrant *> &path) const
+{
   Quadrant *cell = (Quadrant *)root;
   Coord size(top_level - 1);
   Coord current(top_left);
@@ -668,79 +670,69 @@ void HashlifeUniverse::print_grid(Quadrant *r, size_t level)
   }
 }
 
-
-
-
-void HashlifeUniverse::get_cell_in_bounds_rec(Rect bounds, vector<Coord> &coords, vector<CellState> &cell_states, size_t current_level, Quadrant* current_cell, Coord current_coord) const {
+void HashlifeUniverse::get_cell_in_bounds_rec(Rect bounds, vector<Coord> &coords, size_t current_level, Quadrant *current_cell, Coord current_coord) const
+{
 
   BigInt x = current_coord.x;
   BigInt y = current_coord.y;
-  
-  if (current_level == 1) {
+
+  if (current_level == 1)
+  {
     MiniCell minicell = current_cell->minicell;
-    if (bounds.is_in( {x    ,y    } )) {
-       cell_states.push_back(minicell.nw);
-       coords.push_back({x    ,y    });
+    if (bounds.is_in({x, y}))
+    {
+      if(minicell.nw)
+        coords.push_back({x, y});
     }
 
-    if (bounds.is_in( {x+1,y    } )) {
-       cell_states.push_back(minicell.ne);
-       coords.push_back({x+1,y    });
+    if (bounds.is_in({x + 1, y}))
+    {
+      if(minicell.ne)
+        coords.push_back({x + 1, y});
     }
 
-    if (bounds.is_in( {x    ,y+1} )) {
-       cell_states.push_back(minicell.sw);
-       coords.push_back({x    ,y+1});
-    }
-    
-    if (bounds.is_in( {x+1,y+1} )) {
-       cell_states.push_back(minicell.se);
-       coords.push_back({x+1,y+1});
+    if (bounds.is_in({x, y + 1}))
+    {
+      if(minicell.sw)
+        coords.push_back({x, y + 1});
     }
 
-
-  } else {
-    BigInt size = 1 << (current_level-1);
-    MacroCell macrocell = current_cell->macrocell;
-    if (bounds.collides({{x     ,y     }, {x  +size,y  +size}}  )) {
-      get_cell_in_bounds_rec(bounds, coords, cell_states, current_level-1, macrocell.nw, {x     ,y     } );
-    }
-
-    if (bounds.collides({{x+size,y     }, {x+2*size,y  +size}}  )) {
-      get_cell_in_bounds_rec(bounds, coords, cell_states, current_level-1, macrocell.ne, {x+size,y     } );
-    }
-
-    if (bounds.collides({{x     ,y+size}, {x  +size,y+2*size}}  )) {
-      get_cell_in_bounds_rec(bounds, coords, cell_states, current_level-1, macrocell.sw, {x     ,y+size} );
-    }
-
-    if (bounds.collides({{x+size,y+size}, {x+2*size,y+2*size}}  )) {
-      get_cell_in_bounds_rec(bounds, coords, cell_states, current_level-1, macrocell.se, {x+size,y+size} );
+    if (bounds.is_in({x + 1, y + 1}))
+    {
+      if(minicell.se)
+        coords.push_back({x + 1, y + 1});
     }
   }
+  else
+  {
+    MacroCell macrocell = current_cell->macrocell;
+    if (!(macrocell == zeros[current_level]->macrocell))
+    {
+      BigInt size = 1 << (current_level - 1);
+      if (bounds.collides({{x, y}, {x + size, y + size}}))
+      {
+        get_cell_in_bounds_rec(bounds, coords, current_level - 1, macrocell.nw, {x, y});
+      }
 
+      if (bounds.collides({{x + size, y}, {x + 2 * size, y + size}}))
+      {
+        get_cell_in_bounds_rec(bounds, coords, current_level - 1, macrocell.ne, {x + size, y});
+      }
+
+      if (bounds.collides({{x, y + size}, {x + size, y + 2 * size}}))
+      {
+        get_cell_in_bounds_rec(bounds, coords, current_level - 1, macrocell.sw, {x, y + size});
+      }
+
+      if (bounds.collides({{x + size, y + size}, {x + 2 * size, y + 2 * size}}))
+      {
+        get_cell_in_bounds_rec(bounds, coords, current_level - 1, macrocell.se, {x + size, y + size});
+      }
+    }
+  }
 }
 
-
-
-void HashlifeUniverse::get_cell_in_bounds(Rect bounds, vector<Coord> &coords, vector<CellState> &cell_states) const {
-  get_cell_in_bounds_rec(bounds, coords, cell_states, top_level, (Quadrant*) root, top_left);
+void HashlifeUniverse::get_cell_in_bounds(Rect bounds, vector<Coord> &coords) const
+{
+  get_cell_in_bounds_rec(bounds, coords, top_level, (Quadrant *)root, top_left);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

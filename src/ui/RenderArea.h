@@ -18,6 +18,8 @@ public:
 	void zoomin_event(QPoint origin);
 	void zoomout_event(QPoint origin);
 
+	Coord map_coords_from_mouse(QPoint mouseCoords);
+
 protected:
 	void initializeGL() override;
 	void resizeGL(int w, int h) override;

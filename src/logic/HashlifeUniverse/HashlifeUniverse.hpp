@@ -28,7 +28,7 @@ public:
   void debug();
   
 
-  void get_cell_in_bounds(Rect bounds, vector<Coord> &coords, vector<CellState> &cell_states) const;
+  void get_cell_in_bounds(Rect bounds, vector<Coord> &coords) const;
 /*
   class Iterator;
   Iterator iter(Rect bounds);
@@ -85,7 +85,7 @@ private:
   Quadrant *quadrant(size_t level);
 
 
-  void get_cell_in_bounds_rec(Rect bounds, vector<Coord> &coords, vector<CellState> &cell_states, size_t current_level, Quadrant* current_cell, Coord current_coord) const;
+  void get_cell_in_bounds_rec(Rect bounds, vector<Coord> &coords, size_t current_level, Quadrant* current_cell, Coord current_coord) const;
 };
 
 #endif // HASHLIFE_UNIVERSE_HPP
