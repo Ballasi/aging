@@ -18,6 +18,8 @@ public:
 	void zoomin_event(QPoint origin);
 	void zoomout_event(QPoint origin);
 
+	Coord map_coords_from_mouse(QPoint mouseCoords);
+
 protected:
 	void initializeGL() override;
 	void resizeGL(int w, int h) override;
@@ -31,13 +33,17 @@ private:
 	std::string fragmentShaderSource;
 
 	GLuint m_posAttr;
-	GLuint m_matrixUniform;
+	GLuint m_modelUniform;
+	GLuint m_viewUniform;
+	GLuint m_projectionUniform;
+
+	QMatrix4x4 projectionMatrix;
 
 	float square_vertices[8] = {
-		-0.5f,  0.5f,  // Top-left
-		0.5f,  0.5f,  // Top-right
-		0.5f, -0.5f,  // Bottom-right
-		-0.5f, -0.5f,  // Bottom-left
+		0.05f,  0.05f,  // Top-left
+		0.95f,  0.05f,  // Top-right
+		0.95f,  0.95f,  // Bottom-right
+		0.05f,  0.95f,  // Bottom-left
 	};
 	GLuint square_elements[4] = {
 		0,1,3,2,
