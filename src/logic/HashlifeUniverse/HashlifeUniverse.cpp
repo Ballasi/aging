@@ -75,9 +75,11 @@ void HashlifeUniverse::read_rle_data(QFile &file, Coord boundingbox)
   }
 
   data = data.simplified();
+  int boundingbox_x = boundingbox.x.get_si();
+  int boundingbox_y = boundingbox.y.get_si();
 
-  int init_x = (1 << (top_level - 1)) - (int)boundingbox.x / 2;
-  int init_y = (1 << (top_level - 1)) - (int)boundingbox.y / 2;
+  int init_x = (1 << (top_level - 1)) - boundingbox_x / 2;
+  int init_y = (1 << (top_level - 1)) - boundingbox_y / 2;
   int curr_x = init_x;
   int curr_y = init_y;
 
@@ -115,8 +117,10 @@ void HashlifeUniverse::read_rle_data(QFile &file, Coord boundingbox)
 
 void HashlifeUniverse::assert_handles(size_t asserted_level)
 {
+
   if (asserted_level >= macrocell_sets.size())
   {
+    cout << "Asserted level greater\n"; 
     size_t previous_asserted_level = macrocell_sets.size() - 1;
 
     macrocell_sets.resize(asserted_level + 1);
@@ -134,7 +138,9 @@ void HashlifeUniverse::step()
   crown();
   crown();
   // Calculate result of universe
-  root = (MacroCell *)result(top_level--, root);
+  root = (MacroCell *) result(top_level--, root);
+
+  generation_count += BigInt(1) << mp_size_t(top_level - 2);
 
   Quadrant *z = zeros[top_level - 2];
 
@@ -152,6 +158,7 @@ void HashlifeUniverse::step()
       root->sw->macrocell.sw == z &&
       root->sw->macrocell.nw == z)
   {
+    cout << "Allo ?" << '\n';
     top_level--;
     root = macrocell(top_level, root->nw->macrocell.se, root->ne->macrocell.sw,
                      root->sw->macrocell.ne, root->se->macrocell.nw);
@@ -160,11 +167,13 @@ void HashlifeUniverse::step()
   {
     top_left -= Coord(top_level - 2);
   }
+
+  cout << "Universe size : " << top_level << '\n';
 }
 
 const CellState HashlifeUniverse::get(Coord target) const
 {
-  if (target.y >= top_left.y && target.y < top_left.y + (1 << top_level) && target.x >= top_left.x && target.x < top_left.x + (1 << top_level))
+  if (target.y >= top_left.y && target.y < top_left.y + (BigInt(1) << mp_size_t(top_level)) && target.x >= top_left.x && target.x < top_left.x + (BigInt(1) << mp_size_t(top_level)))
     return *find(target);
   else
     return 0;
@@ -681,25 +690,25 @@ void HashlifeUniverse::get_cell_in_bounds_rec(Rect bounds, vector<Coord> &coords
     MiniCell minicell = current_cell->minicell;
     if (bounds.is_in({x, y}))
     {
-      if(minicell.nw)
+      if (minicell.nw)
         coords.push_back({x, y});
     }
 
     if (bounds.is_in({x + 1, y}))
     {
-      if(minicell.ne)
+      if (minicell.ne)
         coords.push_back({x + 1, y});
     }
 
     if (bounds.is_in({x, y + 1}))
     {
-      if(minicell.sw)
+      if (minicell.sw)
         coords.push_back({x, y + 1});
     }
 
     if (bounds.is_in({x + 1, y + 1}))
     {
-      if(minicell.se)
+      if (minicell.se)
         coords.push_back({x + 1, y + 1});
     }
   }
@@ -708,23 +717,23 @@ void HashlifeUniverse::get_cell_in_bounds_rec(Rect bounds, vector<Coord> &coords
     MacroCell macrocell = current_cell->macrocell;
     if (!(macrocell == zeros[current_level]->macrocell))
     {
-      BigInt size = 1 << (current_level - 1);
+      BigInt size = BigInt(1) << mp_size_t(current_level - 1);
       if (bounds.collides({{x, y}, {x + size, y + size}}))
       {
         get_cell_in_bounds_rec(bounds, coords, current_level - 1, macrocell.nw, {x, y});
       }
 
-      if (bounds.collides({{x + size, y}, {x + 2 * size, y + size}}))
+      if (bounds.collides({{x + size, y}, {x + BigInt(2) * size, y + size}}))
       {
         get_cell_in_bounds_rec(bounds, coords, current_level - 1, macrocell.ne, {x + size, y});
       }
 
-      if (bounds.collides({{x, y + size}, {x + size, y + 2 * size}}))
+      if (bounds.collides({{x, y + size}, {x + size, y + BigInt(2) * size}}))
       {
         get_cell_in_bounds_rec(bounds, coords, current_level - 1, macrocell.sw, {x, y + size});
       }
 
-      if (bounds.collides({{x + size, y + size}, {x + 2 * size, y + 2 * size}}))
+      if (bounds.collides({{x + size, y + size}, {x + BigInt(2) * size, y + BigInt(2) * size}}))
       {
         get_cell_in_bounds_rec(bounds, coords, current_level - 1, macrocell.se, {x + size, y + size});
       }

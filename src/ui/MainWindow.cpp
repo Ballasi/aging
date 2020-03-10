@@ -120,7 +120,7 @@ void MainWindow::updateStatusBar() {
 	if(game != nullptr)
 		s += std::to_string(game->getGeneration());
 	else if(hashlife_universe != nullptr)
-		s += std::to_string(hashlife_universe->get_generation());
+		s += (hashlife_universe->get_generation()).get_str();
 	statusBar()->showMessage(QString(s.c_str()));
 }
 

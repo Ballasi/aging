@@ -40,10 +40,10 @@ private:
 	QMatrix4x4 projectionMatrix;
 
 	float square_vertices[8] = {
-		0.0f,  0.0f,  // Top-left
-		1.0f,  0.0f,  // Top-right
-		1.0f,  1.0f,  // Bottom-right
-		0.0f,  1.0f,  // Bottom-left
+		0.05f,  0.05f,  // Top-left
+		0.95f,  0.05f,  // Top-right
+		0.95f,  0.95f,  // Bottom-right
+		0.05f,  0.95f,  // Bottom-left
 	};
 	GLuint square_elements[4] = {
 		0,1,3,2,

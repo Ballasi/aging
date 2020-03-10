@@ -1,6 +1,8 @@
 #ifndef BIG_INT_HPP
 #define BIG_INT_HPP
 
-typedef long long int BigInt;
+#include <gmpxx.h>
+
+typedef mpz_class BigInt;
 
 #endif // BIG_INT_HPP

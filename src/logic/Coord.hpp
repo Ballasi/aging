@@ -17,6 +17,7 @@ public:
   void operator+=(const Coord &coord);
   Coord operator-(const Coord &coord);
   void operator-=(const Coord &coord);
+  
   Coord operator<<(size_t shift);
   void operator>>=(size_t shift);
   Coord operator>>(size_t shift);

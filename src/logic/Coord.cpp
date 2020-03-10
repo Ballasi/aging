@@ -1,7 +1,7 @@
 #include "Coord.hpp"
 
 Coord::Coord(size_t level)
-  : x(1 << level), y(1 << level) {}
+  : x(BigInt(1) << mp_size_t(level)), y(BigInt(1) << mp_size_t(level)) {}
 
 Coord::Coord(BigInt x, BigInt y)
   : x(x), y(y) {}
@@ -29,19 +29,19 @@ void Coord::operator-=(const Coord &coord) {
 }
 
 Coord Coord::operator<<(size_t shift) {
-  return Coord(x << shift, y << shift);
+  return Coord(x << mp_size_t(shift), y << mp_size_t(shift));
 }
 
 void Coord::operator<<=(size_t shift) {
-  x <<= shift;
-  y <<= shift;
+  x <<= mp_size_t(shift);
+  y <<= mp_size_t(shift);
 }
 
 Coord Coord::operator>>(size_t shift) {
-  return Coord(x >> shift, y >> shift);
+  return Coord(x >> mp_size_t(shift), y >> mp_size_t(shift));
 }
 
 void Coord::operator>>=(size_t shift) {
-  x >>= shift;
-  y >>= shift;
+  x >>= mp_size_t(shift);
+  y >>= mp_size_t(shift);
 }

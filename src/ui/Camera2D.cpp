@@ -55,8 +55,8 @@ Rect Camera2D::get_view_bounds(float aspect_ratio, Universe *universe) {
     
     QRectF rectf = inv.mapRect(QRectF(QPointF(0.0f,0.0f),QPointF(1.0f * aspect_ratio,1.0f)));
 
-    Coord top_left = Coord((BigInt) std::ceil(rectf.topLeft().x()), (BigInt) std::ceil(rectf.bottomRight().y()));
-    Coord bottom_right = Coord((BigInt) std::ceil(rectf.bottomRight().x()), (BigInt) std::ceil(rectf.topLeft().y()));
+    Coord top_left = Coord(BigInt((int) std::ceil(rectf.topLeft().x())), BigInt((int) std::ceil(rectf.bottomRight().y())));
+    Coord bottom_right = Coord(BigInt((int) std::ceil(rectf.bottomRight().x())), BigInt((int) std::ceil(rectf.topLeft().y())));
 
     //top_left.y = (1 << universe->get_top_level()) - top_left.y;
     //bottom_right.y = (1 << universe->get_top_level()) - bottom_right.y;

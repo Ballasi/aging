@@ -152,7 +152,7 @@ void RenderArea::render_hashlife(QMatrix4x4 &viewMatrix)
 	for (size_t i = 0; i < coords.size(); ++i)
 	{
 		modelMatrix.setToIdentity();
-		modelMatrix.translate(coords[i].x, -coords[i].y, 0);
+		modelMatrix.translate(coords[i].x.get_si(), -coords[i].y.get_si(), 0);
 		m_program->setUniformValue(m_modelUniform, modelMatrix);
 		glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0);
 	}
@@ -181,8 +181,9 @@ Coord RenderArea::map_coords_from_mouse(QPoint mouseCoords)
 	float x_relative = (float)mouseCoords.x() / (float) width();
 	float y_relative = (float)mouseCoords.y() / (float) height();
 
-	return Coord(view.top_left.x + x_relative * (view.bottom_right.x - view.top_left.x),
-                 view.top_left.y + y_relative * (view.bottom_right.y - view.top_left.y));
+	//return Coord(view.top_left.x + x_relative * (view.bottom_right.x - view.top_left.x),
+    //             view.top_left.y + y_relative * (view.bottom_right.y - view.top_left.y));
+	return Coord();
 }
 
 void RenderArea::handleInput(QKeyEvent *event)
