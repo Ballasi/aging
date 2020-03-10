@@ -1,57 +1,46 @@
 #ifndef UNIVERSE_HPP
 #define UNIVERSE_HPP
 
-#include <unordered_set>
-#include <vector>
-
-#include "cell.hpp"
+#include "CellState.hpp"
 #include "Coord.hpp"
-#include "cell/MiniCell.hpp"
+#include "LifeFile.hpp"
+#include "Rect.hpp"
+#include <vector>
+#include "RLE/RLE.hpp"
 
 using namespace std;
 
+// Universal Universe interface
 class Universe {
 public:
-  Universe(size_t top_level);
-  Universe(Coord top_left, size_t top_level);
+  Universe(Rect bounds);
+  Universe(QString filename, Coord top_left = 0);
+  Universe(Coord size = Coord(8, 8));
+  Universe(size_t top_level, Coord top_left);
 
-  size_t step();
-  const CellState get(Coord coord) const;
-  void set(Coord target, CellState state);
-  void debug();
+  // Makes a step in the simulation
+  virtual void step() = 0;
 
-  Coord get_top_left();
-  size_t get_top_level();
+  // Universe interaction
+  virtual void set(Coord, CellState) = 0;
+  virtual const CellState get(Coord coord) const = 0;
 
-private:
-  size_t top_level;
-  Coord top_left;
-  Quadrant *root;
+  //virtual void get_cell_in_bounds(Rect bounds, vector<Coord> coords, vector<CellState> cell_states) const = 0;
 
-  vector<unordered_set<MacroCell>> macrocell_sets;
-  unordered_set<MiniCell> minicells;
-  vector<Quadrant*> zeros;
+/*
+  class Iterator {
+    virtual bool next(Coord &coord, CellState &state) = 0;
+  };
 
-  // Recursive setter
-  Quadrant *set_rec(Coord current, size_t level, Quadrant *cell, Coord target, CellState state);
+  virtual Iterator iterate(Rect bounds) const = 0;
+*/
 
-  // Finding
-  CellState *find(Coord) const;
-  CellState *find_path(Coord coord, vector<Quadrant*> &path) const;
+  // Getters
+  Rect get_bounds() const;
+  BigInt get_generation() const;
 
-  // Minicells
-  MiniCell *minicell();
-  MiniCell *minicell(CellState nw, CellState ne,
-                     CellState sw, CellState se);
-
-  // Macrocells
-  MacroCell *macrocell(size_t level);
-  MacroCell *macrocell(size_t level,
-                       Quadrant *nw, Quadrant *ne,
-                       Quadrant *sw, Quadrant *se);
-
-  // Quadrant
-  Quadrant *quadrant(size_t level);
+  BigInt generation_count;
+  Rect bounds;
 };
 
 #endif // UNIVERSE_HPP

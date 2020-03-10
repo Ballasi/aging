@@ -2,6 +2,7 @@
 #define UI_MAINWINDOW_H_
 
 #include <QMainWindow>
+#include <QToolButton>
 #include <QTimer>
 #include "RenderArea.h"
 
@@ -19,6 +20,7 @@ public slots:
 
 protected:
 	void keyPressEvent(QKeyEvent *event);
+	void mousePressEvent(QMouseEvent *event);
 
 private:
 	RenderArea *r_area;
@@ -31,6 +33,8 @@ private:
 	QAction *playPauseAction;
 	QIcon *playIcon, *pauseIcon;
 	QTimer *stepTimer;
+
+	QToolButton *zoominButton, *zoomoutButton, *pencilButton, *eraserButton;
 
 };
 

@@ -12,7 +12,11 @@ union Quadrant {
 public:
   MiniCell minicell;
   MacroCell macrocell;
+
+  Quadrant* operator[](const size_t index) const;
+
   void debug(size_t level);
+
   static Quadrant *generate(size_t level);
   static Quadrant *generate_random(size_t level, CellState max_value);
 

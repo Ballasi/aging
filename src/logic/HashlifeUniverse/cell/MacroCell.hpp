@@ -13,6 +13,8 @@ public:
             Quadrant *sw, Quadrant *se);
 
   bool operator==(const MacroCell other) const;
+  Quadrant* operator[](const size_t index) const;
+
   friend std::hash<MacroCell>;
   friend Quadrant;
 
