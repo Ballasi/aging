@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 2.6)
 
-project (Hashlife)
+project (aging)
 
 
 # search for location of header gmpxx.h", only at positions given by the user
@@ -80,11 +80,11 @@ file(
     src/*
     )
 
-add_executable(Hashlife ${sources_files})
+add_executable(aging ${sources_files})
 
-target_link_libraries(Hashlife ${GMP_LIB} ${GMPXX_LIB})
+target_link_libraries(aging ${GMP_LIB} ${GMPXX_LIB})
 
-target_link_libraries(Hashlife PRIVATE
+target_link_libraries(aging PRIVATE
     Qt5::Core
     Qt5::Gui
     Qt5::Widgets
