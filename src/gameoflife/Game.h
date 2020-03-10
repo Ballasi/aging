@@ -1,4 +1,4 @@
-#ifndef __GAME_H
+/*#ifndef __GAME_H
 #define __GAME_H
 
 #include "CellMap.h"
@@ -22,3 +22,4 @@ private:
 };
 
 #endif // __GAME_H
+*/
