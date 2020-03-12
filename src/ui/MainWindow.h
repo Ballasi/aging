@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QToolButton>
 #include <QTimer>
+#include <QSettings>
 #include "RenderArea.h"
 
 class MainWindow : public QMainWindow {
@@ -17,6 +18,7 @@ public slots:
 	void stepSimulation();
 	void load();
 	void playPause();
+	void chooseColors();
 
 protected:
 	void keyPressEvent(QKeyEvent *event);

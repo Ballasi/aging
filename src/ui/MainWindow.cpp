@@ -9,8 +9,10 @@
 #include <QFileDialog>
 #include <QToolButton>
 #include <QButtonGroup>
+#include <QColorDialog>
 
 MainWindow::MainWindow() {
+
 	this->resize(720, 720);
 	this->setFocusPolicy(Qt::FocusPolicy::ClickFocus);
 
@@ -93,8 +95,10 @@ void MainWindow::createUI() {
 	QMenu *fileMenu = new QMenu("File");
 	QMenu *prefMenu = new QMenu("Preferences");
 	QAction *loadAction = fileMenu->addAction("Load pattern");
+	QAction *changeColorsAction = prefMenu->addAction("Choose colors");
 
 	connect(loadAction, &QAction::triggered, this, &MainWindow::load);
+	connect(changeColorsAction, &QAction::triggered, this, &MainWindow::chooseColors);
 	loadAction->setShortcut(QKeySequence::Open);
 
 	menuBar()->addMenu(fileMenu);
@@ -120,9 +124,7 @@ void MainWindow::updateStatusBar() {
 	if(game != nullptr)
 		s += std::to_string(game->getGeneration());
 	else if(hashlife_universe != nullptr)
-		s += (hashlife_universe->get_generation()).get_str()[0];
-		s += "e";
-		s += std::to_string((hashlife_universe->get_generation()).get_str().size() - 1);
+		s += bigint_to_str(hashlife_universe->get_generation());
 	statusBar()->showMessage(QString(s.c_str()));
 }
 
@@ -177,5 +179,17 @@ void MainWindow::mousePressEvent(QMouseEvent *event) {
 
 		}	
 	}
+}
+
+void MainWindow::chooseColors(){
+	QColor cell_color = QColorDialog::getColor(Qt::white,this,"Choose cell color");
+	QColor bg_color = QColorDialog::getColor(Qt::black,this,"Choose background color");
+
+	QSettings settings("aging-team", "aging");
+	settings.setValue("renderer/bg-color",bg_color);
+	settings.setValue("renderer/cell-color",cell_color);
+
+	r_area->set_colors(cell_color,bg_color);
+	r_area->update();
 }
 

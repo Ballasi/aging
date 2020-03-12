@@ -1,9 +1,10 @@
 #include "ui/MainWindow.h"
 #include <QApplication>
 
-#include "logic/Universe.hpp"
-
 int main(int argc, char **argv) {
+
+  QCoreApplication::setApplicationName("aging");
+  QCoreApplication::setOrganizationName("aging-team");
 
   QApplication app(argc,argv);
 
