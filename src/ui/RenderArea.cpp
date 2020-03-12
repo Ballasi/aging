@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <QSurfaceFormat>
+#include <QSettings>
 #include "../logic/Rect.hpp"
 #include "../logic/HashlifeUniverse/HashlifeUniverse.hpp"
 
@@ -17,6 +18,13 @@ RenderArea::RenderArea(QWidget *parent, Universe *hashlife_universe)
 void RenderArea::initializeGL()
 {
 
+	QSettings settings("aging-team", "aging");
+	settings.sync();
+	QColor bg_color = settings.value("renderer/bg-color").value<QColor>();
+	QColor c_color = settings.value("renderer/cell-color").value<QColor>();
+
+	set_colors(c_color, bg_color);
+
 	this->vertexShaderSource =
 		"attribute vec2 posAttr;\n"
 		"uniform mat4 model;\n"
@@ -27,13 +35,12 @@ void RenderArea::initializeGL()
 		"}\n";
 
 	this->fragmentShaderSource =
+		"uniform vec3 color;"
 		"void main() {\n"
-		"	gl_FragColor = vec4(1.0f,1.0f,1.0f,1.0f);\n"
+		"	gl_FragColor = vec4(color,1.0f);\n"
 		"}\n";
 
 	initializeOpenGLFunctions();
-
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glDepthMask(0);
 
 	m_program = new QOpenGLShaderProgram(this);
@@ -44,6 +51,7 @@ void RenderArea::initializeGL()
 	m_modelUniform = m_program->uniformLocation("model");
 	m_viewUniform = m_program->uniformLocation("view");
 	m_projectionUniform = m_program->uniformLocation("projection");
+	m_colorUniform = m_program->uniformLocation("color");
 
 	glGenBuffers(1, &square_ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, square_ebo);
@@ -83,9 +91,11 @@ void RenderArea::paintGL()
 	const qreal retinaScale = devicePixelRatio();
 	glViewport(0, 0, width() * retinaScale, height() * retinaScale);
 
+	glClearColor(bg_r, bg_g, bg_b, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	m_program->bind();
+	m_program->setUniformValue(m_colorUniform, cell_color);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(m_posAttr, 2, GL_FLOAT, GL_FALSE, 0, square_vertices);
 
@@ -178,11 +188,11 @@ Coord RenderArea::map_coords_from_mouse(QPoint mouseCoords)
 {
 	Rect view = camera->get_view_bounds((float)width() / (float)height(), hashlife_universe);
 
-	float x_relative = (float)mouseCoords.x() / (float) width();
-	float y_relative = (float)mouseCoords.y() / (float) height();
+	float x_relative = (float)mouseCoords.x() / (float)width();
+	float y_relative = (float)mouseCoords.y() / (float)height();
 
 	//return Coord(view.top_left.x + x_relative * (view.bottom_right.x - view.top_left.x),
-    //             view.top_left.y + y_relative * (view.bottom_right.y - view.top_left.y));
+	//             view.top_left.y + y_relative * (view.bottom_right.y - view.top_left.y));
 	return Coord();
 }
 
@@ -213,4 +223,15 @@ void RenderArea::handleInput(QKeyEvent *event)
 		break;
 	}
 	update();
+}
+
+void RenderArea::set_colors(QColor c_color, QColor bg_color)
+{
+	bg_r = bg_color.redF();
+	bg_g = bg_color.greenF();
+	bg_b = bg_color.blueF();
+
+	cell_color.setX(c_color.redF());
+	cell_color.setY(c_color.greenF());
+	cell_color.setZ(c_color.blueF());
 }

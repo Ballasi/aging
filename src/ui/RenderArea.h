@@ -19,6 +19,7 @@ public:
 	void zoomout_event(QPoint origin);
 
 	Coord map_coords_from_mouse(QPoint mouseCoords);
+	void set_colors(QColor cell_color, QColor bg_color);
 
 protected:
 	void initializeGL() override;
@@ -36,6 +37,10 @@ private:
 	GLuint m_modelUniform;
 	GLuint m_viewUniform;
 	GLuint m_projectionUniform;
+	GLuint m_colorUniform;
+
+	GLclampf bg_r, bg_g, bg_b;
+	QVector3D cell_color;
 
 	QMatrix4x4 projectionMatrix;
 
