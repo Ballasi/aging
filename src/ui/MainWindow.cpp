@@ -174,9 +174,14 @@ void MainWindow::mousePressEvent(QMouseEvent *event) {
 		else if(pencilButton->isChecked()){
 			Coord c = r_area->map_coords_from_mouse(r_area->mapFromParent(pos));
 			std::cout << "Coords : " << c.x << "," << c.y << "\n";
+			hashlife_universe->set(c,1);
+			r_area->update();
 		}
 		else if(eraserButton->isChecked()){
-
+			Coord c = r_area->map_coords_from_mouse(r_area->mapFromParent(pos));
+			std::cout << "Coords : " << c.x << "," << c.y << "\n";
+			hashlife_universe->set(c,0);
+			r_area->update();
 		}	
 	}
 }

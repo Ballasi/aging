@@ -186,14 +186,17 @@ void RenderArea::zoomout_event(QPoint origin)
 
 Coord RenderArea::map_coords_from_mouse(QPoint mouseCoords)
 {
-	Rect view = camera->get_view_bounds((float)width() / (float)height(), hashlife_universe);
-
-	float x_relative = (float)mouseCoords.x() / (float)width();
+	float aspect_ratio = (float) width() / (float) height();
+	float x_relative = (float)mouseCoords.x() / (float)width() * aspect_ratio;
 	float y_relative = (float)mouseCoords.y() / (float)height();
 
-	//return Coord(view.top_left.x + x_relative * (view.bottom_right.x - view.top_left.x),
-	//             view.top_left.y + y_relative * (view.bottom_right.y - view.top_left.y));
-	return Coord();
+	QMatrix4x4 viewinv = camera->get_view().inverted();
+	Coord c;
+	QPointF p = viewinv.map(QPointF(x_relative,y_relative));
+	c.x = BigInt(std::floor(p.x()));
+	c.y = BigInt(std::ceil(-p.y()));
+
+	return c;
 }
 
 void RenderArea::handleInput(QKeyEvent *event)
@@ -201,15 +204,19 @@ void RenderArea::handleInput(QKeyEvent *event)
 	switch (event->key())
 	{
 	case Qt::Key_Z:
+	case Qt::Key_Up:
 		camera->pos.setY(camera->pos.y() - 0.05f);
 		break;
 	case Qt::Key_S:
+	case Qt::Key_Down:
 		camera->pos.setY(camera->pos.y() + 0.05f);
 		break;
 	case Qt::Key_Q:
+	case Qt::Key_Left:
 		camera->pos.setX(camera->pos.x() - 0.05f);
 		break;
 	case Qt::Key_D:
+	case Qt::Key_Right:
 		camera->pos.setX(camera->pos.x() + 0.05f);
 		break;
 	case Qt::Key_Plus:
