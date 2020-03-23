@@ -13,30 +13,30 @@ public:
 
   // Constructors
   Vec2() = default;
-  constexpr Vec2(const size_t level);
-  constexpr Vec2(const BigInt &x, const BigInt &y);
+  Vec2(const size_t level);
+  Vec2(const BigInt &x, const BigInt &y);
 
   // Equality operators
-  inline constexpr bool operator==(const Vec2 &) const;
-  inline constexpr bool operator!=(const Vec2 &) const;
+  inline bool operator==(const Vec2 &) const;
+  inline bool operator!=(const Vec2 &) const;
 
   // Inclusion operators
-  inline constexpr bool operator< (const Vec2 &) const;
-  inline constexpr bool operator<=(const Vec2 &) const;
-  inline constexpr bool operator> (const Vec2 &) const;
-  inline constexpr bool operator>=(const Vec2 &) const;
+  inline bool operator< (const Vec2 &) const;
+  inline bool operator<=(const Vec2 &) const;
+  inline bool operator> (const Vec2 &) const;
+  inline bool operator>=(const Vec2 &) const;
 
   // Sum operator
-  inline constexpr Vec2 operator+ (const Vec2 &) const;
-  inline constexpr Vec2 operator- (const Vec2 &) const;
-  inline constexpr void operator+=(const Vec2 &);
-  inline constexpr void operator-=(const Vec2 &);
+  inline Vec2 operator+ (const Vec2 &) const;
+  inline Vec2 operator- (const Vec2 &) const;
+  inline void operator+=(const Vec2 &);
+  inline void operator-=(const Vec2 &);
 
   // Scaling operators
-  inline constexpr Vec2 operator<< (const size_t) const;
-  inline constexpr Vec2 operator>> (const size_t) const;
-  inline constexpr void operator<<=(const size_t);
-  inline constexpr void operator>>=(const size_t);
+  inline Vec2 operator<< (const size_t) const;
+  inline Vec2 operator>> (const size_t) const;
+  inline void operator<<=(const size_t);
+  inline void operator>>=(const size_t);
 };
 
 #endif // VEC2_HPP

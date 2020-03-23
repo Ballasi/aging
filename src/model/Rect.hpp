@@ -15,33 +15,32 @@ public:
 
   // Constructors
   Rect() = default;
-  constexpr Rect(Vec2 &top_left, Vec2 &size);
-  constexpr Rect(Vec2 &top_left, size_t level);
+  Rect(Vec2 &top_left, Vec2 &size);
+  Rect(Vec2 &top_left, size_t level);
 
   // Equality operators
-  inline constexpr bool operator==(const Vec2 &) const;
-  inline constexpr bool operator!=(const Vec2 &) const;
+  inline bool operator==(const Vec2 &) const;
+  inline bool operator!=(const Vec2 &) const;
 
-  // Maybe change whith named operator "collides"
-  // Touch operator operator
-  inline constexpr bool operator&(const Vec2 &) const;
-  inline constexpr bool operator&(const Rect &) const;
+  // Collides operator
+  inline bool operator&(const Vec2 &) const;
+  inline bool operator&(const Rect &) const;
 
-  // Do NOT touch operator
-  inline constexpr bool operator|(const Vec2 &) const;
-  inline constexpr bool operator|(const Rect &) const;
+  // Does not collide operator
+  inline bool operator|(const Vec2 &) const;
+  inline bool operator|(const Rect &) const;
 
   // Move operator
-  inline constexpr Rect operator+ (const Vec2 &) const;
-  inline constexpr Rect operator- (const Vec2 &) const;
-  inline constexpr void operator+=(const Vec2 &);
-  inline constexpr void operator-=(const Vec2 &);
+  inline Rect operator+ (const Vec2 &) const;
+  inline Rect operator- (const Vec2 &) const;
+  inline void operator+=(const Vec2 &);
+  inline void operator-=(const Vec2 &);
 
   // Scaling operators
-  inline constexpr Vec2 operator<< (const size_t) const;
-  inline constexpr Vec2 operator>> (const size_t) const;
-  inline constexpr void operator<<=(const size_t);
-  inline constexpr void operator>>=(const size_t);
+  inline Vec2 operator<< (const size_t) const;
+  inline Vec2 operator>> (const size_t) const;
+  inline void operator<<=(const size_t);
+  inline void operator>>=(const size_t);
 
   // Getters
   inline BigInt &x() const;
@@ -51,11 +50,6 @@ public:
 
   // Pseudo getters
   inline const Vec2& bottom_right() const;
-
-private:
-  // // Cache (optional)
-  mutable bool is_bottom_left_cached;
-  mutable Vec2 bottom_left_cache;
 };
 
 #endif // RECT_HPP
