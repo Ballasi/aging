@@ -1,4 +1,4 @@
-#include "Game.h"
+/*#include "Game.h"
 #include "CellMap.h"
 
 #include <QFile>
@@ -83,4 +83,4 @@ void Game::loadRLE(QString filename){
     }
 
 }
-
+*/
