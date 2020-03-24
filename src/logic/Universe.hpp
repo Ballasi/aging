@@ -17,6 +17,7 @@ public:
   Universe(QString filename, Coord top_left = 0);
   Universe(Coord size = Coord(8, 8));
   Universe(size_t top_level, Coord top_left);
+  virtual ~Universe();
 
   // Makes a step in the simulation
   virtual void step() = 0;
