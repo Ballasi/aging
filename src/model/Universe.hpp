@@ -25,7 +25,7 @@ public:
   virtual void set(Vec2 &coord, CellState cell_state);
 
   virtual const bool can_get() const;
-  virtual const CellState get(Vec2 &coord);
+  virtual const CellState get(Vec2 &coord) const;
 
   virtual const bool can_clear() const;
   virtual void clear();
