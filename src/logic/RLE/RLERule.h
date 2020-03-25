@@ -1,14 +1,14 @@
 #ifndef RLE_RULE_HPP
 #define RLE_RULE_HPP
 
-#include "../CellState.hpp"
+#include <logic/CellState.h>
 
 #include <QString>
 
 class RLERule {
 public:
   RLERule() = default;
-  RLERule(QString rule_string);
+  explicit RLERule(QString rule_string);
 
   QString to_qstring() const;
 

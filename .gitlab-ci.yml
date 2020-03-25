@@ -8,9 +8,9 @@ cppcheck:
         stage: lint
         script: cppcheck --inline-suppr --error-exitcode=1 src
 
-#cpplint:
-#        stage: lint
-#        script: cpplint $(find src -type f)
+cpplint:
+        stage: lint
+        script: cpplint $(find src -type f)
 
 make:
         stage: build

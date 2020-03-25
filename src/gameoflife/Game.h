@@ -3,21 +3,20 @@
 
 #include "CellMap.h"
 
-#include <cstddef>
 #include <QString>
+#include <cstddef>
 
-class Game
-{
+class Game {
 public:
-  Game(std:: size_t width, std::size_t height);
+  Game(std::size_t width, std::size_t height);
   ~Game();
   void nextGeneration();
-  CellMap* getMap();
-  std::size_t getGeneration() ;
+  CellMap *getMap();
+  std::size_t getGeneration();
   void loadRLE(QString filename);
 
 private:
-  CellMap* map;
+  CellMap *map;
   std::size_t generation;
 };
 

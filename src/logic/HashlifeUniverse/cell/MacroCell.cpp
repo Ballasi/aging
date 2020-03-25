@@ -1,15 +1,13 @@
-#include "MacroCell.hpp"
+#include <logic/HashlifeUniverse/cell/MacroCell.h>
 
-MacroCell::MacroCell(Quadrant *nw, Quadrant *ne,
-                     Quadrant *sw, Quadrant *se)
-  : nw(nw), ne(ne), sw(sw), se(se), result(nullptr) {}
-
+MacroCell::MacroCell(Quadrant *nw, Quadrant *ne, Quadrant *sw, Quadrant *se)
+    : nw(nw), ne(ne), sw(sw), se(se), result(nullptr) {}
 
 bool MacroCell::operator==(const MacroCell other) const {
   return nw == other.nw && ne == other.ne && sw == other.sw && se == other.se;
 }
 
-Quadrant* MacroCell::operator[](const size_t index) const {
+Quadrant *MacroCell::operator[](const size_t index) const {
   switch (index) {
   case 0:
     return nw;
@@ -19,5 +17,5 @@ Quadrant* MacroCell::operator[](const size_t index) const {
     return sw;
   default:
     return se;
-  };
+  }
 }

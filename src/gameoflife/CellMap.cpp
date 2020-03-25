@@ -1,31 +1,27 @@
-#include "CellMap.h"
-#include "Game.h"
+#include <gameoflife/CellMap.h>
+#include <gameoflife/Game.h>
 
-
-CellMap::CellMap(Game* g, size_t w, size_t h)
-  : game(g), width(w), height(h), length_in_bytes(w * h) {
+CellMap::CellMap(Game *g, size_t w, size_t h)
+    : game(g), width(w), height(h), length_in_bytes(w * h) {
   // Adding () calls constructor for every Cell in the array
   cells = new Cell[length_in_bytes]();
 }
-
 
 CellMap::CellMap(size_t w, size_t h)
-  :width(w), height(h), length_in_bytes(w * h) {
+    : width(w), height(h), length_in_bytes(w * h) {
   // Adding () calls constructor for every Cell in the array
   cells = new Cell[length_in_bytes]();
 }
 
-CellMap::~CellMap() {
-  delete[] cells;
-}
+CellMap::~CellMap() { delete[] cells; }
 
-void CellMap::clear(){
-  for(size_t i = 0; i < length_in_bytes; ++i)
+void CellMap::clear() {
+  for (size_t i = 0; i < length_in_bytes; ++i)
     cells[i] = 0;
 }
 
 void CellMap::changeCellState(size_t c, size_t l, int toAlive) {
-  Cell* cell_ptr = cells + (l * width) + c;
+  Cell *cell_ptr = cells + (l * width) + c;
 
   if (toAlive)
     *(cell_ptr) |= LIVING_BIT;
@@ -41,31 +37,19 @@ void CellMap::nextGeneration() {
   updateNeighbourCount();
 
   size_t w = width, h = height;
-  Cell* cell_ptr;
+  Cell *cell_ptr;
 
   cell_ptr = cells;
-  for (size_t l = 0; l < h; ++l)
-  {
-    for (size_t c = 0; c < w; ++c)
-    {
-      if (*cell_ptr != 0)
-      {
+  for (size_t l = 0; l < h; ++l) {
+    for (size_t c = 0; c < w; ++c) {
+      if (*cell_ptr != 0) {
         size_t neighbours = *cell_ptr >> 1;
-        if (*cell_ptr & LIVING_BIT)
-        {
-          // TODO: adapt the game's rules
+        if (*cell_ptr & LIVING_BIT) {
           if ((neighbours != 2) && (neighbours != 3))
-          {
             changeCellState(c, l, 0);
-          }
-        }
-        else
-        {
-          // TODO: adapt the game's rules
+        } else {
           if (neighbours == 3)
-          {
             changeCellState(c, l, 1);
-          }
         }
       }
       ++cell_ptr;
@@ -74,25 +58,21 @@ void CellMap::nextGeneration() {
 }
 
 void CellMap::updateNeighbourCount() {
-  Cell* cell_ptr;
+  Cell *cell_ptr;
   size_t w = width, h = height;
 
   // we clear previous neighbour calculations
   cell_ptr = cells;
-  for (size_t i = 0; i < length_in_bytes; ++i)
-  {
+  for (size_t i = 0; i < length_in_bytes; ++i) {
     *(cell_ptr) &= LIVING_BIT;
     ++cell_ptr;
   }
 
   // and we calculate the neighbour count
   cell_ptr = cells;
-  for (size_t l = 0; l < h; ++l)
-  {
-    for (size_t c = 0; c < w; ++c)
-    {
-      if (*cell_ptr & LIVING_BIT)
-      {
+  for (size_t l = 0; l < h; ++l) {
+    for (size_t c = 0; c < w; ++c) {
+      if (*cell_ptr & LIVING_BIT) {
         if (c > 0 && l > 0)
           *(cell_ptr - w - 1) += NEIGHBOR_COUNT_BITS; // top left
         if (l > 0)
@@ -115,11 +95,6 @@ void CellMap::updateNeighbourCount() {
   }
 }
 
+size_t CellMap::getWidth() { return width; }
 
-size_t CellMap::getWidth() {
-  return width;
-}
-
-size_t CellMap::getHeight() {
-  return height;
-}
+size_t CellMap::getHeight() { return height; }

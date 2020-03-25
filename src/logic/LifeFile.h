@@ -4,20 +4,20 @@
 #include <QFile>
 #include <QString>
 
-#include "CellState.hpp"
-#include "Coord.hpp"
-#include "Rect.hpp"
-#include "Rule.hpp"
+#include <logic/CellState.h>
+#include <logic/Coord.h>
+#include <logic/Rect.h>
+#include <logic/Rule.h>
 
 class LifeFile {
 public:
-  LifeFile(QFile *file);
+  explicit LifeFile(QFile *file);
 
   class Iterator {
   public:
-    Iterator(QFile *file);
+    explicit Iterator(QFile *file);
 
-    bool next(CellState& state);
+    bool next(const CellState &state);
   };
 
   Iterator iterate(QFile *file) const;

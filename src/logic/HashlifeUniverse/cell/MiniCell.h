@@ -3,7 +3,7 @@
 
 #include <functional>
 
-#include "../../CellState.hpp"
+#include <logic/CellState.h>
 
 union Quadrant;
 
@@ -23,17 +23,16 @@ public:
 };
 
 namespace std {
-  template <>
-  struct hash<MiniCell> {
-    hash() = default;
+template <> struct hash<MiniCell> {
+  hash() = default;
 
-    size_t operator()(const MiniCell &minicell) const {
-      return hasher(minicell.nw) ^ hasher(minicell.ne)
-        ^ hasher(minicell.sw) ^ hasher(minicell.se);
-    }
+  size_t operator()(const MiniCell &minicell) const {
+    return hasher(minicell.nw) ^ hasher(minicell.ne) ^ hasher(minicell.sw) ^
+           hasher(minicell.se);
+  }
 
-    hash<CellState> hasher;
-  };
+  hash<CellState> hasher;
+};
 } // namespace std
 
 #endif // MINICELL_HPP

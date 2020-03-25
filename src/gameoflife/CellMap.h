@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <cstring>
 
-#define LIVING_BIT          0b01
+#define LIVING_BIT 0b01
 #define NEIGHBOR_COUNT_BITS 0b10
 typedef uint8_t Cell;
 
@@ -23,10 +23,9 @@ class Game;
  * This allows us to not use the temp_cells array.
  */
 
-class CellMap
-{
+class CellMap {
 public:
-  CellMap(Game* g, size_t w, size_t h);
+  CellMap(Game *g, size_t w, size_t h);
   CellMap(size_t w, size_t h);
   ~CellMap();
   void changeCellState(size_t c, size_t l, int toAlive);
@@ -37,8 +36,8 @@ public:
   void clear();
 
 private:
-  Game* game;
-  Cell* cells;
+  Game *game;
+  Cell *cells;
   size_t width;
   size_t height;
   size_t length_in_bytes;

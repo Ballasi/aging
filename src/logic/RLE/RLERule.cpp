@@ -1,6 +1,6 @@
-#include "RLERule.hpp"
-#include "../CellState.hpp"
 #include <cstddef>
+#include <logic/CellState.h>
+#include <logic/RLE/RLERule.h>
 
 enum ReadingState { B_SEARCH, B_VALUES, S_SEARCH, S_VALUES };
 
@@ -32,18 +32,19 @@ RLERule::RLERule(QString rule_string) {
     case B_SEARCH:
       if (c == 'B')
         state = B_VALUES;
-      else throw "RLERule strings should start with B";
+      else
+        throw "RLERule strings should start with B";
       break;
 
     case B_VALUES:
       if ('0' < c && c < '8') {
-        size_t index =  c.toLatin1() - '0';
+        size_t index = c.toLatin1() - '0';
         transition[0][index] = 1;
-      }
-      else if (c == '/'){
+      } else if (c == '/') {
         state = S_SEARCH;
+      } else {
+        throw "Birth values should be between 0 and 8";
       }
-      else throw "Birth values should be between 0 and 8";
       break;
 
     case S_SEARCH:
@@ -57,15 +58,15 @@ RLERule::RLERule(QString rule_string) {
       if ('0' < c && c < '8') {
         size_t index = c.toLatin1() - '0';
         transition[1][index] = 1;
-      } else
+      } else {
         throw "Survival values should be between 0 and 8";
+      }
       break;
     }
   }
   if (state != S_VALUES)
     throw "Incomplete rule string";
 }
-
 
 CellState RLERule::apply(CellState state, size_t neighbour_count) const {
   return transition[state][neighbour_count];
