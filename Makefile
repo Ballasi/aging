@@ -26,6 +26,12 @@ verify:
 	 cpplint $(shell find src -type f) || SUCCESS=0; \
 	 if [[ $$SUCCESS -eq 0 ]]; then echo -e "\e[101m=> Errors have been found, please check the outputs\e[0m"; fi
 
+clang_setup:
+	@echo -e "=> \e[1mSetting up clang environment...\e[0m"
+	@cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -S . -B tmp > /dev/null 2> /dev/null
+	@cp tmp/compile_commands.json .
+	@rm -Rf tmp
+
 clean:
 	@echo -e "=> \e[1mCleaning $(BIN_FOLDER)/\e[0m"
 	@rm -Rf $(BIN_FOLDER)
