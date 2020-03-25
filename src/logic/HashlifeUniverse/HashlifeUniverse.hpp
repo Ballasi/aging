@@ -7,13 +7,13 @@
 #include <unordered_set>
 #include <vector>
 
-#include "../Universe.hpp"
+#include <logic/Universe.hpp>
 
-#include "../Coord.hpp"
-#include "../Rect.hpp"
-#include "cell/MiniCell.hpp"
-#include "cell/MacroCell.hpp"
-#include "cell/Quadrant.hpp"
+#include <logic/Coord.hpp>
+#include <logic/Rect.hpp>
+#include <logic/HashlifeUniverse/cell/MiniCell.hpp>
+#include <logic/HashlifeUniverse/cell/MacroCell.hpp>
+#include <logic/HashlifeUniverse/cell/Quadrant.hpp>
 
 using namespace std;
 
