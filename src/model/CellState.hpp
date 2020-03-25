@@ -2,6 +2,8 @@
 #define CELL_STATE_HPP
 
 class CellState {
+public:
+  CellState(int);
   int id;
 };
 

@@ -8,15 +8,16 @@
 #include "Vec2.hpp"
 
 class Rect {
-public:
   // Inner data
-  Vec2 size;
-  Vec2 top_left;
+  Vec2 _size;
+  Vec2 _top_left;
 
+public:
   // Constructors
   Rect() = default;
   Rect(Vec2 &top_left, Vec2 &size);
   Rect(Vec2 &top_left, size_t level);
+  Rect(BigInt &x, BigInt &y, BigInt &height, BigInt &width);
 
   // Equality operators
   inline bool operator==(const Vec2 &) const;
@@ -49,7 +50,9 @@ public:
   inline BigInt &height() const;
 
   // Pseudo getters
-  inline const Vec2& bottom_right() const;
+  inline const Vec2 &top_left() const;
+  inline const Vec2 &size() const;
+  inline const Vec2 bottom_right() const;
 };
 
 #endif // RECT_HPP

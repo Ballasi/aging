@@ -7,14 +7,22 @@
 
 // Describes a 2
 class Vec2 {
-public:
   // Inner data
-  BigInt x, y;
+  BigInt _x, _y;
+
+public:
 
   // Constructors
   Vec2() = default;
   Vec2(const size_t level);
   Vec2(const BigInt &x, const BigInt &y);
+
+  // Getters / Setters
+  inline BigInt &x();
+  inline BigInt &y();
+
+  // Assign operator
+  inline void operator=(const Vec2 &);
 
   // Equality operators
   inline bool operator==(const Vec2 &) const;

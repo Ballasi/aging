@@ -1,60 +1,66 @@
 #include "Vec2.hpp"
 
 // Constructors
-Vec2::Vec2(const size_t level) {}
-Vec2::Vec2(const BigInt &x, const BigInt &y){}
+Vec2::Vec2(const size_t level)
+  : _x(BigInt(1 << level)), _y(BigInt(1 << level)) {}
+Vec2::Vec2(const BigInt &x, const BigInt &y)
+  : _x(x), _y(y) {}
+
+// Getters / Setters
+inline BigInt &Vec2::x() { return _x; }
+inline BigInt &Vec2::y() { return _y; }
 
 // Equality operators
-inline  bool Vec2::operator==(const Vec2 &other) const {
-  return x == other.x && y == other.y;
+inline bool Vec2::operator==(const Vec2 &other) const {
+  return _x == other._x && _y == other._y;
 }
 
 inline bool Vec2::operator!=(const Vec2 &other) const {
-  return x != other.x || y != other.y;
+  return _x != other._x || _y != other._y;
 }
 
-// Inclusion operatorsVec2::
+// Inclusion operators
 inline bool Vec2::operator<(const Vec2 &other) const {
-  return x < other.x && y < other.y;
+  return _x < other._x && _y < other._y;
 }
 inline bool Vec2::operator<=(const Vec2 &other) const {
-  return x <= other.x && y <= other.y;
+  return _x <= other._x && _y <= other._y;
 }
 inline bool Vec2::operator>(const Vec2 &other) const {
-  return x > other.x && y > other.x;
+  return _x > other._x && _y > other._x;
 }
 inline bool Vec2::operator>=(const Vec2 &other) const {
-  return x >= other.x && y >= other.y;
+  return _x >= other._x && _y >= other._y;
 }
 
 // Sum operator
 inline Vec2 Vec2::operator+(const Vec2 &other) const {
-  return Vec2(x + other.x, y + other.y);
+  return Vec2(_x + other._x, _y + other._y);
 }
 inline Vec2 Vec2::operator-(const Vec2 &other) const {
-  return Vec2(x - other.x, y - other.y);
+  return Vec2(_x - other._x, _y - other._y);
 }
 inline void Vec2::operator+=(const Vec2 &other) {
-  x += other.x;
-  y += other.y;
+  _x += other._x;
+  _y += other._y;
 }
 inline void Vec2::operator-=(const Vec2 &other) {
-  x -= other.x;
-  y -= other.y;
+  _x -= other._x;
+  _y -= other._y;
 }
 
 // Scaling operators
 inline Vec2 Vec2::operator<<(const size_t level) const {
-  return Vec2(x << level, y << level);
+  return Vec2(_x << level, _y << level);
 }
 inline Vec2 Vec2::operator>>(const size_t level) const {
-  return Vec2(x >> level, y >> level);
+  return Vec2(_x >> level, _y >> level);
 }
 inline void Vec2::operator<<=(const size_t level) {
-  x <<= level;
-  y <<= level;
+  _x <<= level;
+  _y <<= level;
 }
 inline void Vec2::operator>>=(const size_t level) {
-  x >>= level;
-  y >>= level;
+  _x >>= level;
+  _y >>= level;
 }
