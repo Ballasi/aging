@@ -2,6 +2,7 @@ cmake_minimum_required (VERSION 2.6)
 
 project (aging)
 
+include_directories("src")
 
 # search for location of header gmpxx.h", only at positions given by the user
 find_path(GMPXX_INCLUDE_DIR

@@ -1,28 +1,26 @@
 #ifndef RLE_HPP
 #define RLE_HPP
 
-#include "../CellState.hpp"
-#include "../Coord.hpp"
-#include "../LifeFile.hpp"
-#include "../Rect.hpp"
-#include "../Rule.hpp"
+#include <logic/CellState.h>
+#include <logic/Coord.h>
+#include <logic/LifeFile.h>
+#include <logic/Rect.h>
+#include <logic/Rule.h>
 
-#include <QString>
 #include <QFile>
-
-using namespace std;
+#include <QString>
 
 class RLE {
 public:
   // Constructors
-  RLE(QFile *file);
+  explicit RLE(QFile *file);
 
   // Iterator
   class Iterator {
   public:
-    Iterator(QFile *file);
+    explicit Iterator(QFile *file);
 
-    bool next(CellState &state);
+    bool next(const CellState &state);
 
   private:
     QFile *file;

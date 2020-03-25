@@ -1,8 +1,8 @@
 #ifndef RULE_HPP
 #define RULE_HPP
 
-#include "CellState.hpp"
 #include <cstddef>
+#include <logic/CellState.h>
 
 class Rule {
   virtual CellState apply(CellState state, size_t neighbout_count) const;

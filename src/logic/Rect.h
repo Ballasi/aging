@@ -1,7 +1,7 @@
 #ifndef RECT_HPP
 #define RECT_HPP
 
-#include "Coord.hpp"
+#include <logic/Coord.h>
 
 class Rect {
 public:

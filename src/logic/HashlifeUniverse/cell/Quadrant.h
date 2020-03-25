@@ -5,15 +5,15 @@
 #include <random>
 #include <string>
 
-#include "MiniCell.hpp"
-#include "MacroCell.hpp"
+#include <logic/HashlifeUniverse/cell/MacroCell.h>
+#include <logic/HashlifeUniverse/cell/MiniCell.h>
 
 union Quadrant {
 public:
   MiniCell minicell;
   MacroCell macrocell;
 
-  Quadrant* operator[](const size_t index) const;
+  Quadrant *operator[](const size_t index) const;
 
   void debug(size_t level);
 

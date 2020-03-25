@@ -1,7 +1,5 @@
-
+#include <logic/RLE/RLE.h>
 /*
-#include "RLE.hpp"
-
 RLE::RLE(QFile *_file): file(_file) {
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     throw "File could not be opened";
