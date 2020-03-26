@@ -1,0 +1,19 @@
+# CMake files/dir
+CMakeCache.txt
+CMakeFiles/
+build/
+.vscode/
+cmake_install.cmake
+Hashlife_autogen/
+Hashlife
+
+# Vim swapfiles
+**.o
+**.swp
+
+# Clangd
+.clangd/
+compile_commands.json
+
+# Emacs swapfiles
+./#*
