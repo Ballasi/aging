@@ -33,6 +33,8 @@ MainWindow::MainWindow() {
   hashlife_universe->set(Coord(7, 0), 1);
   hashlife_universe->set(Coord(7, 7), 1);
 
+  isDarkTheme = this->palette().window().color().lightnessF() < 0.5;
+
   createUI();
   stepTimer = new QTimer(this);
   connect(stepTimer, &QTimer::timeout, this, &MainWindow::stepSimulation);
@@ -50,10 +52,22 @@ void MainWindow::createUI() {
   // Simulation control toolbar
   QToolBar *controlToolbar = addToolBar("Simulation Controls");
   addToolBar(Qt::LeftToolBarArea, controlToolbar);
-  playIcon = new QIcon("../res/icons/play.svg");
-  pauseIcon = new QIcon("../res/icons/pause.svg");
-  playPauseAction = controlToolbar->addAction(*playIcon, "Play/Pause");
-  QIcon *stepIcon = new QIcon("../res/icons/step.svg");
+  if (isDarkTheme)
+    playIcon = new QIcon("../res/icons/dark/play.svg");
+  else
+    playIcon = new QIcon("../res/icons/light/play.svg");
+  if (isDarkTheme)
+    pauseIcon = new QIcon("../res/icons/dark/pause.svg");
+  else
+    pauseIcon = new QIcon("../res/icons/light/pause.svg");
+  if (isDarkTheme)
+    playPauseAction = controlToolbar->addAction(*playIcon, "Play/Pause");
+  else
+    playPauseAction = controlToolbar->addAction(*playIcon, "Play/Pause");
+  QIcon *stepIcon = new QIcon("../res/icons/light/step.svg");
+  if (isDarkTheme)
+    stepIcon = new QIcon("../res/icons/dark/step.svg");
+
   QAction *stepAction =
       controlToolbar->addAction(*stepIcon, "Advance one step");
 
@@ -67,25 +81,37 @@ void MainWindow::createUI() {
   addToolBar(Qt::LeftToolBarArea, toolboxToolbar);
 
   pencilButton = new QToolButton(toolboxToolbar);
-  pencilButton->setIcon(QIcon("../res/icons/pencil.svg"));
+  if (isDarkTheme)
+    pencilButton->setIcon(QIcon("../res/icons/dark/pencil.svg"));
+  else
+    pencilButton->setIcon(QIcon("../res/icons/light/pencil.svg"));
   pencilButton->setCheckable(true);
   toolboxGroup->addButton(pencilButton);
   toolboxToolbar->addWidget(pencilButton);
 
   eraserButton = new QToolButton(toolboxToolbar);
-  eraserButton->setIcon(QIcon("../res/icons/eraser.svg"));
+  if (isDarkTheme)
+    eraserButton->setIcon(QIcon("../res/icons/dark/eraser.svg"));
+  else
+    eraserButton->setIcon(QIcon("../res/icons/light/eraser.svg"));
   eraserButton->setCheckable(true);
   toolboxGroup->addButton(eraserButton);
   toolboxToolbar->addWidget(eraserButton);
 
   zoominButton = new QToolButton(toolboxToolbar);
-  zoominButton->setIcon(QIcon("../res/icons/zoom-in.svg"));
+  if (isDarkTheme)
+    zoominButton->setIcon(QIcon("../res/icons/dark/zoom-in.svg"));
+  else
+    zoominButton->setIcon(QIcon("../res/icons/light/zoom-in.svg"));
   zoominButton->setCheckable(true);
   toolboxGroup->addButton(zoominButton);
   toolboxToolbar->addWidget(zoominButton);
 
   zoomoutButton = new QToolButton(toolboxToolbar);
-  zoomoutButton->setIcon(QIcon("../res/icons/zoom-out.svg"));
+  if (isDarkTheme)
+    zoomoutButton->setIcon(QIcon("../res/icons/dark/zoom-out.svg"));
+  else
+    zoomoutButton->setIcon(QIcon("../res/icons/light/zoom-out.svg"));
   zoomoutButton->setCheckable(true);
   toolboxGroup->addButton(zoomoutButton);
   toolboxToolbar->addWidget(zoomoutButton);
