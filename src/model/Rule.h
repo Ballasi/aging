@@ -1,7 +1,7 @@
 #ifndef RULE_HPP
 #define RULE_HPP
 
-#include "CellState.hpp"
+#include "CellState.h"
 #include <cstddef>
 
 class Rule {

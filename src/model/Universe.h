@@ -1,9 +1,9 @@
-#ifndef UNIVERSE_HPP
-#define UNIVERSE_HPP
+#ifndef UNIVERSE_H_
+#define UNIVERSE_H_
 
-#include "Vec2.hpp"
-#include "Rect.hpp"
-#include "CellState.hpp"
+#include "Vec2.h"
+#include "Rect.h"
+#include "CellState.h"
 
 #include <QString>
 
@@ -11,7 +11,7 @@
 
 class Universe {
 public:
-  // TODO: Do constructor question with Tristan
+  // TODO(ME): Do constructor question with Tristan
 
   // Required methods
   virtual void update() = 0;
@@ -22,10 +22,10 @@ public:
 
   // Aptitudes
   virtual const bool can_set() const;
-  virtual void set(Vec2 &coord, CellState cell_state);
+  virtual void set(const Vec2 &coord, CellState cell_state);
 
   virtual const bool can_get() const;
-  virtual const CellState get(Vec2 &coord) const;
+  virtual const CellState get(const Vec2 &coord) const;
 
   virtual const bool can_clear() const;
   virtual void clear();
@@ -37,19 +37,19 @@ public:
   virtual void resize();
 
   // Meta aptitudes
-  bool can_get_set();
+  bool can_get_set() const;
 };
 
-class UniverseType {
-public:
-  UniverseType(QString name,
-               QString description,
-               Universe* (*constructor)(void));
+// class UniverseType {
+// public:
+//   UniverseType(QString name,
+//                QString description,
+//                Universe* (*constructor)(void));
 
-  Universe* (*constructor)(void);
+//   Universe* (*constructor)(void);
 
-  const QString name;
-  const QString description;
-};
+//   const QString name;
+//   const QString description;
+// };
 
-#endif // UNIVERSE_HPP
+#endif // UNIVERSE_H_
