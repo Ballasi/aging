@@ -37,6 +37,8 @@ private:
   QTimer *stepTimer;
 
   QToolButton *zoominButton, *zoomoutButton, *pencilButton, *eraserButton;
+
+  bool isDarkTheme;
 };
 
 #endif /* UI_MAINWINDOW_H_ */
