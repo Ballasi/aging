@@ -5,6 +5,7 @@
 #include <QButtonGroup>
 #include <QColorDialog>
 #include <QFileDialog>
+#include <QInputDialog>
 #include <QMenuBar>
 #include <QStatusBar>
 #include <QToolBar>
@@ -121,7 +122,13 @@ void MainWindow::createUI() {
   QMenu *prefMenu = new QMenu("Preferences");
   QAction *loadAction = fileMenu->addAction("Load pattern");
   QAction *changeColorsAction = prefMenu->addAction("Choose colors");
+  QMenu *stepMenu = prefMenu->addMenu("Step size");
+  QAction *stepSizeSelectAction = stepMenu->addAction("Set step size");
+  stepSizeMaxAction = stepMenu->addAction("Maximize step size");
+  stepSizeMaxAction->setCheckable(true);
 
+  connect(stepSizeSelectAction, &QAction::triggered,this,&MainWindow::set_step_size);
+  connect(stepSizeMaxAction, &QAction::changed, this, &MainWindow::set_step_size_maximized);
   connect(loadAction, &QAction::triggered, this, &MainWindow::load);
   connect(changeColorsAction, &QAction::triggered, this,
           &MainWindow::chooseColors);
@@ -149,6 +156,8 @@ void MainWindow::updateStatusBar() {
     s += std::to_string(game->getGeneration());
   else if (hashlife_universe != nullptr)
     s += bigint_to_str(hashlife_universe->get_generation());
+    s += " | Step size : 2^";
+    s += std::to_string(hashlife_universe->get_step_size());
   statusBar()->showMessage(QString(s.c_str()));
 }
 
@@ -174,6 +183,28 @@ void MainWindow::load() {
     r_area = new RenderArea(this, hashlife_universe);
     setCentralWidget(r_area);
   }
+  updateStatusBar();
+}
+
+void MainWindow::set_step_size() {
+  bool ok;
+  std::string s;
+  size_t max = ((HashlifeUniverse*)hashlife_universe)->get_top_level() - 2;
+  s += "Step size (enter the exponent) max : ";
+  s += std::to_string(max);
+  int i = QInputDialog::getInt(this, "Enter a step size",s.c_str(), hashlife_universe->get_step_size(), 0, max, 1, &ok);
+
+  if (ok) {
+    stepSizeMaxAction->setChecked(false);
+    ((HashlifeUniverse*)hashlife_universe)->set_step_size(i);
+  }
+
+  updateStatusBar();
+}
+
+void MainWindow::set_step_size_maximized() {
+
+  ((HashlifeUniverse*)hashlife_universe)->set_step_size_maximized(stepSizeMaxAction->isChecked());
   updateStatusBar();
 }
 

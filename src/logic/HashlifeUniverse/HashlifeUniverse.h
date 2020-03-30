@@ -34,6 +34,9 @@ public:
   Coord get_top_left();
   size_t get_top_level();
 
+  void set_step_size(size_t new_step_size);
+  void set_step_size_maximized(bool is_maximized);
+
   void grid(int *L, int width, Quadrant *r, int level, int x, int y);
   void print_grid(Quadrant *r, size_t level);
 
@@ -41,10 +44,13 @@ private:
   size_t top_level;
   Coord top_left;
   MacroCell *root;
+  bool step_size_maximized;
 
   std::vector<std::unordered_set<MacroCell>> macrocell_sets;
   std::unordered_set<MiniCell> minicells;
   std::vector<Quadrant *> zeros;
+
+  void flush_cache();
 
   // File loading
   Coord read_rle_size(QFile *file);
