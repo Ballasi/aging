@@ -1,12 +1,12 @@
-#ifndef __NAIVEUNIVERSE_H
-#define __NAIVEUNIVERSE_H
+#ifndef NAIVEUNIVERSE_H_
+#define NAIVEUNIVERSE_H_
 
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
 
-#include "../Universe.hpp"
-#include "../Coord.hpp"
+#include <logic/Coord.hpp>
+#include <logic/Universe.hpp>
 
 typedef uint8_t Cell;
 
@@ -15,10 +15,9 @@ typedef uint8_t Cell;
   Each bits of this byte corresponds to the living state of the cell.
  */
 
-class NaiveUniverse: public Universe
-{
+class NaiveUniverse : public Universe {
 public:
-  NaiveUniverse(Coord size);
+  explicit NaiveUniverse(Coord size);
   ~NaiveUniverse();
 
   void clear();
@@ -27,11 +26,11 @@ public:
   void step();
 
 private:
-  Cell* cells;
+  Cell *cells;
   size_t width;
   size_t height;
   size_t length_in_bytes;
-  void updateNeighbourCount(uint8_t* neighbour_count);
+  void updateNeighbourCount(uint8_t *neighbour_count);
 };
 
-#endif // __NAIVEUNIVERSE_H
+#endif // NAIVEUNIVERSE_H_

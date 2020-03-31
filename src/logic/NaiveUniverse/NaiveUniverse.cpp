@@ -2,7 +2,8 @@
 #include <gmp.h>
 
 NaiveUniverse::NaiveUniverse(Coord size)
-    : width(size.x.get_si() + 8 - size.x.get_si() % 8), height(size.y.get_si()), length_in_bytes((size.x.get_si() + 7) * size.y.get_si() / 8) {
+    : width(size.x.get_si() + 8 - size.x.get_si() % 8), height(size.y.get_si()),
+      length_in_bytes((size.x.get_si() + 7) * size.y.get_si() / 8) {
   // Adding () calls constructor for every Cell in the array
   cells = new Cell[length_in_bytes]();
 }
@@ -15,7 +16,8 @@ void NaiveUniverse::clear() {
 }
 
 void NaiveUniverse::set(Coord target, CellState state) {
-  Cell *cell_ptr = cells + (target.y.get_si() * width / 8) + (target.x.get_si() + 7) / 8;
+  Cell *cell_ptr =
+      cells + (target.y.get_si() * width / 8) + (target.x.get_si() + 7) / 8;
 
   if (state)
     *(cell_ptr) |= 1 << (target.x.get_si() % 8);
@@ -24,11 +26,14 @@ void NaiveUniverse::set(Coord target, CellState state) {
 }
 
 const CellState NaiveUniverse::get(Coord coord) const {
-  return (*(cells + coord.y.get_si() * width / 8 + (coord.x.get_si() + 7) / 8) >> (coord.x.get_si() % 8)) & 0b01;
+  return (*(cells + coord.y.get_si() * width / 8 +
+            (coord.x.get_si() + 7) / 8) >>
+          (coord.x.get_si() % 8)) &
+         0b01;
 }
 
 void NaiveUniverse::step() {
-  uint8_t neighbour_count[(width + 1) * height / 2];
+  uint8_t *neighbour_count = new uint8_t[(width + 1) * height / 2];
   memset(neighbour_count, 0, (width + 1) * height / 2);
   updateNeighbourCount(neighbour_count);
 
