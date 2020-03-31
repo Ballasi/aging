@@ -38,9 +38,11 @@ public:
   // Getters
   Rect get_bounds() const;
   BigInt get_generation() const;
+  size_t get_step_size();
 
   BigInt generation_count;
   Rect bounds;
+  size_t step_size;
 };
 
 #endif // UNIVERSE_HPP

@@ -16,6 +16,8 @@ public:
 
 public slots:
   void stepSimulation();
+  void set_step_size();
+  void set_step_size_maximized();
   void load();
   void playPause();
   void chooseColors();
@@ -32,7 +34,7 @@ private:
   void updateStatusBar();
 
   bool simulationRunning;
-  QAction *playPauseAction;
+  QAction *playPauseAction, *stepSizeMaxAction;
   QIcon *playIcon, *pauseIcon;
   QTimer *stepTimer;
 
