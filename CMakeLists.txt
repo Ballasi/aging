@@ -68,8 +68,7 @@ else()
     "gmpxx library directory: ${GMPXX_LIB}\n\n")
 endif()
 
-
-find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets 3DCore 3DExtras 3DRender 3DInput Charts)
+find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets)
 
 set(CMAKE_AUTOMOC ON)
 
@@ -85,13 +84,8 @@ add_executable(aging ${sources_files})
 
 target_link_libraries(aging ${GMP_LIB} ${GMPXX_LIB})
 
-target_link_libraries(aging PRIVATE
+target_link_libraries(aging
     Qt5::Core
     Qt5::Gui
     Qt5::Widgets
-    Qt5::3DCore
-    Qt5::3DExtras
-    Qt5::3DRender
-    Qt5::3DInput
-    Qt5::Charts
 )
