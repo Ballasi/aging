@@ -68,8 +68,7 @@ else()
     "gmpxx library directory: ${GMPXX_LIB}\n\n")
 endif()
 
-
-find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets Charts)
+find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets)
 
 set(CMAKE_AUTOMOC ON)
 
@@ -89,5 +88,4 @@ target_link_libraries(aging
     Qt5::Core
     Qt5::Gui
     Qt5::Widgets
-    Qt5::Charts
 )
