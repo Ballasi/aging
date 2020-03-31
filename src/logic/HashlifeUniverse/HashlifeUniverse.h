@@ -50,8 +50,6 @@ private:
   std::unordered_set<MiniCell> minicells;
   std::vector<Quadrant *> zeros;
 
-  void flush_cache();
-
   // File loading
   Coord read_rle_size(QFile *file);
   void read_rle_data(QFile *file, Coord boundingbox);
