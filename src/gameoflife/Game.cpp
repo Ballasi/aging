@@ -1,10 +1,7 @@
-<<<<<<< HEAD
-#include <gameoflife/CellMap.h>
-#include <gameoflife/Game.h>
-=======
+#include "Game.h"
+
 /*#include "Game.h"
 #include "CellMap.h"
->>>>>>> naive-new
 
 #include <QFile>
 
@@ -79,7 +76,4 @@ void Game::loadRLE(QString filename) {
       break;
   }
 }
-<<<<<<< HEAD
-=======
 */
->>>>>>> naive-new

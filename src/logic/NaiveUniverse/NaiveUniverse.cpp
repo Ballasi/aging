@@ -1,14 +1,35 @@
-#include "NaiveUniverse.hpp"
+#include "NaiveUniverse.h"
+#include <iostream>
 #include <gmp.h>
+#include <cmath>
 
 NaiveUniverse::NaiveUniverse(Coord size)
     : width(size.x.get_si() + 8 - size.x.get_si() % 8), height(size.y.get_si()),
       length_in_bytes((size.x.get_si() + 7) * size.y.get_si() / 8) {
   // Adding () calls constructor for every Cell in the array
   cells = new Cell[length_in_bytes]();
+  neighbour_count = new uint8_t[(width + 1) * height / 2];
 }
 
-NaiveUniverse::~NaiveUniverse() { delete[] cells; }
+NaiveUniverse::NaiveUniverse(QString filename) {
+  QFile file(filename);
+  if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    return;
+  Coord size;
+  Coord box = read_rle_size(&file, &size);
+  width = size.x.get_si() + 8 - size.x.get_si() % 8;
+  height = size.y.get_si();
+  length_in_bytes = (size.x.get_si() + 7) * size.y.get_si() / 8;
+  cells = new Cell[length_in_bytes]();
+  neighbour_count = new uint8_t[(width + 1) * height / 2];
+
+  read_rle_data(&file, box, size);
+}
+
+NaiveUniverse::~NaiveUniverse() {
+  delete[] cells;
+  delete[] neighbour_count;
+}
 
 void NaiveUniverse::clear() {
   for (size_t i = 0; i < length_in_bytes; ++i)
@@ -16,13 +37,16 @@ void NaiveUniverse::clear() {
 }
 
 void NaiveUniverse::set(Coord target, CellState state) {
-  Cell *cell_ptr =
-      cells + (target.y.get_si() * width / 8) + (target.x.get_si() + 7) / 8;
+  if (target.x.get_si() >= 0 && target.x.get_si() < width &&
+     target.y.get_si() >= 0 & target.y.get_si() < height) {
+    Cell *cell_ptr =
+        cells + (target.y.get_si() * width / 8) + (target.x.get_si() + 7) / 8;
 
-  if (state)
-    *(cell_ptr) |= 1 << (target.x.get_si() % 8);
-  else
-    *(cell_ptr) &= ~(1 << (target.x.get_si() % 8));
+    if (state)
+      *(cell_ptr) |= 1 << (target.x.get_si() % 8);
+    else
+      *(cell_ptr) &= ~(1 << (target.x.get_si() % 8));
+  }
 }
 
 const CellState NaiveUniverse::get(Coord coord) const {
@@ -33,7 +57,6 @@ const CellState NaiveUniverse::get(Coord coord) const {
 }
 
 void NaiveUniverse::step() {
-  uint8_t *neighbour_count = new uint8_t[(width + 1) * height / 2];
   memset(neighbour_count, 0, (width + 1) * height / 2);
   updateNeighbourCount(neighbour_count);
 
@@ -109,3 +132,69 @@ void NaiveUniverse::updateNeighbourCount(uint8_t *neighbour_count) {
     }
   }
 }
+
+Coord NaiveUniverse::read_rle_size(QFile *file, Coord *size) {
+  while (!file->atEnd()) {
+    QByteArray line = file->readLine();
+    if (line[0] == '#') {
+      continue;
+    }
+    if (line[0] == 'x') {
+      QList<QByteArray> list = line.split(',');
+      int width = ((list[0].split('='))[1]
+      .simplified()).toInt();
+      int height = ((list[1].split('='))[1]
+      .simplified()).toInt();
+      size_t len = 1 <<
+      ((width > height) ? (size_t) log2(width) + 2
+                        : (size_t) log2(height) + 2);
+      *size = Coord(len, len);
+      return Coord(width, height);
+    }
+  }
+  return Coord(6);
+}
+
+void NaiveUniverse::read_rle_data(QFile *file, Coord boundingbox, Coord size) {
+  QByteArray data("");
+  while (!file->atEnd()) {
+    QByteArray line = file->readLine();
+    data.append(line);
+  }
+
+  data = data.simplified();
+  int boundingbox_x = boundingbox.x.get_si();
+  int boundingbox_y = boundingbox.y.get_si();
+
+  int init_x = size.x.get_si() / 2 - boundingbox_x / 2;
+  int init_y = size.y.get_si() / 2;
+  int curr_x = init_x;
+  int curr_y = init_y;
+
+  QByteArray qs("");
+  for (int i = 0; i < data.length(); ++i) {
+    if (data[i] == '\0')
+      continue;
+    int q;
+    if (data[i] == '$') {
+      q = qs.isEmpty() ? 1 : qs.toInt();
+      curr_y -= q;
+      curr_x = init_x;
+      qs.clear();
+    }
+    if (data[i] >= '0' && data[i] <= '9') {
+      qs.append(data[i]);
+    }
+    if (data[i] == 'o' || data[i] == 'b') {
+      q = qs.isEmpty() ? 1 : qs.toInt();
+      for (int n = 0; n < q; n++) {
+        set(Coord(curr_x, curr_y), data[i] == 'o');
+        curr_x++;
+      }
+      qs.clear();
+    }
+    if (data[i] == '!')
+      break;
+  }
+}
+

@@ -72,7 +72,7 @@ void HashlifeUniverse::read_rle_data(QFile *file, Coord boundingbox) {
   int boundingbox_y = boundingbox.y.get_si();
 
   int init_x = (1 << (top_level - 1)) - boundingbox_x / 2;
-  int init_y = (1 << (top_level - 1)) - boundingbox_y / 2;
+  int init_y = (1 << (top_level - 1));
   int curr_x = init_x;
   int curr_y = init_y;
 
@@ -83,7 +83,7 @@ void HashlifeUniverse::read_rle_data(QFile *file, Coord boundingbox) {
     int q;
     if (data[i] == '$') {
       q = qs.isEmpty() ? 1 : qs.toInt();
-      curr_y += q;
+      curr_y -= q;
       curr_x = init_x;
       qs.clear();
     }

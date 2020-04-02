@@ -5,8 +5,8 @@
 #include <cstdint>
 #include <cstring>
 
-#include <logic/Coord.hpp>
-#include <logic/Universe.hpp>
+#include <logic/Coord.h>
+#include <logic/Universe.h>
 
 typedef uint8_t Cell;
 
@@ -18,6 +18,7 @@ typedef uint8_t Cell;
 class NaiveUniverse : public Universe {
 public:
   explicit NaiveUniverse(Coord size);
+  explicit NaiveUniverse(QString filename);
   ~NaiveUniverse();
 
   void clear();
@@ -25,12 +26,17 @@ public:
   const CellState get(Coord coord) const;
   void step();
 
-private:
-  Cell *cells;
   size_t width;
   size_t height;
+
+private:
+  Cell *cells;
   size_t length_in_bytes;
+  uint8_t *neighbour_count;
   void updateNeighbourCount(uint8_t *neighbour_count);
+
+  Coord read_rle_size(QFile *file, Coord *size);
+  void read_rle_data(QFile *file, Coord boundingbox, Coord size);
 };
 
 #endif // NAIVEUNIVERSE_H_

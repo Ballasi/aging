@@ -6,6 +6,7 @@
 #include <QSettings>
 #include <QTimer>
 #include <QToolButton>
+#include <logic/UniverseType.h>
 
 class MainWindow : public QMainWindow {
   Q_OBJECT
@@ -13,7 +14,6 @@ class MainWindow : public QMainWindow {
 public:
   MainWindow();
   virtual ~MainWindow();
-
 public slots:
   void stepSimulation();
   void set_step_size();
@@ -21,6 +21,7 @@ public slots:
   void load();
   void playPause();
   void chooseColors();
+  void universeSwitched();
 
 protected:
   void keyPressEvent(QKeyEvent *event);
@@ -28,13 +29,16 @@ protected:
 
 private:
   RenderArea *r_area;
-  Game *game;
   Universe *hashlife_universe;
+
+  UniverseType univ_type;
+
   void createUI();
   void updateStatusBar();
 
   bool simulationRunning;
   QAction *playPauseAction, *stepSizeMaxAction;
+  QAction *hashlifeUniverseBox, *lifeUniverseBox;
   QIcon *playIcon, *pauseIcon;
   QTimer *stepTimer;
 
