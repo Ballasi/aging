@@ -17,6 +17,10 @@ NaiveUniverse::NaiveUniverse(QString filename) {
     return;
   Coord size;
   Coord box = read_rle_size(&file, &size);
+
+  size_t min_len = (size.x.get_si() > 128) ? size.x.get_si() : 128;
+  size = Coord(min_len, min_len);
+
   width = size.x.get_si() + 8 - size.x.get_si() % 8;
   height = size.y.get_si();
   length_in_bytes = width * height;
