@@ -1,4 +1,4 @@
-#include "Game.h"
+#include <gameoflife/Game.h>
 
 /*#include "Game.h"
 #include "CellMap.h"

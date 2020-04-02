@@ -1,11 +1,11 @@
-#include "NaiveUniverse.h"
+#include <logic/NaiveUniverse/NaiveUniverse.h>
 #include <iostream>
 #include <gmp.h>
 #include <cmath>
 
 NaiveUniverse::NaiveUniverse(Coord size)
     : width(size.x.get_si() + 8 - size.x.get_si() % 8), height(size.y.get_si()),
-      length_in_bytes((size.x.get_si() + 7) * size.y.get_si() / 8) {
+      length_in_bytes(width * height) {
   // Adding () calls constructor for every Cell in the array
   cells = new Cell[length_in_bytes]();
   neighbour_count = new uint8_t[(width + 1) * height / 2];
@@ -19,7 +19,7 @@ NaiveUniverse::NaiveUniverse(QString filename) {
   Coord box = read_rle_size(&file, &size);
   width = size.x.get_si() + 8 - size.x.get_si() % 8;
   height = size.y.get_si();
-  length_in_bytes = (size.x.get_si() + 7) * size.y.get_si() / 8;
+  length_in_bytes = width * height;
   cells = new Cell[length_in_bytes]();
   neighbour_count = new uint8_t[(width + 1) * height / 2];
 
