@@ -1,6 +1,7 @@
 #include <logic/HashlifeUniverse/HashlifeUniverse.h>
 #include <logic/Universe.h>
 #include <ui/MainWindow.h>
+#include <logic/NaiveUniverse/NaiveUniverse.h>
 
 #include <QButtonGroup>
 #include <QColorDialog>
@@ -26,13 +27,14 @@ MainWindow::MainWindow() {
           for (size_t l = 0; l < map->getHeight(); ++l)
                   map->changeCellState(c,l,c % 3);
   */
-  game = nullptr;
-  hashlife_universe = new HashlifeUniverse(3);
+  hashlife_universe = new HashlifeUniverse(8);
+  univ_type = UniverseType::Hashlife;
 
-  hashlife_universe->set(Coord(0, 0), 1);
-  hashlife_universe->set(Coord(0, 7), 1);
-  hashlife_universe->set(Coord(7, 0), 1);
-  hashlife_universe->set(Coord(7, 7), 1);
+  for (int i = 0; i < 256; ++i) {
+    for (int j = 0; j < 256; ++j) {
+      hashlife_universe->set(Coord(i, j), (i + j) % 8 == 0);
+    }
+  }
 
   isDarkTheme = this->palette().window().color().lightnessF() < 0.5;
 
@@ -45,7 +47,7 @@ void MainWindow::createUI() {
   updateStatusBar();
 
   // Render Area
-  r_area = new RenderArea(this, hashlife_universe);
+  r_area = new RenderArea(this, hashlife_universe, UniverseType::Hashlife);
   setCentralWidget(r_area);
 
   r_area->setCursor(Qt::ArrowCursor);
@@ -71,9 +73,6 @@ void MainWindow::createUI() {
 
   QAction *stepAction =
       controlToolbar->addAction(*stepIcon, "Advance one step");
-
-  connect(playPauseAction, &QAction::triggered, this, &MainWindow::playPause);
-  connect(stepAction, &QAction::triggered, this, &MainWindow::stepSimulation);
 
   // Control toolbox
   QToolBar *toolboxToolbar = addToolBar("Toolbox");
@@ -127,6 +126,27 @@ void MainWindow::createUI() {
   stepSizeMaxAction = stepMenu->addAction("Maximize step size");
   stepSizeMaxAction->setCheckable(true);
 
+  QMenu *universeMenu = prefMenu->addMenu("Select Universe");
+
+  hashlifeUniverseBox = new QAction("Hashlife");
+  hashlifeUniverseBox->setCheckable(true);
+  hashlifeUniverseBox->setChecked(true);
+  lifeUniverseBox = new QAction("Life");
+  lifeUniverseBox->setCheckable(true);
+  //lifeUniverseBox->setChecked(true);
+
+  QActionGroup *universeBoxes = new QActionGroup(universeMenu);
+  universeBoxes->setExclusive(true);
+  universeBoxes->addAction(hashlifeUniverseBox);
+  universeBoxes->addAction(lifeUniverseBox);
+
+  universeMenu->addActions(universeBoxes->actions());
+
+  connect(hashlifeUniverseBox, &QAction::toggled,
+          this, &MainWindow::universeSwitched);
+  connect(lifeUniverseBox, &QAction::toggled,
+          this, &MainWindow::universeSwitched);
+
   connect(stepSizeSelectAction, &QAction::triggered,
           this, &MainWindow::set_step_size);
 
@@ -137,6 +157,9 @@ void MainWindow::createUI() {
 
   connect(changeColorsAction, &QAction::triggered, this,
           &MainWindow::chooseColors);
+
+  connect(playPauseAction, &QAction::triggered, this, &MainWindow::playPause);
+  connect(stepAction, &QAction::triggered, this, &MainWindow::stepSimulation);
 
   loadAction->setShortcut(QKeySequence::Open);
 
@@ -157,65 +180,79 @@ void MainWindow::playPause() {
 
 void MainWindow::updateStatusBar() {
   std::string s;
-  s += "Generation : ";
-  if (game != nullptr) {
-    s += std::to_string(game->getGeneration());
-  } else if (hashlife_universe != nullptr) {
-    s += bigint_to_str(hashlife_universe->get_generation());
-    s += " | Step size : 2^";
-    s += std::to_string(hashlife_universe->get_step_size());
+  switch (univ_type) {
+    case UniverseType::Hashlife :
+      s += "Generation : ";
+      s += bigint_to_str(hashlife_universe->get_generation());
+      s += " | Step size : 2^";
+      s += std::to_string(hashlife_universe->get_step_size());
+      statusBar()->showMessage(QString(s.c_str()));
+      break;
+    case UniverseType::Life :
+      s += "Generation : ";
+      s += bigint_to_str(hashlife_universe->get_generation());
+      s += " | Step size : 1";
+      statusBar()->showMessage(QString(s.c_str()));
+      break;
   }
-  statusBar()->showMessage(QString(s.c_str()));
 }
 
 void MainWindow::stepSimulation() {
-  if (game != nullptr)
-    game->nextGeneration();
-  else if (hashlife_universe != nullptr)
-    hashlife_universe->step();
-
+  hashlife_universe->step();
   r_area->update();
   updateStatusBar();
 }
 
 void MainWindow::load() {
   QString fileName = QFileDialog::getOpenFileName(this, "Open File", "",
-                                                  "Run Length Encoded (*.rle)");
-  if (game != nullptr) {
-    game->loadRLE(fileName);
-  } else if (hashlife_universe != nullptr) {
-    delete hashlife_universe;
-    hashlife_universe = new HashlifeUniverse(fileName);
-    delete r_area;
-    r_area = new RenderArea(this, hashlife_universe);
-    setCentralWidget(r_area);
+                                          "Run Length Encoded (*.rle)");
+
+  switch (univ_type) {
+    case UniverseType::Hashlife :
+      delete hashlife_universe;
+      hashlife_universe = new HashlifeUniverse(fileName);
+      delete r_area;
+      r_area = new RenderArea(this, hashlife_universe, UniverseType::Hashlife);
+      break;
+    case UniverseType::Life :
+      delete hashlife_universe;
+      hashlife_universe = new NaiveUniverse(fileName);
+      delete r_area;
+      r_area = new RenderArea(this, hashlife_universe, UniverseType::Life);
+      break;
   }
+  setCentralWidget(r_area);
   updateStatusBar();
 }
 
 void MainWindow::set_step_size() {
-  bool ok;
-  std::string s;
-  size_t max = (reinterpret_cast<HashlifeUniverse*>(
-    hashlife_universe))->get_top_level() - 2;
-  s += "Step size (enter the exponent) max : ";
-  s += std::to_string(max);
-  int i = QInputDialog::getInt(this, "Enter a step size", s.c_str(),
-                hashlife_universe->get_step_size(), 0, max, 1, &ok);
+  if (univ_type == UniverseType::Hashlife) {
+    bool ok;
+    std::string s;
+    size_t max = (reinterpret_cast<HashlifeUniverse*>(
+      hashlife_universe))->get_top_level() - 2;
+    s += "Step size (enter the exponent) max : ";
+    s += std::to_string(max);
+    int i = QInputDialog::getInt(this, "Enter a step size", s.c_str(),
+                  hashlife_universe->get_step_size(), 0, max, 1, &ok);
 
-  if (ok) {
-    stepSizeMaxAction->setChecked(false);
-    (reinterpret_cast<HashlifeUniverse*>(hashlife_universe))->set_step_size(i);
+    if (ok) {
+      stepSizeMaxAction->setChecked(false);
+      (reinterpret_cast<HashlifeUniverse*>(hashlife_universe))
+                                          ->set_step_size(i);
+    }
+
+    updateStatusBar();
   }
-
-  updateStatusBar();
 }
 
 void MainWindow::set_step_size_maximized() {
-  (reinterpret_cast<HashlifeUniverse*>(hashlife_universe))
-            ->set_step_size_maximized(stepSizeMaxAction->isChecked());
+  if (univ_type == UniverseType::Hashlife) {
+    (reinterpret_cast<HashlifeUniverse*>(hashlife_universe))
+              ->set_step_size_maximized(stepSizeMaxAction->isChecked());
 
-  updateStatusBar();
+    updateStatusBar();
+  }
 }
 
 MainWindow::~MainWindow() { delete r_area; }
@@ -255,4 +292,27 @@ void MainWindow::chooseColors() {
 
   r_area->set_colors(cell_color, bg_color);
   r_area->update();
+}
+
+void MainWindow::universeSwitched() {
+  if (hashlifeUniverseBox->isChecked()) {
+    if (univ_type != UniverseType::Hashlife) {
+      univ_type = UniverseType::Hashlife;
+      delete hashlife_universe;
+      hashlife_universe = new HashlifeUniverse(6);
+      delete r_area;
+      r_area = new RenderArea(this, hashlife_universe, UniverseType::Hashlife);
+      setCentralWidget(r_area);
+    }
+  }
+  if (lifeUniverseBox->isChecked()) {
+    if (univ_type != UniverseType::Life) {
+      univ_type = UniverseType::Life;
+      delete hashlife_universe;
+      hashlife_universe = new NaiveUniverse(Coord(128, 128));
+      delete r_area;
+      r_area = new RenderArea(this, hashlife_universe, UniverseType::Life);
+      setCentralWidget(r_area);
+    }
+  }
 }

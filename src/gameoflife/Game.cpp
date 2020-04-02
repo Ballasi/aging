@@ -1,5 +1,7 @@
-#include <gameoflife/CellMap.h>
 #include <gameoflife/Game.h>
+
+/*#include "Game.h"
+#include "CellMap.h"
 
 #include <QFile>
 
@@ -74,3 +76,4 @@ void Game::loadRLE(QString filename) {
       break;
   }
 }
+*/
