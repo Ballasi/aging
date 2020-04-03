@@ -17,6 +17,9 @@ public:
   friend std::hash<MacroCell>;
   friend Quadrant;
 
+  // Metadata
+  bool result_advances_in_time;
+
   Quadrant *result;
   Quadrant *nw, *ne;
   Quadrant *sw, *se;

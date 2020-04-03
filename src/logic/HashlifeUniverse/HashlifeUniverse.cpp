@@ -3,7 +3,8 @@
 #include <unordered_set>
 
 HashlifeUniverse::HashlifeUniverse(size_t top_level, Coord top_left)
-    : Universe(top_level, top_left), top_left(top_left), top_level(top_level) {
+    : Universe(top_level, top_left),
+    top_left(top_left), top_level(top_level) , step_size_maximized(true) {
   macrocell_sets.resize(top_level + 1);
   zeros.push_back(nullptr);
   zeros.push_back(reinterpret_cast<Quadrant *>(minicell()));
@@ -15,8 +16,8 @@ HashlifeUniverse::HashlifeUniverse(size_t top_level, Coord top_left)
 }
 
 HashlifeUniverse::HashlifeUniverse(QString filename, Coord top_left)
-    : Universe(filename, top_left), top_left(top_left) {
-
+    : Universe(filename, top_left),
+    top_left(top_left), step_size_maximized(true) {
   QFile file(filename);
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     return;
@@ -33,6 +34,8 @@ HashlifeUniverse::HashlifeUniverse(QString filename, Coord top_left)
 
   read_rle_data(&file, boundingbox);
   file.close();
+
+  step_size = top_level - 2;
 }
 
 void HashlifeUniverse::debug() {
@@ -69,7 +72,7 @@ void HashlifeUniverse::read_rle_data(QFile *file, Coord boundingbox) {
   int boundingbox_y = boundingbox.y.get_si();
 
   int init_x = (1 << (top_level - 1)) - boundingbox_x / 2;
-  int init_y = (1 << (top_level - 1)) - boundingbox_y / 2;
+  int init_y = (1 << (top_level - 1));
   int curr_x = init_x;
   int curr_y = init_y;
 
@@ -80,7 +83,7 @@ void HashlifeUniverse::read_rle_data(QFile *file, Coord boundingbox) {
     int q;
     if (data[i] == '$') {
       q = qs.isEmpty() ? 1 : qs.toInt();
-      curr_y += q;
+      curr_y -= q;
       curr_x = init_x;
       qs.clear();
     }
@@ -118,10 +121,16 @@ void HashlifeUniverse::step() {
   // Add of crown of empty cell
   crown();
   crown();
+
+  // Setting the step size
+  // Step size either grows with each step or stays user-defined.
+  if (step_size_maximized)
+    step_size = top_level - 2;
+
   // Calculate result of universe
   root = reinterpret_cast<MacroCell *>(result(top_level--, root));
 
-  generation_count += BigInt(1) << mp_size_t(top_level - 2);
+  generation_count += BigInt(1) << mp_size_t(step_size);
 
   Quadrant *z = zeros[top_level - 2];
 
@@ -345,8 +354,15 @@ void HashlifeUniverse::crown() {
 }
 
 Quadrant *HashlifeUniverse::result(size_t level, MacroCell *macrocell_tmp) {
-  if (macrocell_tmp->result != nullptr)
-    return macrocell_tmp->result;
+  bool step_size_lock = level > step_size + 2;
+
+  if (macrocell_tmp->result != nullptr) {
+    if (step_size_lock && !macrocell_tmp->result_advances_in_time)
+      return macrocell_tmp->result;
+
+    if (!step_size_lock && macrocell_tmp->result_advances_in_time)
+      return macrocell_tmp->result;
+  }
 
   if (level == 2) {
     int nb_nw =
@@ -447,6 +463,9 @@ Quadrant *HashlifeUniverse::result(size_t level, MacroCell *macrocell_tmp) {
 
     macrocell_tmp->result =
         reinterpret_cast<Quadrant *>(minicell(new_nw, new_ne, new_sw, new_se));
+
+    macrocell_tmp->result_advances_in_time = true;
+
     return macrocell_tmp->result;
   } else {
     // voir figure 4 de :
@@ -498,18 +517,67 @@ Quadrant *HashlifeUniverse::result(size_t level, MacroCell *macrocell_tmp) {
 
     Quadrant *temp_se =
         result(level - 1, reinterpret_cast<MacroCell *>(macrocell_tmp->se));
+    if (!step_size_lock) {
+      Quadrant *res_nw = result(
+          level - 1, macrocell(level - 1, temp_nw, temp_n, temp_w, temp_c));
+      Quadrant *res_ne = result(
+          level - 1, macrocell(level - 1, temp_n, temp_ne, temp_c, temp_e));
+      Quadrant *res_sw = result(
+          level - 1, macrocell(level - 1, temp_w, temp_c, temp_sw, temp_s));
+      Quadrant *res_se = result(
+          level - 1, macrocell(level - 1, temp_c, temp_e, temp_s, temp_se));
 
-    Quadrant *res_nw = result(
-        level - 1, macrocell(level - 1, temp_nw, temp_n, temp_w, temp_c));
-    Quadrant *res_ne = result(
-        level - 1, macrocell(level - 1, temp_n, temp_ne, temp_c, temp_e));
-    Quadrant *res_sw = result(
-        level - 1, macrocell(level - 1, temp_w, temp_c, temp_sw, temp_s));
-    Quadrant *res_se = result(
-        level - 1, macrocell(level - 1, temp_c, temp_e, temp_s, temp_se));
 
-    macrocell_tmp->result = reinterpret_cast<Quadrant *>(
+      macrocell_tmp->result_advances_in_time = true;
+
+      macrocell_tmp->result = reinterpret_cast<Quadrant *>(
+          macrocell(level - 1, res_nw, res_ne, res_sw, res_se));
+    } else {
+      Quadrant *res_nw;
+      Quadrant *res_ne;
+      Quadrant *res_sw;
+      Quadrant *res_se;
+
+      if (level == 3) {
+        res_nw = reinterpret_cast<Quadrant *>(
+          minicell(temp_nw->minicell.se, temp_n->minicell.sw,
+                   temp_w->minicell.ne, temp_c->minicell.nw));
+
+        res_ne = reinterpret_cast<Quadrant *>(
+          minicell(temp_n->minicell.se, temp_ne->minicell.sw,
+                   temp_c->minicell.ne, temp_e->minicell.nw));
+
+        res_sw = reinterpret_cast<Quadrant *>(
+          minicell(temp_w->minicell.se, temp_c->minicell.sw,
+                   temp_sw->minicell.ne, temp_s->minicell.nw));
+
+        res_se = reinterpret_cast<Quadrant *>(
+          minicell(temp_c->minicell.se, temp_e->minicell.sw,
+                   temp_s->minicell.ne, temp_se->minicell.nw));
+      } else {
+        res_nw = reinterpret_cast<Quadrant *>(
+          macrocell(level - 2, temp_nw->macrocell.se, temp_n->macrocell.sw,
+                               temp_w->macrocell.ne, temp_c->macrocell.nw));
+
+        res_ne = reinterpret_cast<Quadrant *>(
+          macrocell(level - 2, temp_n->macrocell.se, temp_ne->macrocell.sw,
+                               temp_c->macrocell.ne, temp_e->macrocell.nw));
+        res_sw = reinterpret_cast<Quadrant *>(
+          macrocell(level - 2, temp_w->macrocell.se, temp_c->macrocell.sw,
+                               temp_sw->macrocell.ne, temp_s->macrocell.nw));
+        res_se = reinterpret_cast<Quadrant *>(
+          macrocell(level - 2, temp_c->macrocell.se, temp_e->macrocell.sw,
+                               temp_s->macrocell.ne, temp_se->macrocell.nw));
+      }
+
+      //DEGEULASSE
+      macrocell_tmp->result = reinterpret_cast<Quadrant *>(
+          macrocell(level - 1, res_nw, res_ne, res_sw, res_se));
+
+      macrocell_tmp->result_advances_in_time = false;
+      return reinterpret_cast<Quadrant *>(
         macrocell(level - 1, res_nw, res_ne, res_sw, res_se));
+    }
     return macrocell_tmp->result;
   }
 }
@@ -617,4 +685,19 @@ void HashlifeUniverse::get_cell_in_bounds(Rect bounds,
                                           std::vector<Coord> *coords) const {
   get_cell_in_bounds_rec(bounds, coords, top_level,
                          reinterpret_cast<Quadrant *>(root), top_left);
+}
+
+void HashlifeUniverse::set_step_size(size_t new_step_size) {
+  if (new_step_size <= top_level - 2) {
+    step_size = new_step_size;
+    step_size_maximized = false;
+  } else {
+    std::cout << "Step size is too big for this universe !" << std::endl;
+  }
+}
+
+void HashlifeUniverse::set_step_size_maximized(bool is_maximized) {
+  step_size_maximized = is_maximized;
+  if (step_size_maximized)
+    set_step_size(top_level - 2);
 }

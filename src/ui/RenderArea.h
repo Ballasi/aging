@@ -9,11 +9,12 @@
 #include <logic/Universe.h>
 #include <string>
 #include <ui/Camera2D.h>
+#include <logic/UniverseType.h>
 
 class RenderArea : public QOpenGLWidget, protected QOpenGLFunctions {
 public:
-  explicit RenderArea(QWidget *parent = 0, CellMap *gol_map = 0);
-  explicit RenderArea(QWidget *parent = 0, Universe *hashlife_universe = 0);
+  explicit RenderArea(QWidget *parent = 0, Universe *hashlife_universe = 0,
+                      UniverseType type = UniverseType::Hashlife);
   void handleInput(QKeyEvent *event);
   void zoomin_event(QPoint origin);
   void zoomout_event(QPoint origin);
@@ -28,7 +29,6 @@ protected:
   void wheelEvent(QWheelEvent *event) override;
 
 private:
-  CellMap *gol_map;
   Universe *hashlife_universe;
   std::string vertexShaderSource;
   std::string fragmentShaderSource;
@@ -60,6 +60,8 @@ private:
 
   QOpenGLShaderProgram *m_program;
   Camera2D *camera;
+
+  UniverseType type;
 
   void render_gol(const QMatrix4x4 &matrix);
   void render_hashlife(const QMatrix4x4 &matrix);

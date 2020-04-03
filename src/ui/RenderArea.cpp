@@ -5,13 +5,12 @@
 #include <logic/Rect.h>
 #include <ui/RenderArea.h>
 #include <vector>
+#include <logic/NaiveUniverse/NaiveUniverse.h>
+#include <cmath>
 
-RenderArea::RenderArea(QWidget *parent, CellMap *gol_map)
-    : QOpenGLWidget(parent), gol_map(gol_map), hashlife_universe(nullptr) {}
-
-RenderArea::RenderArea(QWidget *parent, Universe *hashlife_universe)
-    : QOpenGLWidget(parent), hashlife_universe(hashlife_universe),
-      gol_map(nullptr) {}
+RenderArea::RenderArea(QWidget *parent,
+    Universe *hashlife_universe, UniverseType type)
+    : QOpenGLWidget(parent), hashlife_universe(hashlife_universe), type(type) {}
 
 void RenderArea::initializeGL() {
   QSettings settings("aging-team", "aging");
@@ -64,13 +63,25 @@ void RenderArea::initializeGL() {
 
   // The Camera holds the view matrix and handles zooming
   camera = new Camera2D();
-  camera->pos.setX(0.0f);
-  camera->pos.setY(0.0f);
 
-  if (hashlife_universe != nullptr)
-    camera->set_zoom(1 << ((static_cast<HashlifeUniverse *>(hashlife_universe))
-                               ->get_top_level() +
-                           1));
+  switch (type) {
+    size_t zoom_level;
+    case UniverseType::Life :
+      zoom_level = static_cast<size_t>(ceil(log2(
+        reinterpret_cast<NaiveUniverse*>
+                    (hashlife_universe)->width)));
+      camera->set_zoom(1 << zoom_level);
+      camera->pos.setX(-0.25f);
+      camera->pos.setY(-0.75f);
+      break;
+    case UniverseType::Hashlife :
+      zoom_level = static_cast<size_t>(reinterpret_cast<HashlifeUniverse *>
+                    (hashlife_universe)->get_top_level() + 1);
+      camera->set_zoom(1 << zoom_level);
+      camera->pos.setX(-0.25f);
+      camera->pos.setY(-0.75f);
+      break;
+  }
 }
 
 void RenderArea::resizeGL(int w, int h) {
@@ -99,35 +110,38 @@ void RenderArea::paintGL() {
 
   QMatrix4x4 viewMatrix = camera->get_view();
 
-  if (gol_map != nullptr) {
-    render_gol(viewMatrix);
-  } else if (hashlife_universe != nullptr) {
-    render_hashlife(viewMatrix);
-  } else {
-    std::cout << "Error : No Universe detected" << std::endl;
+  switch (type) {
+    case UniverseType::Hashlife :
+      render_hashlife(viewMatrix);
+      break;
+    case UniverseType::Life :
+      render_gol(viewMatrix);
+      break;
   }
 
   glDisableVertexAttribArray(0);
   m_program->release();
 }
 
-void RenderArea::render_gol(const QMatrix4x4 &matrix) {
-  /*
-  for(size_t c = 0; c< gol_map->getWidth();c++) {
+void RenderArea::render_gol(const QMatrix4x4 &viewMatrix) {
+  QMatrix4x4 modelMatrix;
+  modelMatrix.setToIdentity();
 
-          matrix.translate(1.0f,0.0f,0.0f);
-          for(size_t l = 0; l< gol_map->getHeight(); l++) {
-                  matrix.translate(0.0f,-1.0f,0.0f);
-                  if(gol_map->isAlive(c,l)){
-                          m_program->setUniformValue(m_matrixUniform, matrix);
-                          glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT,
-  0);
-                  }
-          }
-          matrix.translate(0.0f,gol_map->getHeight(),0.0f);
+  m_program->setUniformValue(m_viewUniform, viewMatrix);
+  m_program->setUniformValue(m_projectionUniform, projectionMatrix);
 
+  NaiveUniverse *univ = reinterpret_cast<NaiveUniverse *>(hashlife_universe);
+
+  for (size_t i = 0; i < univ->width; ++i) {
+    for (size_t j = 0; j < univ->height; ++j) {
+      modelMatrix.setToIdentity();
+      if (univ->get(Coord(i, j))) {
+        modelMatrix.translate(i, -static_cast<int>(j), 0);
+        m_program->setUniformValue(m_modelUniform, modelMatrix);
+        glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0);
+      }
+    }
   }
-  */
 }
 
 void RenderArea::render_hashlife(const QMatrix4x4 &viewMatrix) {
