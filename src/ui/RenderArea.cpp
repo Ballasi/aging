@@ -165,10 +165,12 @@ void RenderArea::render_hashlife(const QMatrix4x4 &viewMatrix) {
   m_program->setUniformValue(m_viewUniform, viewMatrix);
   m_program->setUniformValue(m_projectionUniform, projectionMatrix);
 
+  /*
   std::cout << "Top left : " << bounds.top_left.x << ',' << bounds.top_left.y
             << '\n';
   std::cout << "Bottom right : " << bounds.bottom_right.x << ','
             << bounds.bottom_right.y << '\n';
+  */
 
   for (size_t i = 0; i < coords.size(); ++i) {
     modelMatrix.setToIdentity();

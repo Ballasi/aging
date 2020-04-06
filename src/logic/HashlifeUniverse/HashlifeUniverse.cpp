@@ -21,8 +21,17 @@ HashlifeUniverse::HashlifeUniverse(QString filename, Coord top_left)
   QFile file(filename);
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     return;
+  QString format = filename.split(".")[1].simplified();
+  std::cout << "File format : " << format.toStdString() << std::endl;
+  if (format == "rle") {
+    build_from_rle(&file);
+  } else if (format == "mc") {
+    build_from_mc(&file);
+  }
+}
 
-  Coord boundingbox = read_rle_size(&file);
+void HashlifeUniverse::build_from_rle(QFile *file) {
+  Coord boundingbox = read_rle_size(file);
   // Starting with one extra level
   macrocell_sets.resize(top_level + 1);
   zeros.push_back(nullptr);
@@ -32,9 +41,109 @@ HashlifeUniverse::HashlifeUniverse(QString filename, Coord top_left)
   }
   root = reinterpret_cast<MacroCell *>(zeros.back());
 
-  read_rle_data(&file, boundingbox);
-  file.close();
+  read_rle_data(file, boundingbox);
+  file->close();
 
+  step_size = top_level - 2;
+}
+
+void HashlifeUniverse::build_from_mc(QFile *file) {
+  // This vector will store the pointers to the quadrants
+  std::vector<Quadrant *> mcells;
+  // mcells[0] should never be accessed
+  mcells.push_back(nullptr);
+  size_t max_top_level = 3;
+  macrocell_sets.resize(max_top_level + 1);
+  zeros.push_back(nullptr);
+  zeros.push_back(reinterpret_cast<Quadrant *>(minicell()));
+  zeros.push_back(reinterpret_cast<Quadrant *>(macrocell(2)));
+  zeros.push_back(reinterpret_cast<Quadrant *>(macrocell(3)));
+
+  while (!file->atEnd()) {
+    QByteArray line = file->readLine();
+    if (line[0] == '#' || line[0] == '[') {
+        std::cout << line.toStdString() << std::endl;
+        continue;
+    }
+    // Description of an 8x8 macrocell
+    if (line[0] == '$' || line[0] == '.' || line[0] == '*') {
+      size_t level = 3;
+      if (level > max_top_level) {
+        macrocell_sets.resize(level + 1);
+        for (size_t i = max_top_level + 1; i <= level; ++i) {
+          zeros.push_back(reinterpret_cast<Quadrant *>(macrocell(i)));
+        }
+        max_top_level = level;
+      }
+
+      // Reading 8x8 macrocell
+      CellState cells[8][8] = {{0}};
+      uint8_t x = 0;
+      uint8_t y = 0;
+      int line_i = 0;
+      while (line[line_i] == '$'
+          || line[line_i] == '.'
+          || line[line_i] == '*') {
+        char c = line[line_i];
+        if (c == '.') {
+          ++x;
+        } else if (c == '*') {
+          cells[x][y] = 1;
+          ++x;
+        } else if (c == '$') {
+          ++y;
+          x = 0;
+        }
+        ++line_i;
+      }
+
+      Quadrant* minis[4][4];
+      for (size_t j = 0; j < 4; ++j) {
+        for (size_t i = 0; i < 4; ++i) {
+          minis[i][j] = reinterpret_cast<Quadrant *>
+          (minicell(cells[2*i][2*j], cells[2*i + 1][2*j],
+                    cells[2*i][2*j+1], cells[2*i+1][2*j+1]));
+        }
+      }
+      mcells.push_back(reinterpret_cast<Quadrant *>(macrocell(3,
+      reinterpret_cast<Quadrant *>(macrocell(2, minis[0][0], minis[1][0],
+                                                minis[0][1], minis[1][1])),
+      reinterpret_cast<Quadrant *>(macrocell(2, minis[2][0], minis[3][0],
+                                                minis[2][1], minis[3][1])),
+      reinterpret_cast<Quadrant *>(macrocell(2, minis[0][2], minis[1][2],
+                                                minis[0][3], minis[1][3])),
+      reinterpret_cast<Quadrant *>(macrocell(2, minis[2][2], minis[3][2],
+                                                minis[2][3], minis[3][3])))));
+    }
+    // Description of a macrocell made from previous levels
+    if (line[0] >= '0' && line[0] <= '9') {
+      QByteArrayList line_data = line.split(' ');
+      size_t level = line_data[0].toULong();
+      if (level > max_top_level) {
+        macrocell_sets.resize(level + 1);
+        for (size_t i = max_top_level + 1; i <= level; ++i) {
+          zeros.push_back(reinterpret_cast<Quadrant *>(macrocell(i)));
+        }
+        max_top_level = level;
+      }
+      // Reading macrocell
+      Quadrant *nw, *ne, *sw, *se;
+      size_t nw_pos = line_data[1].toULong();
+      size_t ne_pos = line_data[2].toULong();
+      size_t sw_pos = line_data[3].toULong();
+      size_t se_pos = line_data[4].toULong();
+      nw = (nw_pos == 0) ? zeros[level - 1] : mcells[nw_pos];
+      ne = (ne_pos == 0) ? zeros[level - 1] : mcells[ne_pos];
+      sw = (sw_pos == 0) ? zeros[level - 1] : mcells[sw_pos];
+      se = (se_pos == 0) ? zeros[level - 1] : mcells[se_pos];
+      mcells.push_back(reinterpret_cast<Quadrant *>
+                      (macrocell(level, nw, ne, sw, se)));
+    }
+  }
+
+  file->close();
+  top_level = max_top_level;
+  root = reinterpret_cast<MacroCell *>(mcells.back());
   step_size = top_level - 2;
 }
 

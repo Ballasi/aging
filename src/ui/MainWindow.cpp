@@ -204,25 +204,33 @@ void MainWindow::stepSimulation() {
 }
 
 void MainWindow::load() {
-  QString fileName = QFileDialog::getOpenFileName(this, "Open File", "",
-                                          "Run Length Encoded (*.rle)");
-
+  QString fileName, acceptedFormats;
   switch (univ_type) {
-    case UniverseType::Hashlife :
-      delete hashlife_universe;
-      hashlife_universe = new HashlifeUniverse(fileName);
-      delete r_area;
-      r_area = new RenderArea(this, hashlife_universe, UniverseType::Hashlife);
+    case UniverseType::Hashlife:
+      acceptedFormats = "Pattern files (*.rle *.mc)";
       break;
-    case UniverseType::Life :
-      delete hashlife_universe;
-      hashlife_universe = new NaiveUniverse(fileName);
-      delete r_area;
-      r_area = new RenderArea(this, hashlife_universe, UniverseType::Life);
+    case UniverseType::Life:
+      acceptedFormats = "Pattern files (*.rle)";
       break;
   }
-  setCentralWidget(r_area);
-  updateStatusBar();
+
+  fileName = QFileDialog::getOpenFileName(this, "Open File",
+                                          "", acceptedFormats);
+  if (!fileName.isNull()) {
+    delete hashlife_universe;
+    delete r_area;
+    switch (univ_type) {
+      case UniverseType::Hashlife :
+        hashlife_universe = new HashlifeUniverse(fileName);
+        break;
+      case UniverseType::Life :
+        hashlife_universe = new NaiveUniverse(fileName);
+        break;
+    }
+    r_area = new RenderArea(this, hashlife_universe, univ_type);
+    setCentralWidget(r_area);
+    updateStatusBar();
+  }
 }
 
 void MainWindow::set_step_size() {
