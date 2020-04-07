@@ -812,12 +812,16 @@ void HashlifeUniverse::set_step_size_maximized(bool is_maximized) {
 }
 
 Rect HashlifeUniverse::get_pattern_bounding_box() {
-  Rect root_rect = Rect(top_left, Coord(top_left.x + (BigInt(1) << mp_size_t(top_level)), top_left.y + (BigInt(1) << mp_size_t(top_level))));
-  std::cout << "Top left : (" << root_rect.top_left.x << ',' << root_rect.top_left.y << ")" << std::endl;
-  std::cout << "Bottom right : (" << root_rect.bottom_right.x << ',' << root_rect.bottom_right.y << ")" << std::endl;
+  Rect root_rect = Rect(top_left, Coord(top_left.x +
+  (BigInt(1) << mp_size_t(top_level)),
+  top_left.y + (BigInt(1) << mp_size_t(top_level))));
+  std::cout << "Top left : (" << root_rect.top_left.x << ',' <<
+  root_rect.top_left.y << ")" << std::endl;
+  std::cout << "Bottom right : (" << root_rect.bottom_right.x <<
+  ',' << root_rect.bottom_right.y << ")" << std::endl;
   return root_rect;
 }
 
-void HashlifeUniverse::pattern_bounding_box_rec(Rect &box, size_t level, Quadrant *q) {
-
+void HashlifeUniverse::pattern_bounding_box_rec(Rect *box,
+                              size_t level, Quadrant *q) {
 }

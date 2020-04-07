@@ -70,15 +70,16 @@ void MainWindow::createUI() {
   QIcon *stepIcon = new QIcon("../res/icons/light/step.svg");
   if (isDarkTheme)
     stepIcon = new QIcon("../res/icons/dark/step.svg");
-  
+
   QIcon *fitPatternIcon = new QIcon("../res/icons/light/bullseye-line.svg");
-  if(isDarkTheme)
+  if (isDarkTheme)
     fitPatternIcon = new QIcon("../res/icons/dark/bullseye-line.svg");
 
   QAction *stepAction =
       controlToolbar->addAction(*stepIcon, "Advance one step");
-  
-  QAction *fitPatternAction = controlToolbar->addAction(*fitPatternIcon, "Fit Pattern");
+
+  QAction *fitPatternAction =
+      controlToolbar->addAction(*fitPatternIcon, "Fit Pattern");
 
   // Control toolbox
   QToolBar *toolboxToolbar = addToolBar("Toolbox");

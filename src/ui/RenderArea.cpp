@@ -181,7 +181,7 @@ void RenderArea::render_hashlife(const QMatrix4x4 &viewMatrix) {
 }
 
 void RenderArea::wheelEvent(QWheelEvent *event) {
-  if(event->delta() < 0)
+  if (event->delta() < 0)
     zoomout_event(event->pos());
   else
     zoomin_event(event->pos());
@@ -259,7 +259,8 @@ void RenderArea::set_colors(QColor c_color, QColor bg_color) {
 }
 
 void RenderArea::fitPattern() {
-  if(type == UniverseType::Hashlife) {
-    Rect r = reinterpret_cast<HashlifeUniverse *>(hashlife_universe)->get_pattern_bounding_box();
+  if (type == UniverseType::Hashlife) {
+    Rect r = reinterpret_cast<HashlifeUniverse *>(hashlife_universe)
+              ->get_pattern_bounding_box();
   }
 }

@@ -88,8 +88,8 @@ private:
   void get_cell_in_bounds_rec(Rect bounds, std::vector<Coord> *coords,
                               size_t current_level, Quadrant *current_cell,
                               Coord current_coord) const;
-  
-  void pattern_bounding_box_rec(Rect &box, size_t level, Quadrant *q);
+
+  void pattern_bounding_box_rec(Rect *box, size_t level, Quadrant *q);
 };
 
 #endif // HASHLIFE_UNIVERSE_HPP
