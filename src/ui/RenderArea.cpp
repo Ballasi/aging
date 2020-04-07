@@ -181,8 +181,11 @@ void RenderArea::render_hashlife(const QMatrix4x4 &viewMatrix) {
 }
 
 void RenderArea::wheelEvent(QWheelEvent *event) {
-  // camera->set_zoom(camera->get_zoom() - event->delta() / 100.0f);
-  // update();
+  if(event->delta() < 0)
+    zoomout_event(event->pos());
+  else
+    zoomin_event(event->pos());
+  update();
 }
 void RenderArea::zoomin_event(QPoint origin) {
   Coord c = map_coords_from_mouse(origin);
@@ -253,4 +256,10 @@ void RenderArea::set_colors(QColor c_color, QColor bg_color) {
   cell_color.setX(c_color.redF());
   cell_color.setY(c_color.greenF());
   cell_color.setZ(c_color.blueF());
+}
+
+void RenderArea::fitPattern() {
+  if(type == UniverseType::Hashlife) {
+    Rect r = reinterpret_cast<HashlifeUniverse *>(hashlife_universe)->get_pattern_bounding_box();
+  }
 }
