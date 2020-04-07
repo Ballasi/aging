@@ -71,8 +71,15 @@ void MainWindow::createUI() {
   if (isDarkTheme)
     stepIcon = new QIcon("../res/icons/dark/step.svg");
 
+  QIcon *fitPatternIcon = new QIcon("../res/icons/light/bullseye-line.svg");
+  if (isDarkTheme)
+    fitPatternIcon = new QIcon("../res/icons/dark/bullseye-line.svg");
+
   QAction *stepAction =
       controlToolbar->addAction(*stepIcon, "Advance one step");
+
+  QAction *fitPatternAction =
+      controlToolbar->addAction(*fitPatternIcon, "Fit Pattern");
 
   // Control toolbox
   QToolBar *toolboxToolbar = addToolBar("Toolbox");
@@ -160,6 +167,7 @@ void MainWindow::createUI() {
 
   connect(playPauseAction, &QAction::triggered, this, &MainWindow::playPause);
   connect(stepAction, &QAction::triggered, this, &MainWindow::stepSimulation);
+  connect(fitPatternAction, &QAction::triggered, this, &MainWindow::fitPattern);
 
   loadAction->setShortcut(QKeySequence::Open);
 
@@ -323,4 +331,9 @@ void MainWindow::universeSwitched() {
       setCentralWidget(r_area);
     }
   }
+}
+
+void MainWindow::fitPattern() {
+  r_area->fitPattern();
+  r_area->update();
 }

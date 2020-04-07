@@ -17,6 +17,8 @@ public:
   QVector2D pos;
   QVector2D origin;
 
+  void look_at(Coord c);
+
 protected:
   void generate_view_matrix();
 

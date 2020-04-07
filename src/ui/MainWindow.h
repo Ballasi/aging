@@ -22,6 +22,7 @@ public slots:
   void playPause();
   void chooseColors();
   void universeSwitched();
+  void fitPattern();
 
 protected:
   void keyPressEvent(QKeyEvent *event);

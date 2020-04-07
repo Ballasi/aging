@@ -22,6 +22,8 @@ public:
   Coord map_coords_from_mouse(QPoint mouseCoords);
   void set_colors(QColor cell_color, QColor bg_color);
 
+  void fitPattern();
+
 protected:
   void initializeGL() override;
   void resizeGL(int w, int h) override;

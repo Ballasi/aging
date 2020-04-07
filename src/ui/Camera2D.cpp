@@ -11,6 +11,9 @@ Camera2D::Camera2D(void) : zoom(1), pos(0.0f, 0.0f), origin(0.0f, 0.0f) {
 void Camera2D::set_zoom(const int n_zoom) {
   zoom = n_zoom;
   zoom = zoom < 1.0f ? 1.0f : zoom;
+
+  transform.update(pos, origin, zoom);
+  generate_view_matrix();
 }
 
 int Camera2D::get_zoom() const { return zoom; }
@@ -28,6 +31,7 @@ QMatrix4x4 Camera2D::get_view() {
 
   if (dirty)
     generate_view_matrix();
+
   return transform.matrix;
 }
 
@@ -73,4 +77,14 @@ Rect Camera2D::get_view_bounds(float aspect_ratio, Universe *universe) {
 
   Rect rect(top_left, bottom_right);
   return rect;
+}
+
+void Camera2D::look_at(Coord c) {
+  pos.setX((static_cast<float>(c.x.get_si()) / static_cast<float>(zoom))
+            - 0.5f + 0.5f / static_cast<float>(zoom));
+  pos.setY((-static_cast<float>(c.y.get_si()) / static_cast<float>(zoom))
+            - 0.5f + 0.5f / static_cast<float>(zoom));
+
+  transform.update(pos, origin, zoom);
+  generate_view_matrix();
 }
