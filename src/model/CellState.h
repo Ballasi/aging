@@ -3,12 +3,6 @@
 
 #include <cstddef>
 
-class CellState {
-public:
-  CellState() = default;
-  CellState(size_t id): id(id) {}
-
-  size_t id;
-};
+typedef size_t CellState;
 
 #endif // CELL_STATE_H_
