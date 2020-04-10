@@ -4,7 +4,8 @@
 
 HashlifeUniverse::HashlifeUniverse(size_t top_level, Coord top_left)
     : Universe(top_level, top_left),
-    top_left(top_left), top_level(top_level) , step_size_maximized(true) {
+    top_left(top_left), top_level(top_level) , step_size_maximized(true) ,
+    hyperspeed(false) {
   macrocell_sets.resize(top_level + 1);
   zeros.push_back(nullptr);
   zeros.push_back(reinterpret_cast<Quadrant *>(minicell()));
@@ -17,7 +18,7 @@ HashlifeUniverse::HashlifeUniverse(size_t top_level, Coord top_left)
 
 HashlifeUniverse::HashlifeUniverse(QString filename, Coord top_left)
     : Universe(filename, top_left),
-    top_left(top_left), step_size_maximized(true) {
+    top_left(top_left), step_size_maximized(true), hyperspeed(false) {
   QFile file(filename);
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     return;
@@ -244,21 +245,23 @@ void HashlifeUniverse::step() {
   Quadrant *z = zeros[top_level - 2];
 
   // Checking for crown
-  if (root->nw->macrocell.se == z && root->nw->macrocell.nw == z &&
-      root->nw->macrocell.ne == z && root->ne->macrocell.nw == z &&
-      root->ne->macrocell.ne == z && root->ne->macrocell.se == z &&
-      root->se->macrocell.ne == z && root->se->macrocell.se == z &&
-      root->se->macrocell.sw == z && root->sw->macrocell.se == z &&
-      root->sw->macrocell.sw == z && root->sw->macrocell.nw == z) {
-    std::cout << "Allo ?" << '\n';
-    top_level--;
-    root = macrocell(top_level, root->nw->macrocell.se, root->ne->macrocell.sw,
-                     root->sw->macrocell.ne, root->se->macrocell.nw);
+  if (!hyperspeed) {
+    if ((root->nw->macrocell.se == z && root->nw->macrocell.nw == z &&
+        root->nw->macrocell.ne == z && root->ne->macrocell.nw == z &&
+        root->ne->macrocell.ne == z && root->ne->macrocell.se == z &&
+        root->se->macrocell.ne == z && root->se->macrocell.se == z &&
+        root->se->macrocell.sw == z && root->sw->macrocell.se == z &&
+        root->sw->macrocell.sw == z && root->sw->macrocell.nw == z)) {
+      top_level--;
+      root = macrocell(top_level,
+                      root->nw->macrocell.se, root->ne->macrocell.sw,
+                      root->sw->macrocell.ne, root->se->macrocell.nw);
+    } else {
+      top_left -= Coord(top_level - 2);
+    }
   } else {
-    top_left -= Coord(top_level - 2);
+      top_left -= Coord(top_level - 2);
   }
-
-  std::cout << "Universe size : " << top_level << '\n';
 }
 
 const CellState HashlifeUniverse::get(Coord target) const {
@@ -737,30 +740,43 @@ void HashlifeUniverse::get_cell_in_bounds_rec(Rect bounds,
                                               std::vector<Coord> *coords,
                                               size_t current_level,
                                               Quadrant *current_cell,
-                                              Coord current_coord) const {
+                                              Coord current_coord,
+                                              size_t min_level) const {
   BigInt x = current_coord.x;
   BigInt y = current_coord.y;
 
-  if (current_level == 1) {
-    MiniCell minicell = current_cell->minicell;
-    if (bounds.is_in({x, y})) {
-      if (minicell.nw)
+  if (current_level == min_level) {
+    if (min_level == 1) {
+      MiniCell minicell = current_cell->minicell;
+      if (bounds.is_in({x, y})) {
+        if (minicell.nw)
+          coords->push_back({x, y});
+      }
+
+      if (bounds.is_in({x + 1, y})) {
+        if (minicell.ne)
+          coords->push_back({x + 1, y});
+      }
+
+      if (bounds.is_in({x, y + 1})) {
+        if (minicell.sw)
+          coords->push_back({x, y + 1});
+      }
+
+      if (bounds.is_in({x + 1, y + 1})) {
+        if (minicell.se)
+          coords->push_back({x + 1, y + 1});
+      }
+    } else {
+      BigInt size = BigInt(1) << mp_size_t(current_level - 1);
+      if (current_cell->macrocell.nw != zeros[current_level])
         coords->push_back({x, y});
-    }
-
-    if (bounds.is_in({x + 1, y})) {
-      if (minicell.ne)
-        coords->push_back({x + 1, y});
-    }
-
-    if (bounds.is_in({x, y + 1})) {
-      if (minicell.sw)
-        coords->push_back({x, y + 1});
-    }
-
-    if (bounds.is_in({x + 1, y + 1})) {
-      if (minicell.se)
-        coords->push_back({x + 1, y + 1});
+      if (current_cell->macrocell.ne != zeros[current_level])
+        coords->push_back({x + size, y});
+      if (current_cell->macrocell.sw != zeros[current_level])
+        coords->push_back({x, y + size});
+      if (current_cell->macrocell.se != zeros[current_level])
+        coords->push_back({x + size, y + size});
     }
   } else {
     MacroCell macrocell = current_cell->macrocell;
@@ -768,32 +784,33 @@ void HashlifeUniverse::get_cell_in_bounds_rec(Rect bounds,
       BigInt size = BigInt(1) << mp_size_t(current_level - 1);
       if (bounds.collides({{x, y}, {x + size, y + size}})) {
         get_cell_in_bounds_rec(bounds, coords, current_level - 1, macrocell.nw,
-                               {x, y});
+                               {x, y}, min_level);
       }
 
       if (bounds.collides({{x + size, y}, {x + BigInt(2) * size, y + size}})) {
         get_cell_in_bounds_rec(bounds, coords, current_level - 1, macrocell.ne,
-                               {x + size, y});
+                               {x + size, y}, min_level);
       }
 
       if (bounds.collides({{x, y + size}, {x + size, y + BigInt(2) * size}})) {
         get_cell_in_bounds_rec(bounds, coords, current_level - 1, macrocell.sw,
-                               {x, y + size});
+                               {x, y + size}, min_level);
       }
 
       if (bounds.collides({{x + size, y + size},
                            {x + BigInt(2) * size, y + BigInt(2) * size}})) {
         get_cell_in_bounds_rec(bounds, coords, current_level - 1, macrocell.se,
-                               {x + size, y + size});
+                               {x + size, y + size}, min_level);
       }
     }
   }
 }
 
 void HashlifeUniverse::get_cell_in_bounds(Rect bounds,
-                                          std::vector<Coord> *coords) const {
+                                          std::vector<Coord> *coords,
+                                          size_t min_level) const {
   get_cell_in_bounds_rec(bounds, coords, top_level,
-                         reinterpret_cast<Quadrant *>(root), top_left);
+          reinterpret_cast<Quadrant *>(root), top_left, min_level);
 }
 
 void HashlifeUniverse::set_step_size(size_t new_step_size) {
@@ -824,4 +841,8 @@ Rect HashlifeUniverse::get_pattern_bounding_box() {
 
 void HashlifeUniverse::pattern_bounding_box_rec(Rect *box,
                               size_t level, Quadrant *q) {
+}
+
+void HashlifeUniverse::set_hyperspeed(bool hyperspeed_activated) {
+  hyperspeed = hyperspeed_activated;
 }

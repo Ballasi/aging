@@ -154,23 +154,45 @@ void RenderArea::render_hashlife(const QMatrix4x4 &viewMatrix) {
                                             static_cast<float>(height()),
                                         hashlife_universe);
 
+  BigInt nb_pixels(width() * height());
+  BigInt nb_cells = (bounds.bottom_right.x - bounds.top_left.x) *
+                    (bounds.bottom_right.y - bounds.top_left.y);
+  mpf_class res_ratio(nb_cells);
+  res_ratio /= nb_pixels;
+  BigInt ratio_mpz(res_ratio);
+
+  int min_rendered_level = mpz_sizeinbase(ratio_mpz.get_mpz_t(), 2) >> 1;
+
+  min_rendered_level = (min_rendered_level >
+            static_cast<HashlifeUniverse *>(hashlife_universe)
+                                            ->get_top_level()) ?
+            static_cast<HashlifeUniverse *>(hashlife_universe)
+                                            ->get_top_level()  :
+            min_rendered_level;
+
+  min_rendered_level = (min_rendered_level < 1) ? 1 : min_rendered_level;
+
+  float size_f = static_cast<float>((1 << (min_rendered_level - 1)));
+
+  float square_vertices2[8] = {
+      0.0f, 0.0f, // Top-left
+      size_f, 0.0f, // Top-right
+      size_f, size_f, // Bottom-right
+      0.0f, size_f, // Bottom-left
+  };
+
+  glVertexAttribPointer(m_posAttr, 2, GL_FLOAT, GL_FALSE, 0, square_vertices2);
+
   std::vector<Coord> coords;
 
   static_cast<HashlifeUniverse *>(hashlife_universe)
-      ->get_cell_in_bounds(bounds, &coords);
+      ->get_cell_in_bounds(bounds, &coords, min_rendered_level);
 
   QMatrix4x4 modelMatrix;
   modelMatrix.setToIdentity();
 
   m_program->setUniformValue(m_viewUniform, viewMatrix);
   m_program->setUniformValue(m_projectionUniform, projectionMatrix);
-
-  /*
-  std::cout << "Top left : " << bounds.top_left.x << ',' << bounds.top_left.y
-            << '\n';
-  std::cout << "Bottom right : " << bounds.bottom_right.x << ','
-            << bounds.bottom_right.y << '\n';
-  */
 
   for (size_t i = 0; i < coords.size(); ++i) {
     modelMatrix.setToIdentity();
