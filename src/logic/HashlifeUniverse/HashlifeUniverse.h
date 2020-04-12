@@ -25,7 +25,8 @@ public:
   void set(Coord target, CellState state);
   void debug();
 
-  void get_cell_in_bounds(Rect bounds, std::vector<Coord> *coords) const;
+  void get_cell_in_bounds(Rect bounds,
+          std::vector<Coord> *coords, size_t min_level) const;
   /*
     class Iterator;
     Iterator iter(Rect bounds);
@@ -36,6 +37,7 @@ public:
 
   void set_step_size(size_t new_step_size);
   void set_step_size_maximized(bool is_maximized);
+  void set_hyperspeed(bool hyperspeed_activated);
 
   void grid(int *L, int width, Quadrant *r, int level, int x, int y);
   void print_grid(Quadrant *r, size_t level);
@@ -47,6 +49,7 @@ private:
   Coord top_left;
   MacroCell *root;
   bool step_size_maximized;
+  bool hyperspeed;
 
   std::vector<std::unordered_set<MacroCell>> macrocell_sets;
   std::unordered_set<MiniCell> minicells;
@@ -87,7 +90,7 @@ private:
 
   void get_cell_in_bounds_rec(Rect bounds, std::vector<Coord> *coords,
                               size_t current_level, Quadrant *current_cell,
-                              Coord current_coord) const;
+                              Coord current_coord, size_t min_level) const;
 
   void pattern_bounding_box_rec(Rect *box, size_t level, Quadrant *q);
 };

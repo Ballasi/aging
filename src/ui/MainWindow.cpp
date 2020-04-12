@@ -19,14 +19,7 @@ MainWindow::MainWindow() {
   this->setFocusPolicy(Qt::FocusPolicy::ClickFocus);
 
   simulationRunning = false;
-  /*
-  game = new Game(100,100);
 
-  CellMap *map = game->getMap();
-  for (size_t c = 0; c < map->getWidth(); ++c)
-          for (size_t l = 0; l < map->getHeight(); ++l)
-                  map->changeCellState(c,l,c % 3);
-  */
   hashlife_universe = new HashlifeUniverse(8);
   univ_type = UniverseType::Hashlife;
 
@@ -149,6 +142,9 @@ void MainWindow::createUI() {
 
   universeMenu->addActions(universeBoxes->actions());
 
+  hyperspeedAction = prefMenu->addAction("Hyperspeed mode");
+  hyperspeedAction->setCheckable(true);
+
   connect(hashlifeUniverseBox, &QAction::toggled,
           this, &MainWindow::universeSwitched);
   connect(lifeUniverseBox, &QAction::toggled,
@@ -159,6 +155,9 @@ void MainWindow::createUI() {
 
   connect(stepSizeMaxAction, &QAction::changed,
           this, &MainWindow::set_step_size_maximized);
+
+  connect(hyperspeedAction, &QAction::changed,
+          this, &MainWindow::set_hyperspeed);
 
   connect(loadAction, &QAction::triggered, this, &MainWindow::load);
 
@@ -336,4 +335,11 @@ void MainWindow::universeSwitched() {
 void MainWindow::fitPattern() {
   r_area->fitPattern();
   r_area->update();
+}
+
+void MainWindow::set_hyperspeed() {
+  if (univ_type == UniverseType::Hashlife) {
+    reinterpret_cast<HashlifeUniverse *>(hashlife_universe)
+          ->set_hyperspeed(hyperspeedAction->isChecked());
+  }
 }
