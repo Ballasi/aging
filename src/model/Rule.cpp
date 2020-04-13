@@ -20,7 +20,7 @@ Rule::Rule(QString rule_string)
   enum ReadingState { B_SEARCH, B_VALUES, S_SEARCH, S_VALUES };
 
   ReadingState reading_state = B_SEARCH;
-  for (QChar c: rule_string) {
+  for (QChar c : rule_string) {
     switch (reading_state) {
     case B_SEARCH:
       if (c == 'B')
@@ -52,7 +52,8 @@ Rule::Rule(QString rule_string)
         size_t neighbour = c.toLatin1() - '0';
         set(neighbour, 1, 1);
       } else {
-        throw std::invalid_argument("Survival values should be between 0 and 8");
+        throw std::invalid_argument
+          ("Survival values should be between 0 and 8");
       }
       break;
     }
