@@ -12,17 +12,19 @@
 #include "model/Rect.h"
 
 /*
-  Cells are memorized in a 8 bit type format.
-  Each bits of this byte corresponds to the living state of the cell.
+  The classical game of life simulating universe.
+  With limited size, this CPU based simulation assures
+  constant performance even on the mose chaotic scenarios.
  */
 
 class LifeUniverse: public Universe {
 public:
+  // Constructors
   explicit LifeUniverse(const Vec2 &size);
   ~LifeUniverse();
 
+  // Universe interface
   void update() override;
-
   const Rect &bounds() const override;
   const BigInt &generation() const override;
   const BigInt &step_size() const override;
@@ -35,17 +37,20 @@ public:
   const CellState get(const Vec2 &coord) const override;
 
 private:
+  // getters
   const bool _get(size_t x,  size_t y) const;
   void _set(size_t x, size_t y, bool state);
 
+  // Universe interface variables
   Rect _bound_rect;
-  const BigInt _step_size = 1;
   BigInt _generation_count;
+  const BigInt _step_size = 1;
 
-  uint8_t *_cell_blocks;
-
+  // Inner workings
   size_t _width;
   size_t _height;
+
+  uint8_t *_cell_blocks;
 
   size_t _length_in_bytes;
 

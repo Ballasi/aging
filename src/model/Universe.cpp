@@ -32,8 +32,3 @@ const bool Universe::can_reshape() const { return false; }
 void Universe::reshape(Rect bounds) {
   throw "This method is not implemented for this universe";
 }
-
-// Meta aptitudes
-bool Universe::can_get_set() const {
-  return can_get() && can_set();
-}
