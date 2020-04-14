@@ -34,6 +34,7 @@ public:
 
   Coord get_top_left();
   size_t get_top_level();
+  Rect get_bounds();
 
   void set_step_size(size_t new_step_size);
   void set_step_size_maximized(bool is_maximized);

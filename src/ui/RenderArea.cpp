@@ -31,7 +31,7 @@ void RenderArea::initializeGL() {
 
   this->fragmentShaderSource = "uniform vec3 color;"
                                "void main() {\n"
-                               "  gl_FragColor = vec4(color,1.0f);\n"
+                               "  gl_FragColor = vec4(color,1.0);\n"
                                "}\n";
 
   initializeOpenGLFunctions();
@@ -43,6 +43,7 @@ void RenderArea::initializeGL() {
   m_program->addShaderFromSourceCode(QOpenGLShader::Fragment,
                                      fragmentShaderSource.c_str());
   m_program->link();
+
   m_posAttr = m_program->attributeLocation("posAttr");
   m_modelUniform = m_program->uniformLocation("model");
   m_viewUniform = m_program->uniformLocation("view");
@@ -50,9 +51,16 @@ void RenderArea::initializeGL() {
   m_colorUniform = m_program->uniformLocation("color");
 
   glGenBuffers(1, &square_ebo);
+  glGenBuffers(1, &line_ebo);
+
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, square_ebo);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(square_elements),
                square_elements, GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, line_ebo);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(line_elements),
+               line_elements, GL_STATIC_DRAW);
+
 
   float aspect_ratio =
       static_cast<float>(width()) / static_cast<float>(height());
@@ -132,12 +140,40 @@ void RenderArea::render_gol(const QMatrix4x4 &viewMatrix) {
 
   NaiveUniverse *univ = reinterpret_cast<NaiveUniverse *>(hashlife_universe);
 
-  for (size_t i = 0; i < univ->width; ++i) {
-    for (size_t j = 0; j < univ->height; ++j) {
-      modelMatrix.setToIdentity();
-      if (univ->get(Coord(i, j))) {
-        modelMatrix.translate(i, -static_cast<int>(j), 0);
+  Rect bounds = camera->get_view_bounds(static_cast<float>(width()) /
+                                            static_cast<float>(height()),
+                                        univ);
+
+  bounds.top_left.x = (bounds.top_left.x < 0) ? 0 : bounds.top_left.x;
+  bounds.top_left.y = (bounds.top_left.y < 0) ? 0 : bounds.top_left.y;
+
+  bounds.bottom_right.x = (bounds.bottom_right.x > univ->width - 1)
+                          ? univ->width - 1
+                          : bounds.bottom_right.x;
+
+  bounds.bottom_right.y = (bounds.bottom_right.y > univ->height - 1)
+                          ? univ->height - 1
+                          : bounds.bottom_right.y;
+
+  if (camera->get_zoom() <= 32) {
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, line_ebo);
+    for (BigInt i = bounds.top_left.x; i < bounds.bottom_right.x; ++i) {
+      for (BigInt j = bounds.top_left.y; j < bounds.bottom_right.y; ++j) {
+        modelMatrix.setToIdentity();
+        modelMatrix.translate(i.get_si(), -j.get_si(), 0);
         m_program->setUniformValue(m_modelUniform, modelMatrix);
+        glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, 0);
+      }
+    }
+  }
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, square_ebo);
+  for (BigInt i = bounds.top_left.x; i < bounds.bottom_right.x; ++i) {
+    for (BigInt j = bounds.top_left.y; j < bounds.bottom_right.y; ++j) {
+      modelMatrix.setToIdentity();
+      modelMatrix.translate(i.get_si(), -j.get_si(), 0);
+      m_program->setUniformValue(m_modelUniform, modelMatrix);
+      if (univ->get(Coord(i, j))) {
         glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0);
       }
     }
@@ -145,8 +181,9 @@ void RenderArea::render_gol(const QMatrix4x4 &viewMatrix) {
 }
 
 void RenderArea::render_hashlife(const QMatrix4x4 &viewMatrix) {
-  Coord top_left =
-      (static_cast<HashlifeUniverse *>(hashlife_universe))->get_top_left();
+  Rect univ_bounds =
+      (static_cast<HashlifeUniverse *>(hashlife_universe))->get_bounds();
+
   size_t level =
       (static_cast<HashlifeUniverse *>(hashlife_universe))->get_top_level();
 
@@ -194,6 +231,30 @@ void RenderArea::render_hashlife(const QMatrix4x4 &viewMatrix) {
   m_program->setUniformValue(m_viewUniform, viewMatrix);
   m_program->setUniformValue(m_projectionUniform, projectionMatrix);
 
+  bounds.top_left.x = (bounds.top_left.x < 0) ? 0 : bounds.top_left.x;
+  bounds.top_left.y = (bounds.top_left.y < 0) ? 0 : bounds.top_left.y;
+
+  bounds.bottom_right.x = (bounds.bottom_right.x > univ_bounds.bottom_right.x)
+                          ? univ_bounds.bottom_right.x
+                          : bounds.bottom_right.x;
+
+  bounds.bottom_right.y = (bounds.bottom_right.y > univ_bounds.bottom_right.y)
+                          ? univ_bounds.bottom_right.y
+                          : bounds.bottom_right.y;
+
+  if (camera->get_zoom() <= 32) {
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, line_ebo);
+    for (BigInt i = bounds.top_left.x; i < bounds.bottom_right.x; ++i) {
+      for (BigInt j = bounds.top_left.y; j < bounds.bottom_right.y; ++j) {
+        modelMatrix.setToIdentity();
+        modelMatrix.translate(i.get_si(), -j.get_si(), 0);
+        m_program->setUniformValue(m_modelUniform, modelMatrix);
+        glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, 0);
+      }
+    }
+  }
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, square_ebo);
   for (size_t i = 0; i < coords.size(); ++i) {
     modelMatrix.setToIdentity();
     modelMatrix.translate(coords[i].x.get_si(), -coords[i].y.get_si(), 0);

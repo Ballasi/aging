@@ -846,3 +846,9 @@ void HashlifeUniverse::pattern_bounding_box_rec(Rect *box,
 void HashlifeUniverse::set_hyperspeed(bool hyperspeed_activated) {
   hyperspeed = hyperspeed_activated;
 }
+
+Rect HashlifeUniverse::get_bounds() {
+  return Rect(top_left, top_left +
+         Coord(BigInt(1) << mp_size_t(top_level),
+               BigInt(1) << mp_size_t(top_level)));
+}
