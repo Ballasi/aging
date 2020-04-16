@@ -6,6 +6,7 @@
 // #include <iterator>
 #include <unordered_set>
 #include <vector>
+#include <utility>
 
 #include <logic/Universe.h>
 
@@ -43,7 +44,7 @@ public:
   void grid(int *L, int width, Quadrant *r, int level, int x, int y);
   void print_grid(Quadrant *r, size_t level);
 
-  Rect get_pattern_bounding_box();
+  std::pair<Rect, size_t> get_pattern_bounding_box();
 
 private:
   size_t top_level;
@@ -93,7 +94,7 @@ private:
                               size_t current_level, Quadrant *current_cell,
                               Coord current_coord, size_t min_level) const;
 
-  void pattern_bounding_box_rec(Rect *box, size_t level, Quadrant *q);
+  size_t pattern_bounding_box_rec(Rect *box, size_t level, Quadrant *q);
 };
 
 #endif // HASHLIFE_UNIVERSE_HPP

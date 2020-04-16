@@ -7,6 +7,7 @@
 #include <vector>
 #include <logic/NaiveUniverse/NaiveUniverse.h>
 #include <cmath>
+#include <utility>
 
 RenderArea::RenderArea(QWidget *parent,
     Universe *hashlife_universe, UniverseType type)
@@ -231,8 +232,10 @@ void RenderArea::render_hashlife(const QMatrix4x4 &viewMatrix) {
   m_program->setUniformValue(m_viewUniform, viewMatrix);
   m_program->setUniformValue(m_projectionUniform, projectionMatrix);
 
-  bounds.top_left.x = (bounds.top_left.x < 0) ? 0 : bounds.top_left.x;
-  bounds.top_left.y = (bounds.top_left.y < 0) ? 0 : bounds.top_left.y;
+  bounds.top_left.x = (bounds.top_left.x < univ_bounds.top_left.x) ?
+                      univ_bounds.top_left.x : bounds.top_left.x;
+  bounds.top_left.y = (bounds.top_left.y < univ_bounds.top_left.y) ?
+                      univ_bounds.top_left.y : bounds.top_left.y;
 
   bounds.bottom_right.x = (bounds.bottom_right.x > univ_bounds.bottom_right.x)
                           ? univ_bounds.bottom_right.x
@@ -343,7 +346,17 @@ void RenderArea::set_colors(QColor c_color, QColor bg_color) {
 
 void RenderArea::fitPattern() {
   if (type == UniverseType::Hashlife) {
-    Rect r = reinterpret_cast<HashlifeUniverse *>(hashlife_universe)
-              ->get_pattern_bounding_box();
+    std::pair<Rect, size_t> p = reinterpret_cast<HashlifeUniverse *>
+                 (hashlife_universe)->get_pattern_bounding_box();
+
+    BigInt cx = p.first.top_left.x;
+    cx += p.first.bottom_right.x;
+    cx >>= mp_size_t(1);
+    BigInt cy = p.first.top_left.y;
+    cy += p.first.bottom_right.y;
+    cy >>= mp_size_t(1);
+    Coord center(cx, cy);
+    camera->set_zoom(1 << (p.second));
+    camera->look_at(center);
   }
 }

@@ -828,19 +828,73 @@ void HashlifeUniverse::set_step_size_maximized(bool is_maximized) {
     set_step_size(top_level - 2);
 }
 
-Rect HashlifeUniverse::get_pattern_bounding_box() {
-  Rect root_rect = Rect(top_left, Coord(top_left.x +
-  (BigInt(1) << mp_size_t(top_level)),
-  top_left.y + (BigInt(1) << mp_size_t(top_level))));
-  std::cout << "Top left : (" << root_rect.top_left.x << ',' <<
-  root_rect.top_left.y << ")" << std::endl;
-  std::cout << "Bottom right : (" << root_rect.bottom_right.x <<
-  ',' << root_rect.bottom_right.y << ")" << std::endl;
-  return root_rect;
+std::pair<Rect, size_t> HashlifeUniverse::get_pattern_bounding_box() {
+  Rect r = get_bounds();
+  size_t l = pattern_bounding_box_rec(&r, top_level,
+                    reinterpret_cast<Quadrant *>(root));
+  std::cout << "Top left : (" << r.top_left.x << ',' <<
+  r.top_left.y << ")" << std::endl;
+  std::cout << "Bottom right : (" << r.bottom_right.x <<
+  ',' << r.bottom_right.y << ")" << std::endl;
+
+  std::pair<Rect, size_t> pair(r, l);
+  return pair;
 }
 
-void HashlifeUniverse::pattern_bounding_box_rec(Rect *box,
+size_t HashlifeUniverse::pattern_bounding_box_rec(Rect *box,
                               size_t level, Quadrant *q) {
+  if (level <= 4 || q == zeros[level]) {
+    return level;
+  } else {
+    std::cout << "Searching..." << std::endl;
+    Quadrant *z1 = zeros[level - 1];
+    Quadrant *z2 = zeros[level - 2];
+    bool nw = q->macrocell.nw != z1;
+    bool ne = q->macrocell.ne != z1;
+    bool sw = q->macrocell.sw != z1;
+    bool se = q->macrocell.se != z1;
+    if (nw && !ne && !sw && !se) {
+      std::cout << "NW" << std::endl;
+      box->bottom_right.x -= BigInt(1) << mp_size_t(level - 1);
+      box->bottom_right.y -= BigInt(1) << mp_size_t(level - 1);
+      return pattern_bounding_box_rec(box, level - 1, q->macrocell.nw);
+    } else if (!nw && ne && !sw && !se) {
+      std::cout << "NE" << std::endl;
+      box->top_left.x += BigInt(1) << mp_size_t(level - 1);
+      box->bottom_right.y -= BigInt(1) << mp_size_t(level - 1);
+      return pattern_bounding_box_rec(box, level - 1, q->macrocell.ne);
+    } else if (!nw && !ne && sw && !se) {
+      std::cout << "SW" << std::endl;
+      box->top_left.y += BigInt(1) << mp_size_t(level - 1);
+      box->bottom_right.x -= BigInt(1) << mp_size_t(level - 1);
+      return pattern_bounding_box_rec(box, level - 1, q->macrocell.sw);
+    } else if (!nw && !ne && !sw && se) {
+      std::cout << "SE" << std::endl;
+      box->top_left.x += BigInt(1) << mp_size_t(level - 1);
+      box->top_left.y += BigInt(1) << mp_size_t(level - 1);
+      return pattern_bounding_box_rec(box, level - 1, q->macrocell.se);
+    }
+    /*
+    else if (q->macrocell.nw->macrocell.se == z2 && q->macrocell.nw->macrocell.nw == z2 &&
+        q->macrocell.nw->macrocell.ne == z2 && q->macrocell.ne->macrocell.nw == z2 &&
+        q->macrocell.ne->macrocell.ne == z2 && q->macrocell.ne->macrocell.se == z2 &&
+        q->macrocell.se->macrocell.ne == z2 && q->macrocell.se->macrocell.se == z2 &&
+        q->macrocell.se->macrocell.sw == z2 && q->macrocell.sw->macrocell.se == z2 &&
+        q->macrocell.sw->macrocell.sw == z2 && q->macrocell.sw->macrocell.nw == z2 &&
+        q->macrocell.nw->macrocell.se != z2 && q->macrocell.ne->macrocell.sw != z2 &&
+        q->macrocell.sw->macrocell.ne != z2 && q->macrocell.se->macrocell.nw != z2) {
+          std::cout << "CENTER" << std::endl;
+          MacroCell q2(q->macrocell.nw->macrocell.se, q->macrocell.ne->macrocell.sw,
+                      q->macrocell.sw->macrocell.ne, q->macrocell.se->macrocell.nw);
+          box->top_left.x += BigInt(1) << mp_size_t(level - 2);
+          box->top_left.y += BigInt(1) << mp_size_t(level - 2);
+          box->bottom_right.x -= BigInt(1) << mp_size_t(level - 2);
+          box->bottom_right.y -= BigInt(1) << mp_size_t(level - 2);
+          pattern_bounding_box_rec(box, level - 1, reinterpret_cast<Quadrant *>(&q2));
+        }
+      */
+  }
+  return level;
 }
 
 void HashlifeUniverse::set_hyperspeed(bool hyperspeed_activated) {
