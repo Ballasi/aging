@@ -155,7 +155,7 @@ void RenderArea::render_gol(const QMatrix4x4 &viewMatrix) {
   bounds.bottom_right.y = (bounds.bottom_right.y > univ->height - 1)
                           ? univ->height - 1
                           : bounds.bottom_right.y;
-  
+
   float width_f = static_cast<float>(univ->width) - 1;
   float height_f = static_cast<float>(univ->height) - 1;
 
