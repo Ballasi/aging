@@ -155,6 +155,25 @@ void RenderArea::render_gol(const QMatrix4x4 &viewMatrix) {
   bounds.bottom_right.y = (bounds.bottom_right.y > univ->height - 1)
                           ? univ->height - 1
                           : bounds.bottom_right.y;
+  
+  float width_f = static_cast<float>(univ->width) - 1;
+  float height_f = static_cast<float>(univ->height) - 1;
+
+  float border_vertices[8] = {
+      0.0f, 0.0f, // Top-left
+      width_f, 0.0f, // Top-right
+      width_f, height_f, // Bottom-right
+      0.0f, height_f, // Bottom-left
+  };
+
+  modelMatrix.setToIdentity();
+  modelMatrix.translate(0, -height_f + 1, 0);
+  m_program->setUniformValue(m_modelUniform, modelMatrix);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, line_ebo);
+  glVertexAttribPointer(m_posAttr, 2, GL_FLOAT, GL_FALSE, 0, border_vertices);
+  glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, 0);
+
+  glVertexAttribPointer(m_posAttr, 2, GL_FLOAT, GL_FALSE, 0, square_vertices);
 
   if (camera->get_zoom() <= 32) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, line_ebo);
