@@ -100,6 +100,12 @@ void HashlifeUniverse::build_from_mc(QFile *file) {
           zeros.push_back(reinterpret_cast<Quadrant *>(macrocell(i)));
         }
         max_top_level = level;
+        #ifdef LOGGING
+          logger->write("Resizing mcell sets...");
+          QString l("Max top level : ");
+          l += std::to_string(max_top_level).c_str();
+          logger->write(l);
+        #endif
       }
 
       // Reading 8x8 macrocell
@@ -165,6 +171,12 @@ void HashlifeUniverse::build_from_mc(QFile *file) {
           zeros.push_back(reinterpret_cast<Quadrant *>(macrocell(i)));
         }
         max_top_level = level;
+        #ifdef LOGGING
+          logger->write("Resizing mcell sets...");
+          QString l("Max top level : ");
+          l += std::to_string(max_top_level).c_str();
+          logger->write(l);
+        #endif
       }
       // Reading macrocell
       Quadrant *nw, *ne, *sw, *se;
