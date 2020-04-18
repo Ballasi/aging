@@ -1,6 +1,9 @@
 #include <logic/HashlifeUniverse/HashlifeUniverse.h>
 // #include <iterator>
 #include <unordered_set>
+#include <logs/Logger.h>
+
+#define LOGGING
 
 HashlifeUniverse::HashlifeUniverse(size_t top_level, Coord top_left)
     : Universe(top_level, top_left),
@@ -49,6 +52,16 @@ void HashlifeUniverse::build_from_rle(QFile *file) {
 }
 
 void HashlifeUniverse::build_from_mc(QFile *file) {
+  #ifdef LOGGING
+    Logger *logger = new Logger(nullptr, "logs.txt", true);
+    logger->write(
+      "Building HashlifeUniverse from MCell file : "
+       + file->fileName());
+    size_t nb_lines_read = 0;
+    size_t nb_ignored_lines = 0;
+    size_t nb_base_level = 0;
+  #endif
+
   // This vector will store the pointers to the quadrants
   std::vector<Quadrant *> mcells;
   // mcells[0] should never be accessed
@@ -61,13 +74,25 @@ void HashlifeUniverse::build_from_mc(QFile *file) {
   zeros.push_back(reinterpret_cast<Quadrant *>(macrocell(3)));
 
   while (!file->atEnd()) {
+    #ifdef LOGGING
+      nb_lines_read++;
+    #endif
     QByteArray line = file->readLine();
     if (line[0] == '#' || line[0] == '[') {
+        #ifdef LOGGING
+          logger->write(
+            QString(line.toStdString().c_str()).trimmed()
+             + " [IGNORED]");
+          nb_ignored_lines++;
+        #endif
         std::cout << line.toStdString() << std::endl;
         continue;
     }
     // Description of an 8x8 macrocell
     if (line[0] == '$' || line[0] == '.' || line[0] == '*') {
+      #ifdef LOGGING
+          nb_base_level++;
+      #endif
       size_t level = 3;
       if (level > max_top_level) {
         macrocell_sets.resize(level + 1);
@@ -81,6 +106,9 @@ void HashlifeUniverse::build_from_mc(QFile *file) {
       CellState cells[8][8] = {{0}};
       uint8_t x = 0;
       uint8_t y = 0;
+      #ifdef LOGGING
+        size_t pop = 0;
+      #endif
       int line_i = 0;
       while (line[line_i] == '$'
           || line[line_i] == '.'
@@ -90,6 +118,9 @@ void HashlifeUniverse::build_from_mc(QFile *file) {
           ++x;
         } else if (c == '*') {
           cells[x][y] = 1;
+          #ifdef LOGGING
+            pop++;
+          #endif
           ++x;
         } else if (c == '$') {
           ++y;
@@ -115,6 +146,14 @@ void HashlifeUniverse::build_from_mc(QFile *file) {
                                                 minis[0][3], minis[1][3])),
       reinterpret_cast<Quadrant *>(macrocell(2, minis[2][2], minis[3][2],
                                                 minis[2][3], minis[3][3])))));
+
+      #ifdef LOGGING
+        QString l("Line ");
+        l += std::to_string(nb_lines_read - nb_ignored_lines).c_str();
+        l += " : 8x8 Macrocell with population ";
+        l += std::to_string(pop).c_str();
+        logger->write(l);
+      #endif
     }
     // Description of a macrocell made from previous levels
     if (line[0] >= '0' && line[0] <= '9') {
@@ -133,6 +172,22 @@ void HashlifeUniverse::build_from_mc(QFile *file) {
       size_t ne_pos = line_data[2].toULong();
       size_t sw_pos = line_data[3].toULong();
       size_t se_pos = line_data[4].toULong();
+      #ifdef LOGGING
+        QString l("Line ");
+        l += std::to_string(nb_lines_read - nb_ignored_lines).c_str();
+        l += " : Level ";
+        l += std::to_string(level).c_str();
+        l += " Macrocell pointing to lines (";
+        l += std::to_string(nw_pos).c_str();
+        l += ",";
+        l += std::to_string(ne_pos).c_str();
+        l += ",";
+        l += std::to_string(sw_pos).c_str();
+        l += ",";
+        l += std::to_string(se_pos).c_str();
+        l += ")";
+        logger->write(l);
+      #endif
       nw = (nw_pos == 0) ? zeros[level - 1] : mcells[nw_pos];
       ne = (ne_pos == 0) ? zeros[level - 1] : mcells[ne_pos];
       sw = (sw_pos == 0) ? zeros[level - 1] : mcells[sw_pos];
@@ -146,6 +201,36 @@ void HashlifeUniverse::build_from_mc(QFile *file) {
   top_level = max_top_level;
   root = reinterpret_cast<MacroCell *>(mcells.back());
   step_size = top_level - 2;
+  #ifdef LOGGING
+    logger->setShowDateTime(true);
+    logger->write("Closing file");
+    logger->write("Total number of lines : " +
+      QString(std::to_string(nb_lines_read).c_str()));
+    logger->write("Total number of ignored lines : " +
+      QString(std::to_string(nb_ignored_lines).c_str()));
+    logger->write("8x8 Macrocells described in file : " +
+      QString(std::to_string(nb_base_level).c_str()));
+    logger->write("Number of Macrocells by level : ");
+    for (size_t i = 0; i < macrocell_sets.size(); ++i) {
+      QString s("Level ");
+      s += std::to_string(i).c_str();
+      s += " : ";
+      s += std::to_string(macrocell_sets[i].size()).c_str();
+      logger->write(s);
+    }
+    logger->write("Top Level : " + QString(std::to_string(top_level).c_str()));
+    QString b("Universe bounds : (");
+    Rect bo = get_bounds();
+    b += bo.top_left.x.get_str().c_str();
+    b += ",";
+    b += bo.top_left.y.get_str().c_str();
+    b += ") , (";
+    b += bo.bottom_right.x.get_str().c_str();
+    b += ",";
+    b += bo.bottom_right.y.get_str().c_str();
+    b += ")";
+    logger->write(b);
+  #endif
 }
 
 void HashlifeUniverse::debug() {
