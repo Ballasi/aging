@@ -1,5 +1,6 @@
 #include <logic/NaiveUniverse/NaiveUniverse.h>
 #include <iostream>
+//#include "../../gmplib/gmp.h"
 #include <gmp.h>
 #include <cmath>
 
@@ -201,4 +202,3 @@ void NaiveUniverse::read_rle_data(QFile *file, Coord boundingbox, Coord size) {
       break;
   }
 }
-

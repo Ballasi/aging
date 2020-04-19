@@ -1,7 +1,7 @@
 #ifndef BIG_INT_H_
 #define BIG_INT_H_
 
-#include <gmpxx.h>
+#include "../gmplib/gmpxx.h"
 
 typedef mpz_class BigInt;
 

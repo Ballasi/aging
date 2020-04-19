@@ -1,10 +1,13 @@
 #ifndef BIG_INT_HPP
 #define BIG_INT_HPP
 
+//#include "../gmplib/gmpxx.h"
 #include <gmpxx.h>
 #include <string>
 
 typedef mpz_class BigInt;
+
+/* Alias des entiers de taille infinie. */
 
 static std::string bigint_to_str(BigInt i) {
   std::string str_i = i.get_str();

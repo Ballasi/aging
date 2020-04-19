@@ -1,7 +1,5 @@
 cmake_minimum_required (VERSION 2.6)
 
-project (aging)
-
 include_directories("src")
 
 # search for location of header gmpxx.h", only at positions given by the user
@@ -81,6 +79,8 @@ file(
     )
 
 add_executable(aging ${sources_files})
+
+target_include_directories(aging PUBLIC ${GMP_INCLUDE_DIR})
 
 target_link_libraries(aging ${GMP_LIB} ${GMPXX_LIB})
 
