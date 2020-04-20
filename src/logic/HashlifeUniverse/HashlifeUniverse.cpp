@@ -180,11 +180,26 @@ void HashlifeUniverse::build_from_mc(QFile *file) {
       }
       // Reading macrocell
       Quadrant *nw, *ne, *sw, *se;
-      size_t nw_pos = line_data[1].toULong();
-      size_t ne_pos = line_data[2].toULong();
-      size_t sw_pos = line_data[3].toULong();
-      size_t se_pos = line_data[4].toULong();
+      bool oks[4] = {false};
+      size_t nw_pos = line_data[1].trimmed().toULong(&oks[0]);
+      size_t ne_pos = line_data[2].trimmed().toULong(&oks[1]);
+      size_t sw_pos = line_data[3].trimmed().toULong(&oks[2]);
+      size_t se_pos = line_data[4].trimmed().toULong(&oks[3]);
       #ifdef LOGGING
+        QString ld("Tokens : ");
+        ld += "\"";
+        ld += line_data[1].trimmed();
+        ld += "\" ";
+        ld += "\"";
+        ld += line_data[2].trimmed();
+        ld += "\" ";
+        ld += "\"";
+        ld += line_data[3].trimmed();
+        ld += "\" ";
+        ld += "\"";
+        ld += line_data[4].trimmed();
+        ld += "\" ";
+        logger->write(ld);
         QString l("Line ");
         l += std::to_string(nb_lines_read - nb_ignored_lines).c_str();
         l += " : Level ";
@@ -197,7 +212,11 @@ void HashlifeUniverse::build_from_mc(QFile *file) {
         l += std::to_string(sw_pos).c_str();
         l += ",";
         l += std::to_string(se_pos).c_str();
-        l += ")";
+        l += ")  Ok ? ";
+        l += std::to_string(oks[0]).c_str();
+        l += std::to_string(oks[1]).c_str();
+        l += std::to_string(oks[2]).c_str();
+        l += std::to_string(oks[3]).c_str();
         logger->write(l);
       #endif
       nw = (nw_pos == 0) ? zeros[level - 1] : mcells[nw_pos];
