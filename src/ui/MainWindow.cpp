@@ -14,332 +14,165 @@
 #include <iostream>
 #include <string>
 
+
 MainWindow::MainWindow() {
-  this->resize(720, 720);
-  this->setFocusPolicy(Qt::FocusPolicy::ClickFocus);
+  resize(720, 720);
+  setFocusPolicy(Qt::FocusPolicy::ClickFocus);
+  isDarkTheme = false;
 
-  simulationRunning = false;
-
-  hashlife_universe = new HashlifeUniverse(8);
+  universe = new HashlifeUniverse(8);
   univ_type = UniverseType::Hashlife;
-
-  for (int i = 0; i < 256; ++i) {
-    for (int j = 0; j < 256; ++j) {
-      hashlife_universe->set(Coord(i, j), (i + j) % 8 == 0);
+  for (int i = 64; i < 192; ++i) {
+    for (int j = 64; j < 192; ++j) {
+      universe->set(Coord(i, j), (i + j) % 12 == 0);
     }
   }
 
-  isDarkTheme = this->palette().window().color().lightnessF() < 0.5;
-
   createUI();
-  stepTimer = new QTimer(this);
-  connect(stepTimer, &QTimer::timeout, this, &MainWindow::stepSimulation);
 }
 
 void MainWindow::createUI() {
-  updateStatusBar();
+  ctxt.universe_scene = new UniverseScene(this,
+    universe,
+    UniverseType::Hashlife);
+  setCentralWidget(ctxt.universe_scene);
 
-  // Render Area
-  r_area = new RenderArea(this, hashlife_universe, UniverseType::Hashlife);
-  setCentralWidget(r_area);
-
-  r_area->setCursor(Qt::ArrowCursor);
-
-  // Simulation control toolbar
   QToolBar *controlToolbar = addToolBar("Simulation Controls");
   addToolBar(Qt::LeftToolBarArea, controlToolbar);
+
+  // chargement des icones
+  QString icon_dir("../res/icons/light/");
   if (isDarkTheme)
-    playIcon = new QIcon("../res/icons/dark/play.svg");
-  else
-    playIcon = new QIcon("../res/icons/light/play.svg");
-  if (isDarkTheme)
-    pauseIcon = new QIcon("../res/icons/dark/pause.svg");
-  else
-    pauseIcon = new QIcon("../res/icons/light/pause.svg");
-  if (isDarkTheme)
-    playPauseAction = controlToolbar->addAction(*playIcon, "Play/Pause");
-  else
-    playPauseAction = controlToolbar->addAction(*playIcon, "Play/Pause");
-  QIcon *stepIcon = new QIcon("../res/icons/light/step.svg");
-  if (isDarkTheme)
-    stepIcon = new QIcon("../res/icons/dark/step.svg");
+    icon_dir = "../res/icons/dark/";
 
-  QIcon *fitPatternIcon = new QIcon("../res/icons/light/bullseye-line.svg");
-  if (isDarkTheme)
-    fitPatternIcon = new QIcon("../res/icons/dark/bullseye-line.svg");
+  // Button Play/pause
+  ctxt.playIcon = new QIcon(icon_dir + "play.svg");
+  ctxt.pauseIcon = new QIcon(icon_dir + "pause.svg");
+  ctxt.playPauseAction = controlToolbar->addAction(*(ctxt.playIcon),
+    "Play/Pause");
+  connect(ctxt.playPauseAction, &QAction::triggered, this,
+    &MainWindow::funcAction_playPause);
 
-  QAction *stepAction =
-      controlToolbar->addAction(*stepIcon, "Advance one step");
+  // Button One Step
+  connect(controlToolbar->addAction(QIcon(icon_dir + "step.svg"),
+    "Advance one step"),
+    &QAction::triggered, this, &MainWindow::funcAction_step);
 
-  QAction *fitPatternAction =
-      controlToolbar->addAction(*fitPatternIcon, "Fit Pattern");
+  controlToolbar->addSeparator();
 
-  // Control toolbox
-  QToolBar *toolboxToolbar = addToolBar("Toolbox");
-  QButtonGroup *toolboxGroup = new QButtonGroup();
-  toolboxGroup->setExclusive(true);
-  addToolBar(Qt::LeftToolBarArea, toolboxToolbar);
+  // Bouton Fit Pattern
+  connect(controlToolbar->addAction(QIcon(icon_dir + "bullseye.svg"),
+    "Fit Pattern"),
+    &QAction::triggered, this, &MainWindow::funcAction_fitPattern);
 
-  pencilButton = new QToolButton(toolboxToolbar);
-  if (isDarkTheme)
-    pencilButton->setIcon(QIcon("../res/icons/dark/pencil.svg"));
-  else
-    pencilButton->setIcon(QIcon("../res/icons/light/pencil.svg"));
-  pencilButton->setCheckable(true);
-  toolboxGroup->addButton(pencilButton);
-  toolboxToolbar->addWidget(pencilButton);
+  controlToolbar->addSeparator();
 
-  eraserButton = new QToolButton(toolboxToolbar);
-  if (isDarkTheme)
-    eraserButton->setIcon(QIcon("../res/icons/dark/eraser.svg"));
-  else
-    eraserButton->setIcon(QIcon("../res/icons/light/eraser.svg"));
-  eraserButton->setCheckable(true);
-  toolboxGroup->addButton(eraserButton);
-  toolboxToolbar->addWidget(eraserButton);
+  // Bouton Change Mode
+  ctxt.moveIcon = new QIcon(icon_dir + "cursor-move.svg");
+  ctxt.editIcon = new QIcon(icon_dir + "pencil.svg");
+  ctxt.selectIcon = new QIcon(icon_dir + "table.svg");
+  ctxt.mouseModeAction = controlToolbar->addAction(*ctxt.moveIcon ,
+    "Change Mode");
+  connect(ctxt.mouseModeAction, &QAction::triggered, this,
+    &MainWindow::funcAction_mode);
+  controlToolbar->addSeparator();
 
-  zoominButton = new QToolButton(toolboxToolbar);
-  if (isDarkTheme)
-    zoominButton->setIcon(QIcon("../res/icons/dark/zoom-in.svg"));
-  else
-    zoominButton->setIcon(QIcon("../res/icons/light/zoom-in.svg"));
-  zoominButton->setCheckable(true);
-  toolboxGroup->addButton(zoominButton);
-  toolboxToolbar->addWidget(zoominButton);
 
-  zoomoutButton = new QToolButton(toolboxToolbar);
-  if (isDarkTheme)
-    zoomoutButton->setIcon(QIcon("../res/icons/dark/zoom-out.svg"));
-  else
-    zoomoutButton->setIcon(QIcon("../res/icons/light/zoom-out.svg"));
-  zoomoutButton->setCheckable(true);
-  toolboxGroup->addButton(zoomoutButton);
-  toolboxToolbar->addWidget(zoomoutButton);
+  // bouton d'un zoom centré
+  connect(controlToolbar->addAction(QIcon(icon_dir + "zoom-in.svg"),
+    "Zoom In"),
+    &QAction::triggered, this, &MainWindow::funcAction_zoomIn);
 
-  // Menu Bar
-  QMenu *fileMenu = new QMenu("File");
-  QMenu *prefMenu = new QMenu("Preferences");
-  QAction *loadAction = fileMenu->addAction("Load pattern");
-  QAction *changeColorsAction = prefMenu->addAction("Choose colors");
-  QMenu *stepMenu = prefMenu->addMenu("Step size");
-  QAction *stepSizeSelectAction = stepMenu->addAction("Set step size");
-  stepSizeMaxAction = stepMenu->addAction("Maximize step size");
-  stepSizeMaxAction->setCheckable(true);
-
-  QMenu *universeMenu = prefMenu->addMenu("Select Universe");
-
-  hashlifeUniverseBox = new QAction("Hashlife");
-  hashlifeUniverseBox->setCheckable(true);
-  hashlifeUniverseBox->setChecked(true);
-  lifeUniverseBox = new QAction("Life");
-  lifeUniverseBox->setCheckable(true);
-  //lifeUniverseBox->setChecked(true);
-
-  QActionGroup *universeBoxes = new QActionGroup(universeMenu);
-  universeBoxes->setExclusive(true);
-  universeBoxes->addAction(hashlifeUniverseBox);
-  universeBoxes->addAction(lifeUniverseBox);
-
-  universeMenu->addActions(universeBoxes->actions());
-
-  hyperspeedAction = prefMenu->addAction("Hyperspeed mode");
-  hyperspeedAction->setCheckable(true);
-
-  connect(hashlifeUniverseBox, &QAction::toggled,
-          this, &MainWindow::universeSwitched);
-  connect(lifeUniverseBox, &QAction::toggled,
-          this, &MainWindow::universeSwitched);
-
-  connect(stepSizeSelectAction, &QAction::triggered,
-          this, &MainWindow::set_step_size);
-
-  connect(stepSizeMaxAction, &QAction::changed,
-          this, &MainWindow::set_step_size_maximized);
-
-  connect(hyperspeedAction, &QAction::changed,
-          this, &MainWindow::set_hyperspeed);
-
-  connect(loadAction, &QAction::triggered, this, &MainWindow::load);
-
-  connect(changeColorsAction, &QAction::triggered, this,
-          &MainWindow::chooseColors);
-
-  connect(playPauseAction, &QAction::triggered, this, &MainWindow::playPause);
-  connect(stepAction, &QAction::triggered, this, &MainWindow::stepSimulation);
-  connect(fitPatternAction, &QAction::triggered, this, &MainWindow::fitPattern);
-
-  loadAction->setShortcut(QKeySequence::Open);
-
-  menuBar()->addMenu(fileMenu);
-  menuBar()->addMenu(prefMenu);
+  // bouton d'un dezoom centré
+  connect(controlToolbar->addAction(QIcon(icon_dir + "zoom-out.svg"),
+    "Zoomt Out"),
+    &QAction::triggered, this, &MainWindow::funcAction_zoomOut);
 }
 
-void MainWindow::playPause() {
-  simulationRunning = !simulationRunning;
-  if (simulationRunning) {
-    playPauseAction->setIcon(*pauseIcon);
-    stepTimer->start(50);
+
+
+MainWindow::~MainWindow() {}
+
+
+void MainWindow::funcAction_playPause() {
+  ctxt.universe_scene->play_pause();
+  if (ctxt.universe_scene->get_state_simulation()) {
+    ctxt.playPauseAction->setIcon(*(ctxt.pauseIcon));
   } else {
-    playPauseAction->setIcon(*playIcon);
-    stepTimer->stop();
+    ctxt.playPauseAction->setIcon(*(ctxt.playIcon));
   }
 }
 
-void MainWindow::updateStatusBar() {
-  std::string s;
-  switch (univ_type) {
-    case UniverseType::Hashlife :
-      s += "Generation : ";
-      s += bigint_to_str(hashlife_universe->get_generation());
-      s += " | Step size : 2^";
-      s += std::to_string(hashlife_universe->get_step_size());
-      statusBar()->showMessage(QString(s.c_str()));
-      break;
-    case UniverseType::Life :
-      s += "Generation : ";
-      s += bigint_to_str(hashlife_universe->get_generation());
-      s += " | Step size : 1";
-      statusBar()->showMessage(QString(s.c_str()));
-      break;
-  }
+void MainWindow::funcAction_step() {
+  ctxt.universe_scene->step();
 }
 
-void MainWindow::stepSimulation() {
-  hashlife_universe->step();
-  r_area->update();
-  updateStatusBar();
+void MainWindow::funcAction_fitPattern() {
+  ctxt.universe_scene->fit_pattern();
 }
 
-void MainWindow::load() {
-  QString fileName, acceptedFormats;
-  switch (univ_type) {
-    case UniverseType::Hashlife:
-      acceptedFormats = "Pattern files (*.rle *.mc)";
+void MainWindow::funcAction_mode() {
+  ctxt.universe_scene->next_mode();
+  switch (ctxt.universe_scene->get_mode()) {
+    case SceneMode::MOVE:
+      ctxt.mouseModeAction->setIcon(*(ctxt.moveIcon));
       break;
-    case UniverseType::Life:
-      acceptedFormats = "Pattern files (*.rle)";
+    case SceneMode::EDIT:
+      ctxt.mouseModeAction->setIcon(*(ctxt.editIcon));
+      break;
+    case SceneMode::SELECT:
+      ctxt.mouseModeAction->setIcon(*(ctxt.selectIcon));
+      break;
+    default:
       break;
   }
+}
 
-  fileName = QFileDialog::getOpenFileName(this, "Open File",
-                                          "", acceptedFormats);
-  if (!fileName.isNull()) {
-    delete hashlife_universe;
-    delete r_area;
-    switch (univ_type) {
-      case UniverseType::Hashlife :
-        hashlife_universe = new HashlifeUniverse(fileName);
-        break;
-      case UniverseType::Life :
-        hashlife_universe = new NaiveUniverse(fileName);
-        break;
-    }
-    r_area = new RenderArea(this, hashlife_universe, univ_type);
-    setCentralWidget(r_area);
-    updateStatusBar();
+void MainWindow::funcAction_zoomIn() {
+  ctxt.universe_scene->zoom_in();
+}
+
+void MainWindow::funcAction_zoomOut() {
+  ctxt.universe_scene->zoom_out();
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event) {
+  switch (event->key()) {
+    case Qt::Key_Z:
+    case Qt::Key_Up:
+      ctxt.universe_scene->up();
+      break;
+    case Qt::Key_S:
+    case Qt::Key_Down:
+      ctxt.universe_scene->down();
+      break;
+    case Qt::Key_Q:
+    case Qt::Key_Left:
+      ctxt.universe_scene->left();
+      break;
+    case Qt::Key_D:
+    case Qt::Key_Right:
+      ctxt.universe_scene->right();
+      break;
+    case Qt::Key_Space:
+      ctxt.universe_scene->step();
+      break;
+    case Qt::Key_Plus:
+      ctxt.universe_scene->zoom_in();
+      break;
+    case Qt::Key_Minus:
+      ctxt.universe_scene->zoom_out();
+      break;
+    default:
+      break;
   }
+  update();
 }
 
-void MainWindow::set_step_size() {
-  if (univ_type == UniverseType::Hashlife) {
-    bool ok;
-    std::string s;
-    size_t max = (reinterpret_cast<HashlifeUniverse*>(
-      hashlife_universe))->get_top_level() - 2;
-    s += "Step size (enter the exponent) max : ";
-    s += std::to_string(max);
-    int i = QInputDialog::getInt(this, "Enter a step size", s.c_str(),
-                  hashlife_universe->get_step_size(), 0, max, 1, &ok);
-
-    if (ok) {
-      stepSizeMaxAction->setChecked(false);
-      (reinterpret_cast<HashlifeUniverse*>(hashlife_universe))
-                                          ->set_step_size(i);
-    }
-
-    updateStatusBar();
-  }
+void MainWindow::wheelEvent(QWheelEvent *event) {
+  if (event->delta() < 0)
+    ctxt.universe_scene->zoom_in(event->pos());
+  else
+    ctxt.universe_scene->zoom_out(event->pos());
 }
 
-void MainWindow::set_step_size_maximized() {
-  if (univ_type == UniverseType::Hashlife) {
-    (reinterpret_cast<HashlifeUniverse*>(hashlife_universe))
-              ->set_step_size_maximized(stepSizeMaxAction->isChecked());
-
-    updateStatusBar();
-  }
-}
-
-MainWindow::~MainWindow() { delete r_area; }
-
-void MainWindow::keyPressEvent(QKeyEvent *event) { r_area->handleInput(event); }
-
-void MainWindow::mousePressEvent(QMouseEvent *event) {
-  if (r_area->underMouse()) {
-    QPoint pos = event->pos();
-    if (zoominButton->isChecked()) {
-      r_area->zoomin_event(r_area->mapFromParent(pos));
-    } else if (zoomoutButton->isChecked()) {
-      r_area->zoomout_event(r_area->mapFromParent(pos));
-    } else if (pencilButton->isChecked()) {
-      Coord c = r_area->map_coords_from_mouse(r_area->mapFromParent(pos));
-      std::cout << "Coords : " << c.x << "," << c.y << "\n";
-      hashlife_universe->set(c, 1);
-      r_area->update();
-    } else if (eraserButton->isChecked()) {
-      Coord c = r_area->map_coords_from_mouse(r_area->mapFromParent(pos));
-      std::cout << "Coords : " << c.x << "," << c.y << "\n";
-      hashlife_universe->set(c, 0);
-      r_area->update();
-    }
-  }
-}
-
-void MainWindow::chooseColors() {
-  QColor cell_color =
-      QColorDialog::getColor(Qt::white, this, "Choose cell color");
-  QColor bg_color =
-      QColorDialog::getColor(Qt::black, this, "Choose background color");
-
-  QSettings settings("aging-team", "aging");
-  settings.setValue("renderer/bg-color", bg_color);
-  settings.setValue("renderer/cell-color", cell_color);
-
-  r_area->set_colors(cell_color, bg_color);
-  r_area->update();
-}
-
-void MainWindow::universeSwitched() {
-  if (hashlifeUniverseBox->isChecked()) {
-    if (univ_type != UniverseType::Hashlife) {
-      univ_type = UniverseType::Hashlife;
-      delete hashlife_universe;
-      hashlife_universe = new HashlifeUniverse(6);
-      delete r_area;
-      r_area = new RenderArea(this, hashlife_universe, UniverseType::Hashlife);
-      setCentralWidget(r_area);
-    }
-  }
-  if (lifeUniverseBox->isChecked()) {
-    if (univ_type != UniverseType::Life) {
-      univ_type = UniverseType::Life;
-      delete hashlife_universe;
-      hashlife_universe = new NaiveUniverse(Coord(128, 128));
-      delete r_area;
-      r_area = new RenderArea(this, hashlife_universe, UniverseType::Life);
-      setCentralWidget(r_area);
-    }
-  }
-}
-
-void MainWindow::fitPattern() {
-  r_area->fitPattern();
-  r_area->update();
-}
-
-void MainWindow::set_hyperspeed() {
-  if (univ_type == UniverseType::Hashlife) {
-    reinterpret_cast<HashlifeUniverse *>(hashlife_universe)
-          ->set_hyperspeed(hyperspeedAction->isChecked());
-  }
-}
