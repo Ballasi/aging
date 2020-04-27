@@ -32,6 +32,9 @@ cserver_setup:
 	@cp tmp/compile_commands.json .
 	@rm -Rf tmp
 
+doc:
+	doxygen Doxyfile
+
 clean:
 	@echo -e "=> \e[1mCleaning $(BIN_FOLDER)/\e[0m"
-	@rm -Rf $(BIN_FOLDER)
+	@rm -Rf $(BIN_FOLDER) docs/html
