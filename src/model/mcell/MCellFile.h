@@ -33,21 +33,22 @@ public:
 
   class Level3_MCell {
     public:
+      Level3_MCell();
       CellState cells[8][8];
   };
   class LevelN_MCell {
     public:
+      LevelN_MCell();
       size_t level;
       size_t nw_index, ne_index;
       size_t sw_index, se_index;
   };
   union Line {
-    public:
-      Level3_MCell level3;
-      LevelN_MCell levelN;
+    Level3_MCell level3;
+    LevelN_MCell levelN;
   };
 
-  LineType next(Line& line);
+  LineType next(Line *line);
 
 private:
   QFile* _file;
