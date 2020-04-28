@@ -123,7 +123,7 @@ private:
 
   // puissance de 2 du saut
   // 2**p_step = taille du saut (16 generations)
-  size_t p_step;
+  int p_step;
 
   // affichage fini ou non de la grille
   int bords;

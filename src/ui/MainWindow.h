@@ -37,12 +37,22 @@ protected:
   void wheelEvent(QWheelEvent *event) override;
 
   // Fonctions actions lance par des connects
+  void funcAction_newFile();
+  void funcAction_openFile();
+  void funcAction_saveFile();
+
   void funcAction_playPause();
   void funcAction_step();
+  void funcAction_incSpeed();
+  void funcAction_decSpeed();
+
   void funcAction_fitPattern();
+
+  void funcAction_mode();
+
   void funcAction_zoomIn();
   void funcAction_zoomOut();
-  void funcAction_mode();
+
 
 private:
   WidgetsCtxt ctxt;
@@ -53,6 +63,8 @@ private:
   UniverseType univ_type;
 
   void createUI();
+  void createToolBar();
+  void createMenuBar();
 };
 
 #endif /* UI_MAINWINDOW_H_ */

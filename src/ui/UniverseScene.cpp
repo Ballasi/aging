@@ -5,9 +5,10 @@ UniverseScene::UniverseScene(QWidget *parent, Universe *universe,
     r_area = new RenderArea(this, universe, UniverseType::Hashlife);
     mode = MOVE;
     isSimulationRun = false;
-    refresh_time_ms = 1;
-    p_step = 0;
     bords = 0;
+
+    refresh_time_ms = 0;
+    p_step = 1;
 }
 
 
@@ -26,11 +27,27 @@ void UniverseScene::step() {
 }
 
 void UniverseScene::increase_speed() {
-    printf("UniverseScene::increase_speed() not Implemented\n");
+  if (refresh_time_ms <= 0) {
+    p_step += 1;
+  } else {
+    refresh_time_ms -= 250;
+    if (refresh_time_ms <= 0) {
+      p_step = 1;
+      refresh_time_ms = 0;
+    }
+  }
 }
 
 void UniverseScene::decrease_speed() {
-    printf("UniverseScene::decrease_speed() not Implemented\n");
+  if (p_step == 0) {
+    refresh_time_ms += 250;
+  } else {
+    p_step -= 1;
+    if (p_step <= 0) {
+      refresh_time_ms = 250;
+      p_step = 0;
+    }
+  }
 }
 
 void UniverseScene::zoom_in(QPoint origin) {
@@ -117,8 +134,12 @@ QString UniverseScene::get_generation() {
 }
 
 QString UniverseScene::get_speed() {
-    printf("UniverseScene::get_speed() not Implemented\n");
-    return (QString) "";
+  if (p_step == 0) {
+    printf("%d ms/step\n", refresh_time_ms);
+  } else {
+    printf("2^%d step\n", p_step);
+  }
+  return (QString) "";
 }
 
 Universe* UniverseScene::get_zone() {

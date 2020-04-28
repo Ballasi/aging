@@ -320,19 +320,19 @@ Coord RenderArea::map_coords_from_mouse(QPoint mouseCoords) {
 
 
 void RenderArea::down() {
-  camera->pos.setY(camera->pos.y() - 0.05f);
-  update();
-}
-void RenderArea::up() {
   camera->pos.setY(camera->pos.y() + 0.05f);
   update();
 }
+void RenderArea::up() {
+  camera->pos.setY(camera->pos.y() - 0.05f);
+  update();
+}
 void RenderArea::right() {
-  camera->pos.setX(camera->pos.x() - 0.05f);
+  camera->pos.setX(camera->pos.x() + 0.05f);
   update();
 }
 void RenderArea::left() {
-  camera->pos.setX(camera->pos.x() + 0.05f);
+  camera->pos.setX(camera->pos.x() - 0.05f);
   update();
 }
 

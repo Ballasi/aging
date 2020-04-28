@@ -24,19 +24,25 @@ MainWindow::MainWindow() {
   univ_type = UniverseType::Hashlife;
   for (int i = 64; i < 192; ++i) {
     for (int j = 64; j < 192; ++j) {
-      universe->set(Coord(i, j), (i + j) % 12 == 0);
+      universe->set(Coord(i, j),  ( (i + j) % 12 == 0 || (i - j) % 12 == 0) );
     }
   }
 
   createUI();
 }
 
+MainWindow::~MainWindow() {}
+
 void MainWindow::createUI() {
   ctxt.universe_scene = new UniverseScene(this,
     universe,
-    UniverseType::Hashlife);
+    univ_type);
   setCentralWidget(ctxt.universe_scene);
+  createToolBar();
+  createMenuBar();
+}
 
+void MainWindow::createToolBar() {
   QToolBar *controlToolbar = addToolBar("Simulation Controls");
   addToolBar(Qt::LeftToolBarArea, controlToolbar);
 
@@ -44,6 +50,25 @@ void MainWindow::createUI() {
   QString icon_dir("../res/icons/light/");
   if (isDarkTheme)
     icon_dir = "../res/icons/dark/";
+
+
+  // new file
+  connect(controlToolbar->addAction(QIcon(icon_dir + "file.svg"),
+    "New File"),
+    &QAction::triggered, this, &MainWindow::funcAction_newFile);
+
+  // open file
+  connect(controlToolbar->addAction(QIcon(icon_dir + "folder-open.svg"),
+    "Open File"),
+    &QAction::triggered, this, &MainWindow::funcAction_openFile);
+
+  // save file
+  connect(controlToolbar->addAction(QIcon(icon_dir + "floppy.svg"),
+    "Save File"),
+    &QAction::triggered, this, &MainWindow::funcAction_saveFile);
+
+
+  controlToolbar->addSeparator();
 
   // Button Play/pause
   ctxt.playIcon = new QIcon(icon_dir + "play.svg");
@@ -57,6 +82,17 @@ void MainWindow::createUI() {
   connect(controlToolbar->addAction(QIcon(icon_dir + "step.svg"),
     "Advance one step"),
     &QAction::triggered, this, &MainWindow::funcAction_step);
+
+  // Button Increase Speed
+  connect(controlToolbar->addAction(QIcon(icon_dir + "fast-forward.svg"),
+    "Increase Speed"),
+    &QAction::triggered, this, &MainWindow::funcAction_incSpeed);
+
+  // Button Decrease Speed
+  connect(controlToolbar->addAction(QIcon(icon_dir + "rewind.svg"),
+    "Decrease Speed"),
+    &QAction::triggered, this, &MainWindow::funcAction_decSpeed);
+
 
   controlToolbar->addSeparator();
 
@@ -72,9 +108,10 @@ void MainWindow::createUI() {
   ctxt.editIcon = new QIcon(icon_dir + "pencil.svg");
   ctxt.selectIcon = new QIcon(icon_dir + "table.svg");
   ctxt.mouseModeAction = controlToolbar->addAction(*ctxt.moveIcon ,
-    "Change Mode");
+    "Change Mouse Mode");
   connect(ctxt.mouseModeAction, &QAction::triggered, this,
     &MainWindow::funcAction_mode);
+
   controlToolbar->addSeparator();
 
 
@@ -90,9 +127,59 @@ void MainWindow::createUI() {
 }
 
 
+void MainWindow::createMenuBar() {
+}
 
-MainWindow::~MainWindow() {}
 
+void MainWindow::funcAction_newFile() {
+  delete universe;
+  delete ctxt.universe_scene;
+
+  universe = new HashlifeUniverse(8);
+  univ_type = UniverseType::Hashlife;
+
+  ctxt.universe_scene = new UniverseScene(this,
+    universe,
+    univ_type);
+  setCentralWidget(ctxt.universe_scene);
+}
+
+void MainWindow::funcAction_openFile() {
+  QString fileName, acceptedFormats;
+  switch (univ_type) {
+    case UniverseType::Hashlife:
+      acceptedFormats = "Pattern files (*.rle *.mc)";
+      break;
+    case UniverseType::Life:
+      acceptedFormats = "Pattern files (*.rle)";
+      break;
+  }
+
+  fileName = QFileDialog::getOpenFileName(this, "Open File",
+                                          "", acceptedFormats);
+  if (!fileName.isNull()) {
+    delete universe;
+    delete ctxt.universe_scene;
+    switch (univ_type) {
+      case UniverseType::Hashlife :
+        universe = new HashlifeUniverse(fileName);
+        univ_type = UniverseType::Hashlife;
+        break;
+      case UniverseType::Life :
+        universe = new NaiveUniverse(fileName);
+        univ_type = UniverseType::Life;
+        break;
+    }
+    ctxt.universe_scene = new UniverseScene(this,
+      universe,
+      univ_type);
+    setCentralWidget(ctxt.universe_scene);
+  }
+}
+
+void MainWindow::funcAction_saveFile() {
+  printf("MainWindow::funcAction_saveFile() not Implemented\n");
+}
 
 void MainWindow::funcAction_playPause() {
   ctxt.universe_scene->play_pause();
@@ -105,6 +192,16 @@ void MainWindow::funcAction_playPause() {
 
 void MainWindow::funcAction_step() {
   ctxt.universe_scene->step();
+}
+
+void MainWindow::funcAction_incSpeed() {
+  ctxt.universe_scene->increase_speed();
+  ctxt.universe_scene->get_speed();
+}
+
+void MainWindow::funcAction_decSpeed() {
+  ctxt.universe_scene->decrease_speed();
+  ctxt.universe_scene->get_speed();
 }
 
 void MainWindow::funcAction_fitPattern() {
@@ -135,6 +232,9 @@ void MainWindow::funcAction_zoomIn() {
 void MainWindow::funcAction_zoomOut() {
   ctxt.universe_scene->zoom_out();
 }
+
+
+
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {
   switch (event->key()) {
