@@ -46,7 +46,9 @@ MCellFile::LineIter::LineType MCellFile::LineIter::next(Line *line) {
     }
 
     _current_line = _file->readLine();
-    if (_current_line[0] == '#' || _current_line[0] == '[') {
+    if (_current_line.trimmed().isEmpty() ||
+        _current_line[0] == '#'           ||
+        _current_line[0] == '[') {
         return next(line);
     } else if ( _current_line[0] == '$' ||
                 _current_line[0] == '.' ||
@@ -78,13 +80,23 @@ MCellFile::LineIter::LineType MCellFile::LineIter::next(Line *line) {
     } else if (_current_line[0] >= '0' &&
                _current_line[0] <= '9') {
         QByteArrayList line_data = _current_line.split(' ');
-        line->levelN.level = line_data[0].trimmed().toULong();
-        line->levelN.nw_index = line_data[1].trimmed().toULong();
-        line->levelN.ne_index = line_data[2].trimmed().toULong();
-        line->levelN.sw_index = line_data[3].trimmed().toULong();
-        line->levelN.se_index = line_data[4].trimmed().toULong();
+        if (line_data.length() < 5)
+            throw "Invalid macrocell line";
+        bool oks[5] = {true};
+        line->levelN.level = line_data[0].trimmed().toULong(oks);
+        line->levelN.nw_index = line_data[1].trimmed().toULong(oks + 1);
+        line->levelN.ne_index = line_data[2].trimmed().toULong(oks + 2);
+        line->levelN.sw_index = line_data[3].trimmed().toULong(oks + 3);
+        line->levelN.se_index = line_data[4].trimmed().toULong(oks + 4);
+        for (bool ok : oks) {
+            if (!ok)
+                throw "Error in toULong()";
+        }
+
         return MACRO_N;
     }
+
+    throw "Unrecognized line";
     _file->close();
     return DONE;
 }
