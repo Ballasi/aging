@@ -25,6 +25,8 @@ public:
 
   void zoomin_event(QPoint origin);
   void zoomout_event(QPoint origin);
+  void zoomin();
+  void zoomout();
 
   Coord map_coords_from_mouse(QPoint mouseCoords);
   void set_colors(QColor cell_color, QColor bg_color);

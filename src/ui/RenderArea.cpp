@@ -299,6 +299,13 @@ void RenderArea::zoomout_event(QPoint origin) {
   update();
 }
 
+void RenderArea::zoomin() {
+  zoomin_event(QPoint(width() / 2, height() / 2));
+} 
+void RenderArea::zoomout() {
+  zoomout_event(QPoint(width() / 2, height() / 2));
+} 
+
 Coord RenderArea::map_coords_from_mouse(QPoint mouseCoords) {
   float aspect_ratio =
       static_cast<float>(width()) / static_cast<float>(height());

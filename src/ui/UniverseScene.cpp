@@ -2,18 +2,31 @@
 
 UniverseScene::UniverseScene(QWidget *parent, Universe *universe,
                 UniverseType type): universe(universe), univ_type(type) {
-    r_area = new RenderArea(this, universe, UniverseType::Hashlife);
+    r_area = new RenderArea(this, universe, type);
     mode = MOVE;
     isSimulationRun = false;
-    bords = 0;
+    bords = true;
 
     refresh_time_ms = 0;
     p_step = 1;
+
+    color_grid = Qt::white;
+    colors[0] = Qt::black;
+    colors[1] = Qt::white;
+
+    stepTimer = new QTimer(this);
+    connect(stepTimer, &QTimer::timeout, this, &UniverseScene::step);
 }
 
 
 void UniverseScene::play_pause() {
   isSimulationRun = !isSimulationRun;
+  if (isSimulationRun) {
+    stepTimer->start(refresh_time_ms);
+  } else {
+    stepTimer->stop();
+  }
+  
   printf("UniverseScene::play_pause() not Implemented\n");
 }
 
@@ -59,11 +72,11 @@ void UniverseScene::zoom_out(QPoint origin) {
 }
 
 void UniverseScene::zoom_in() {
-   r_area->zoomin_event(QPoint(width() / 2, height() / 2));
+  r_area->zoomin();
 }
 
 void UniverseScene::zoom_out() {
-   r_area->zoomout_event(QPoint(width() / 2, height() / 2));
+  r_area->zoomout();
 }
 
 
@@ -113,11 +126,17 @@ SceneMode UniverseScene::get_mode() {
 }
 
 void UniverseScene::toggle_bord() {
-    printf("UniverseScene::toggle_bord() not Implemented\n");
+  bords = !bords;
+}
+
+bool UniverseScene::get_infinite_grid() {
+  return !bords;
 }
 
 void UniverseScene::set_cell_color(CellState state, QColor color) {
     colors[state] = color;
+    r_area->set_colors(colors[1],colors[0]);
+    r_area->update();
 }
 QColor UniverseScene::get_cell_color(CellState state) {
     return colors[state];
@@ -126,20 +145,24 @@ QColor UniverseScene::get_cell_color(CellState state) {
 QColor UniverseScene::get_grid_color() { return color_grid ;}
 void UniverseScene::set_grid_color(QColor color) { color_grid = color ;}
 int UniverseScene::get_rank_grid() { return rank_grid ;}
-void UniverseScene::set_rank_grid(int size_cell) { rank_grid ;}
+void UniverseScene::set_rank_grid(int rank) { rank_grid = rank ;}
+void UniverseScene::up_rank_grid() { rank_grid += 1; };
+void UniverseScene::down_rank_grid() { rank_grid -= 1; };
 
 QString UniverseScene::get_generation() {
-    printf("UniverseScene::get_generation() not Implemented\n");
-    return (QString) "";
+  std::string s;
+  s = bigint_to_str(universe->get_generation());
+  return QString(s.c_str());
 }
 
 QString UniverseScene::get_speed() {
+  char s[256];
   if (p_step == 0) {
-    printf("%d ms/step\n", refresh_time_ms);
+    sprintf(s,"%d ms/step\n", refresh_time_ms);
   } else {
-    printf("2^%d step\n", p_step);
+    sprintf(s,"2^%d step\n", p_step);
   }
-  return (QString) "";
+  return QString(s);
 }
 
 Universe* UniverseScene::get_zone() {

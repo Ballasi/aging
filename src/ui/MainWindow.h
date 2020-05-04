@@ -15,10 +15,8 @@ typedef struct SwidgetsCtxt {
     QIcon *playIcon;  // Play
     QIcon *pauseIcon; // Pause
 
-  QAction *mouseModeAction; // Bouton qui change d'apparence
-    QIcon *moveIcon;   // Move
-    QIcon *editIcon;   // Edit
-    QIcon *selectIcon; // Select
+  bool MouseIsPress;
+
 } WidgetsCtxt;
 
 
@@ -35,7 +33,9 @@ protected:
   // Reecriture des reactions a la souris et au clavier
   void keyPressEvent(QKeyEvent *event) override;
   void wheelEvent(QWheelEvent *event) override;
-
+  void mousePressEvent(QMouseEvent *event) override;
+  void mouseReleaseEvent(QMouseEvent *event) override;
+  void mouseMoveEvent(QMouseEvent *event) override;
   // Fonctions actions lance par des connects
   void funcAction_newFile();
   void funcAction_openFile();
@@ -48,11 +48,28 @@ protected:
 
   void funcAction_fitPattern();
 
-  void funcAction_mode();
+  void funcAction_modeEdit();
+  void funcAction_modeSelect();
+  void funcAction_modeMove();
 
   void funcAction_zoomIn();
   void funcAction_zoomOut();
 
+  void funcAction_setColorBg();
+  void funcAction_setColorFg();
+  void funcAction_setColorGrid();
+  
+  void funcAction_setInfiniteGrid();
+  void funcAction_setRankGrid();
+  void funcAction_darkTheme();
+
+  void funcAction_help();
+  void funcAction_documentation();
+  void funcAction_licence();
+  void funcAction_about();
+
+  void funcAction_newUnivTypeHashlife();
+  void funcAction_newUnivTypeNaive();
 
 private:
   WidgetsCtxt ctxt;
@@ -65,6 +82,8 @@ private:
   void createUI();
   void createToolBar();
   void createMenuBar();
+  void createStatusBar();
+  void updateStatusBar();
 };
 
 #endif /* UI_MAINWINDOW_H_ */

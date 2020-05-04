@@ -5,8 +5,8 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLWidget>
 #include <QWheelEvent>
-
 #include <ui/RenderArea.h>
+#include <QTimer>
 #include <logic/UniverseType.h>
 
 enum SceneMode {EDIT, MOVE, SELECT};
@@ -61,6 +61,7 @@ public:
   // soit l'affichage de la grille est infinie,
   //    et on ne voit plus les bords de l'univers
   void toggle_bord();
+  bool get_infinite_grid();
 
   // get/set les couleurs
   void set_cell_color(CellState state, QColor color);
@@ -71,8 +72,10 @@ public:
 
   // precise à partir de quelle taille de cellule on veut la grille
   // (genre au dessus de 10 pixel/cell)
-  void set_rank_grid(int size_cell);
+  void up_rank_grid();
+  void down_rank_grid();
   int get_rank_grid();
+  void set_rank_grid(int rank);
 
 
   //// GETTEUR DES INFOS DE UNIVERSE ////
@@ -104,6 +107,7 @@ private:
   Universe *universe;
   // le type de l'univers
   UniverseType univ_type;
+  QTimer *stepTimer;
 
 
 
@@ -126,7 +130,7 @@ private:
   int p_step;
 
   // affichage fini ou non de la grille
-  int bords;
+  bool bords;
   // couleurs
   QColor colors[16];
   QColor color_grid;
