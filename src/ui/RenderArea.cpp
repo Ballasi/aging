@@ -301,10 +301,10 @@ void RenderArea::zoomout_event(QPoint origin) {
 
 void RenderArea::zoomin() {
   zoomin_event(QPoint(width() / 2, height() / 2));
-} 
+}
 void RenderArea::zoomout() {
   zoomout_event(QPoint(width() / 2, height() / 2));
-} 
+}
 
 Coord RenderArea::map_coords_from_mouse(QPoint mouseCoords) {
   float aspect_ratio =

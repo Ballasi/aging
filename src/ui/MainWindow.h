@@ -16,7 +16,6 @@ typedef struct SwidgetsCtxt {
     QIcon *pauseIcon; // Pause
 
   bool MouseIsPress;
-
 } WidgetsCtxt;
 
 
@@ -58,7 +57,7 @@ protected:
   void funcAction_setColorBg();
   void funcAction_setColorFg();
   void funcAction_setColorGrid();
-  
+
   void funcAction_setInfiniteGrid();
   void funcAction_setRankGrid();
   void funcAction_darkTheme();

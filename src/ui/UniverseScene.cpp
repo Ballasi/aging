@@ -26,7 +26,7 @@ void UniverseScene::play_pause() {
   } else {
     stepTimer->stop();
   }
-  
+
   printf("UniverseScene::play_pause() not Implemented\n");
 }
 
@@ -135,7 +135,7 @@ bool UniverseScene::get_infinite_grid() {
 
 void UniverseScene::set_cell_color(CellState state, QColor color) {
     colors[state] = color;
-    r_area->set_colors(colors[1],colors[0]);
+    r_area->set_colors(colors[1], colors[0]);
     r_area->update();
 }
 QColor UniverseScene::get_cell_color(CellState state) {
@@ -146,8 +146,8 @@ QColor UniverseScene::get_grid_color() { return color_grid ;}
 void UniverseScene::set_grid_color(QColor color) { color_grid = color ;}
 int UniverseScene::get_rank_grid() { return rank_grid ;}
 void UniverseScene::set_rank_grid(int rank) { rank_grid = rank ;}
-void UniverseScene::up_rank_grid() { rank_grid += 1; };
-void UniverseScene::down_rank_grid() { rank_grid -= 1; };
+void UniverseScene::up_rank_grid() { rank_grid += 1; }
+void UniverseScene::down_rank_grid() { rank_grid -= 1; }
 
 QString UniverseScene::get_generation() {
   std::string s;
@@ -158,9 +158,9 @@ QString UniverseScene::get_generation() {
 QString UniverseScene::get_speed() {
   char s[256];
   if (p_step == 0) {
-    sprintf(s,"%d ms/step\n", refresh_time_ms);
+    sprintf(s, "%d ms/step\n", refresh_time_ms);
   } else {
-    sprintf(s,"2^%d step\n", p_step);
+    sprintf(s, "2^%d step\n", p_step);
   }
   return QString(s);
 }
@@ -193,7 +193,7 @@ Vec2 UniverseScene::map_Vec2_from_mouse(QPoint mouse) {
   float y_relative =
       static_cast<float>(mouseVec2s.y()) / static_cast<float>(height());
 
-  
+
   QMatrix4x4 viewinv = camera->get_view().inverted();
 
   Vec2 c;

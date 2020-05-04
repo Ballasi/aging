@@ -147,7 +147,6 @@ void MainWindow::createToolBar() {
 
 
 void MainWindow::createMenuBar() {
-
   QMenu *fileMenu = new QMenu("File");
     // new file
     connect(fileMenu->addAction("New File"),
@@ -170,7 +169,7 @@ void MainWindow::createMenuBar() {
 
   // Option
   QMenu *optMenu = new QMenu("Options");
-  
+
     QMenu *algoMenu = new QMenu("Set Algorithm");
 
       QActionGroup* groupAlgo = new QActionGroup(algoMenu);
@@ -223,7 +222,7 @@ void MainWindow::createMenuBar() {
 
     prefMenu->addSeparator();
 
-    QAction* dark_theme = prefMenu->addAction("Dark Theme"); 
+    QAction* dark_theme = prefMenu->addAction("Dark Theme");
       dark_theme->setCheckable(true);
       connect(dark_theme,
         &QAction::toggled, this, &MainWindow::funcAction_darkTheme);
@@ -378,10 +377,10 @@ void MainWindow::funcAction_setColorGrid() {
   ctxt.universe_scene->set_grid_color(color);
 }
 
-void MainWindow::funcAction_setInfiniteGrid(){
+void MainWindow::funcAction_setInfiniteGrid() {
   ctxt.universe_scene->toggle_bord();
 }
-void MainWindow::funcAction_setRankGrid(){
+void MainWindow::funcAction_setRankGrid() {
   bool ok;
   std::string s;
   int rank = QInputDialog::getInt(this, "Set Rang Grid", s.c_str(),
@@ -390,7 +389,7 @@ void MainWindow::funcAction_setRankGrid(){
     ctxt.universe_scene->set_rank_grid(rank);
   }
 }
-void MainWindow::funcAction_darkTheme(){
+void MainWindow::funcAction_darkTheme() {
   printf("MainWindow::funcAction_darkTheme not Implemented\n");
 }
 
@@ -402,7 +401,13 @@ void MainWindow::funcAction_licence() {
   QMessageBox msgBox;
   msgBox.setWindowTitle("Licence");
   // msgBox.setTextFormat(Qt::TextFormat::AlignHCenter);
-  msgBox.setText("GNU GENERAL PUBLIC LICENSE\nVersion 3, 29 June 2007\nCopyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>\nEveryone is permitted to copy and distribute verbatim copies\nof this license document, but changing it is not allowed.");
+  std::string s;
+  s += "GNU GENERAL PUBLIC LICENSE";
+  s += "Version 3, 29 June 2007";
+  s += "Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>";
+  s += "Everyone is permitted to copy and distribute verbatim copies";
+  s += "of this license document, but changing it is not allowed.";
+  msgBox.setText(s);
   msgBox.exec();
 }
 void MainWindow::funcAction_about() {
@@ -429,7 +434,7 @@ void MainWindow::funcAction_newUnivTypeNaive() {
   delete universe;
   delete ctxt.universe_scene;
 
-  universe = new NaiveUniverse(Coord(BigInt(1024),BigInt(1024)));
+  universe = new NaiveUniverse(Coord(BigInt(1024), BigInt(1024)));
   univ_type = UniverseType::Life;
 
   ctxt.universe_scene = new UniverseScene(this,
@@ -484,7 +489,7 @@ void MainWindow::wheelEvent(QWheelEvent *event) {
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event) {
-  if ( event->button() == Qt::LeftButton ){
+  if ( event->button() == Qt::LeftButton ) {
     ctxt.MouseIsPress = true;
   }
 }
@@ -497,13 +502,13 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event) {
   if (ctxt.MouseIsPress) {
     switch (ctxt.universe_scene->get_mode()) {
       case SceneMode::MOVE:
-        printf("MOVE Coord Mouse (%d, %d)\n",event->x(),event->y());
+        printf("MOVE Coord Mouse (%d, %d)\n", event->x(), event->y());
         break;
       case SceneMode::EDIT:
-        printf("EDIT Coord Mouse (%d, %d)\n",event->x(),event->y());
+        printf("EDIT Coord Mouse (%d, %d)\n", event->x(), event->y());
         break;
       case SceneMode::SELECT:
-        printf("SELECT Coord Mouse (%d, %d)\n",event->x(),event->y());
+        printf("SELECT Coord Mouse (%d, %d)\n", event->x(), event->y());
         break;
       default:
         break;
