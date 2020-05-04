@@ -14,6 +14,15 @@ inline size_t required_bits(size_t n) {
   return result;
 }
 
+Rule::Rule()
+  : _state_count(2), _neighbour_count(9), _row_length(2),
+    _transition_table(new CellState[2 * 9]()) {
+  // Life rules
+  set(0, 3, 1);
+  set(1, 2, 1);
+  set(1, 3, 1);
+}
+
 Rule::Rule(QString rule_string)
   : _state_count(2), _neighbour_count(9), _row_length(2),
     _transition_table(new CellState[2 * 9]()) {

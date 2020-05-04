@@ -12,6 +12,11 @@
 class Rule {
 public:
   /*
+    Default constructor creates the game of life
+  */
+  Rule();
+
+  /*
     Constructs a rule from a rule string in the B/S format.
     Other formats are not yet supported.
 
