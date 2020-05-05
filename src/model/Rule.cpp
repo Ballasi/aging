@@ -3,10 +3,11 @@
 #include <cstring>
 #include <model/Rule.h>
 #include <stdexcept>
+#include <vector>
 
 /*
   Returns the number of bits required to write n.
- */
+*/
 inline size_t required_bits(size_t n) {
   int result = 0;
   while (n >>= 1)
@@ -15,17 +16,21 @@ inline size_t required_bits(size_t n) {
 }
 
 Rule::Rule()
-  : _state_count(2), _neighbour_count(9), _row_length(2),
-    _transition_table(new CellState[2 * 9]()) {
+  : _state_count(2), _neighbour_count(9), _shift(required_bits(9)) {
+  // Table initialization
+  _transition_table =
+    std::vector<CellState>((1 << _shift) * _state_count);
+
   // Life rules
   set(0, 3, 1);
   set(1, 2, 1);
   set(1, 3, 1);
 }
 
-Rule::Rule(QString rule_string)
-  : _state_count(2), _neighbour_count(9), _row_length(2),
-    _transition_table(new CellState[2 * 9]()) {
+Rule::Rule(QString rule_string) : _state_count(2), _neighbour_count(9) {
+  _shift = required_bits(_neighbour_count);
+  _transition_table = std::vector<CellState>(_state_count * (1 << _shift));
+
   enum ReadingState { B_SEARCH, B_VALUES, S_SEARCH, S_VALUES };
 
   ReadingState reading_state = B_SEARCH;
@@ -72,25 +77,23 @@ Rule::Rule(QString rule_string)
 }
 
 Rule::Rule(size_t state_count, size_t neighbour_count)
-    : _state_count(state_count), _neighbour_count(neighbour_count),
-      _row_length(required_bits(neighbour_count)) {
-  _transition_table = new CellState[_row_length * neighbour_count]();
+    : _state_count(state_count),
+      _neighbour_count(neighbour_count),
+      _shift(required_bits(neighbour_count)) {
+  _transition_table = std::vector<CellState>((1 << _shift) * _state_count);
 }
-
-Rule::~Rule() { delete[] _transition_table; }
-
 
 // Rule usage
 
 inline CellState Rule::apply(CellState state, size_t neighbour_count) const {
-  return _transition_table[neighbour_count + (state << _row_length)];
+  return _transition_table[neighbour_count | (state << _shift)];
 }
 
 
 // Rule editing
 
 inline void Rule::set(CellState state, size_t neighbour, CellState result) {
-  _transition_table[neighbour + (state << _row_length)] = result;
+  _transition_table[neighbour | (state << _shift)] = result;
 }
 
 inline void Rule::clear(CellState state) {

@@ -1,13 +1,19 @@
 #ifndef RULE_HPP
 #define RULE_HPP
 
-#include "CellState.h"
+#include <model/CellState.h>
 #include <cstddef>
 #include <QString>
+#include <vector>
 
 /*
   Describes a classical rule for a simple cellular automaton,
   where only initial state and the number of neighbour is used.
+
+  WARNING:
+  At the momment the rule only supports up to:
+  - 2 states
+  - 8 neighbours
 */
 class Rule {
 public:
@@ -15,6 +21,11 @@ public:
     Default constructor creates the game of life
   */
   Rule();
+
+  /*
+    Rule copying
+  */
+  explicit Rule(const Rule& rule) = default;
 
   /*
     Constructs a rule from a rule string in the B/S format.
@@ -30,11 +41,6 @@ public:
     the default cell state.
   */
   Rule(size_t state_count, size_t neighbour_count);
-
-  /*
-    Destructor
-  */
-  ~Rule();
 
   /*
     Returns the new state of a cell of state `state` with `neighbour` neighbours
@@ -83,18 +89,19 @@ private:
     Maximum number of neighbour handled by the rule.
   */
   size_t _neighbour_count;
+
   /*
     Holdes the transition from every state of with every neighbour count.
     Each row describes state,
     each collumn a neighbour count (aka a serounding).
   */
-  CellState *_transition_table;
+  std::vector<CellState> _transition_table;
 
-  /*
-    Length of `transition_table` row's.
-    Is the first power of two bigger or equal to neighbour_count
+ /*
+    Shift is used to take advantage of alignment when accessing the _transition_table.
+    It is the number of bits required to write neighbour_count.
   */
-  size_t _row_length;
+  size_t _shift;
 };
 
 #endif // RULE_HPP
