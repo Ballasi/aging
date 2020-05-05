@@ -15,9 +15,18 @@ class RenderArea : public QOpenGLWidget, protected QOpenGLFunctions {
 public:
   explicit RenderArea(QWidget *parent = 0, Universe *hashlife_universe = 0,
                       UniverseType type = UniverseType::Hashlife);
-  void handleInput(QKeyEvent *event);
+
+
+  void left();
+  void right();
+  void down();
+  void up();
+
+
   void zoomin_event(QPoint origin);
   void zoomout_event(QPoint origin);
+  void zoomin();
+  void zoomout();
 
   Coord map_coords_from_mouse(QPoint mouseCoords);
   void set_colors(QColor cell_color, QColor bg_color);
@@ -28,7 +37,6 @@ protected:
   void initializeGL() override;
   void resizeGL(int w, int h) override;
   void paintGL() override;
-  void wheelEvent(QWheelEvent *event) override;
 
 private:
   Universe *hashlife_universe;

@@ -285,13 +285,7 @@ void RenderArea::render_hashlife(const QMatrix4x4 &viewMatrix) {
   }
 }
 
-void RenderArea::wheelEvent(QWheelEvent *event) {
-  if (event->delta() < 0)
-    zoomout_event(event->pos());
-  else
-    zoomin_event(event->pos());
-  update();
-}
+
 void RenderArea::zoomin_event(QPoint origin) {
   Coord c = map_coords_from_mouse(origin);
   camera->set_zoom(camera->get_zoom() / 2);
@@ -303,6 +297,13 @@ void RenderArea::zoomout_event(QPoint origin) {
   camera->set_zoom(camera->get_zoom() * 2);
   camera->look_at(c);
   update();
+}
+
+void RenderArea::zoomin() {
+  zoomin_event(QPoint(width() / 2, height() / 2));
+}
+void RenderArea::zoomout() {
+  zoomout_event(QPoint(width() / 2, height() / 2));
 }
 
 Coord RenderArea::map_coords_from_mouse(QPoint mouseCoords) {
@@ -322,36 +323,28 @@ Coord RenderArea::map_coords_from_mouse(QPoint mouseCoords) {
   return c;
 }
 
-void RenderArea::handleInput(QKeyEvent *event) {
-  switch (event->key()) {
-  case Qt::Key_Z:
-  case Qt::Key_Up:
-    camera->pos.setY(camera->pos.y() - 0.05f);
-    break;
-  case Qt::Key_S:
-  case Qt::Key_Down:
-    camera->pos.setY(camera->pos.y() + 0.05f);
-    break;
-  case Qt::Key_Q:
-  case Qt::Key_Left:
-    camera->pos.setX(camera->pos.x() - 0.05f);
-    break;
-  case Qt::Key_D:
-  case Qt::Key_Right:
-    camera->pos.setX(camera->pos.x() + 0.05f);
-    break;
-  case Qt::Key_Plus:
-    zoomin_event(QPoint(width() / 2, height() / 2));
-    break;
-  case Qt::Key_Minus:
-    zoomout_event(QPoint(width() / 2, height() / 2));
-    break;
 
-  default:
-    break;
-  }
+
+
+void RenderArea::down() {
+  camera->pos.setY(camera->pos.y() + 0.05f);
   update();
 }
+void RenderArea::up() {
+  camera->pos.setY(camera->pos.y() - 0.05f);
+  update();
+}
+void RenderArea::right() {
+  camera->pos.setX(camera->pos.x() + 0.05f);
+  update();
+}
+void RenderArea::left() {
+  camera->pos.setX(camera->pos.x() - 0.05f);
+  update();
+}
+
+
+
 
 void RenderArea::set_colors(QColor c_color, QColor bg_color) {
   bg_r = bg_color.redF();
@@ -377,5 +370,6 @@ void RenderArea::fitPattern() {
     Coord center(cx, cy);
     camera->set_zoom(1 << (p.second));
     camera->look_at(center);
+    update();
   }
 }
