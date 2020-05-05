@@ -3,7 +3,7 @@ INSTALL_PREFIX := /usr
 BIN_NAME := aging
 BIN_FOLDER := build
 SRC_FOLDER := .
-
+SHELL = bash
 MAKE := make
 
 $(MAKE): $(BIN_FOLDER)
