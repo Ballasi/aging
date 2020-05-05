@@ -81,14 +81,14 @@ void RenderArea::initializeGL() {
                     (hashlife_universe)->width)));
       camera->set_zoom(1 << zoom_level);
       camera->pos.setX(-0.25f);
-      camera->pos.setY(-0.75f);
+      camera->pos.setY(-0.25f);
       break;
     case UniverseType::Hashlife :
       zoom_level = static_cast<size_t>(reinterpret_cast<HashlifeUniverse *>
                     (hashlife_universe)->get_top_level() + 1);
       camera->set_zoom(1 << zoom_level);
       camera->pos.setX(-0.25f);
-      camera->pos.setY(-0.75f);
+      camera->pos.setY(-0.25f);
       break;
   }
 }
@@ -167,7 +167,6 @@ void RenderArea::render_gol(const QMatrix4x4 &viewMatrix) {
   };
 
   modelMatrix.setToIdentity();
-  modelMatrix.translate(0, -height_f + 1, 0);
   m_program->setUniformValue(m_modelUniform, modelMatrix);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, line_ebo);
   glVertexAttribPointer(m_posAttr, 2, GL_FLOAT, GL_FALSE, 0, border_vertices);
@@ -180,7 +179,7 @@ void RenderArea::render_gol(const QMatrix4x4 &viewMatrix) {
     for (BigInt i = bounds.top_left.x; i < bounds.bottom_right.x; ++i) {
       for (BigInt j = bounds.top_left.y; j < bounds.bottom_right.y; ++j) {
         modelMatrix.setToIdentity();
-        modelMatrix.translate(i.get_si(), -j.get_si(), 0);
+        modelMatrix.translate(i.get_si(), j.get_si(), 0);
         m_program->setUniformValue(m_modelUniform, modelMatrix);
         glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, 0);
       }
@@ -191,7 +190,7 @@ void RenderArea::render_gol(const QMatrix4x4 &viewMatrix) {
   for (BigInt i = bounds.top_left.x; i < bounds.bottom_right.x; ++i) {
     for (BigInt j = bounds.top_left.y; j < bounds.bottom_right.y; ++j) {
       modelMatrix.setToIdentity();
-      modelMatrix.translate(i.get_si(), -j.get_si(), 0);
+      modelMatrix.translate(i.get_si(), j.get_si(), 0);
       m_program->setUniformValue(m_modelUniform, modelMatrix);
       if (univ->get(Coord(i, j))) {
         glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0);
@@ -269,7 +268,7 @@ void RenderArea::render_hashlife(const QMatrix4x4 &viewMatrix) {
     for (BigInt i = bounds.top_left.x; i < bounds.bottom_right.x; ++i) {
       for (BigInt j = bounds.top_left.y; j < bounds.bottom_right.y; ++j) {
         modelMatrix.setToIdentity();
-        modelMatrix.translate(i.get_si(), -j.get_si(), 0);
+        modelMatrix.translate(i.get_si(), j.get_si(), 0);
         m_program->setUniformValue(m_modelUniform, modelMatrix);
         glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, 0);
       }
@@ -279,7 +278,7 @@ void RenderArea::render_hashlife(const QMatrix4x4 &viewMatrix) {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, square_ebo);
   for (size_t i = 0; i < coords.size(); ++i) {
     modelMatrix.setToIdentity();
-    modelMatrix.translate(coords[i].x.get_si(), -coords[i].y.get_si(), 0);
+    modelMatrix.translate(coords[i].x.get_si(), coords[i].y.get_si(), 0);
     m_program->setUniformValue(m_modelUniform, modelMatrix);
     glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0);
   }
@@ -318,7 +317,7 @@ Coord RenderArea::map_coords_from_mouse(QPoint mouseCoords) {
   Coord c;
   QPointF p = viewinv.map(QPointF(x_relative, y_relative));
   c.x = BigInt(std::floor(p.x()));
-  c.y = BigInt(std::ceil(-p.y()));
+  c.y = BigInt(std::floor(p.y()));
 
   return c;
 }

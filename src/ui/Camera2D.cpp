@@ -65,15 +65,11 @@ Rect Camera2D::get_view_bounds(float aspect_ratio, Universe *universe) {
             BigInt(static_cast<int>(std::ceil(rectf.bottomRight().y()))));
   Coord bottom_right =
       Coord(BigInt(static_cast<int>(std::ceil(rectf.bottomRight().x()))),
-            BigInt(static_cast<int>(std::ceil(rectf.topLeft().y()))));
+            BigInt(static_cast<int>(std::ceil(rectf.topLeft().y()))) - 1);
 
-  // top_left.y = (1 << universe->get_top_level()) - top_left.y;
-  // bottom_right.y = (1 << universe->get_top_level()) - bottom_right.y;
-
-  BigInt diff_y = bottom_right.y - top_left.y;
-
-  top_left.y *= -1;
-  bottom_right.y = top_left.y - diff_y + 2;
+  BigInt temp = top_left.y;
+  top_left.y = bottom_right.y;
+  bottom_right.y = temp;
 
   Rect rect(top_left, bottom_right);
   return rect;
@@ -82,7 +78,7 @@ Rect Camera2D::get_view_bounds(float aspect_ratio, Universe *universe) {
 void Camera2D::look_at(Coord c) {
   pos.setX((static_cast<float>(c.x.get_si()) / static_cast<float>(zoom))
             - 0.5f + 0.5f / static_cast<float>(zoom));
-  pos.setY((-static_cast<float>(c.y.get_si()) / static_cast<float>(zoom))
+  pos.setY((static_cast<float>(c.y.get_si()) / static_cast<float>(zoom))
             - 0.5f + 0.5f / static_cast<float>(zoom));
 
   transform.update(pos, origin, zoom);

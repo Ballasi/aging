@@ -2,6 +2,7 @@
 #include <ui/UniverseScene.hpp>
 #include <QStatusBar>
 #include <string>
+#include <iostream>
 
 UniverseScene::UniverseScene(QWidget *parent, Universe *universe,
                 UniverseType type): universe(universe), univ_type(type) {
@@ -21,7 +22,7 @@ UniverseScene::UniverseScene(QWidget *parent, Universe *universe,
     connect(stepTimer, &QTimer::timeout, this, &UniverseScene::step);
 
     _parent = reinterpret_cast<QMainWindow *>(parent);
-    updateStatusBar();
+    //updateStatusBar();
 }
 
 
@@ -204,12 +205,24 @@ void UniverseScene::resizeEvent(QResizeEvent *event) {
     r_area->resize(event->size().width(), event->size().height());
 }
 
+Coord UniverseScene::map_coords(QPoint mouse) {
+  return r_area->map_coords_from_mouse(mouse);
+}
 
 void UniverseScene::updateStatusBar() {
   QString s;
   s += "Generation : ";
   s += get_generation();
-  s += " | ";
+  s += " | Position : (";
+  Coord center = map_coords(QPoint(width() / 2, height() / 2));
+  s += bigint_to_str(center.x).c_str();
+  s += ", ";
+  s += bigint_to_str(center.y).c_str();
+  s += ") | Universe size : ";
+  Coord size = universe->get_size();
+  s += bigint_to_str(size.x).c_str();
+  s += " x ";
+  s += bigint_to_str(size.y).c_str();
   QStatusBar *bar = _parent->statusBar();
   bar->showMessage(s);
 }
@@ -217,10 +230,6 @@ void UniverseScene::updateStatusBar() {
 void UniverseScene::set_cell(Coord coord, CellState state) {
   universe->set(coord, state);
   r_area->update();
-}
-
-Coord UniverseScene::map_coords(QPoint mouse) {
-  return r_area->map_coords_from_mouse(mouse);
 }
 
 /*
