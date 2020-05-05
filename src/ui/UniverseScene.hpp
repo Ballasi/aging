@@ -6,6 +6,7 @@
 #include <QOpenGLWidget>
 #include <QWheelEvent>
 #include <ui/RenderArea.h>
+#include <QMainWindow>
 #include <QTimer>
 #include <logic/UniverseType.h>
 
@@ -45,6 +46,8 @@ public:
   void right();
   void down();
   void up();
+
+  void move_camera(QPointF vector);
 
   // Recentre la render area sur la zone interessante
   void fit_pattern();
@@ -93,6 +96,10 @@ public:
   // supprime tout ce qui est autour de la zone
   void remove_out_zone();
 
+  void updateStatusBar();
+  void set_cell(Coord coord, CellState state);
+  Coord map_coords(QPoint mouse);
+
 protected:
   void resizeEvent(QResizeEvent *event);
 
@@ -139,6 +146,8 @@ private:
 
   // La zone selectionné
   Rect select_zone;
+
+  QMainWindow *_parent;
 };
 
 

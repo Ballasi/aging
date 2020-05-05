@@ -327,19 +327,21 @@ Coord RenderArea::map_coords_from_mouse(QPoint mouseCoords) {
 
 
 void RenderArea::down() {
-  camera->pos.setY(camera->pos.y() + 0.05f);
-  update();
+  move_camera({0.0f, 0.05f});
 }
 void RenderArea::up() {
-  camera->pos.setY(camera->pos.y() - 0.05f);
-  update();
+  move_camera({0.0f, -0.05f});
 }
 void RenderArea::right() {
-  camera->pos.setX(camera->pos.x() + 0.05f);
-  update();
+  move_camera({0.05f, 0.0f});
 }
 void RenderArea::left() {
-  camera->pos.setX(camera->pos.x() - 0.05f);
+  move_camera({-0.05f, 0.0f});
+}
+
+void RenderArea::move_camera(QPointF vector) {
+  camera->pos.setX(camera->pos.x() + vector.x());
+  camera->pos.setY(camera->pos.y() + vector.y());
   update();
 }
 

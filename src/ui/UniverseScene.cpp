@@ -1,5 +1,7 @@
 #include <cstdio>
 #include <ui/UniverseScene.hpp>
+#include <QStatusBar>
+#include <string>
 
 UniverseScene::UniverseScene(QWidget *parent, Universe *universe,
                 UniverseType type): universe(universe), univ_type(type) {
@@ -17,6 +19,9 @@ UniverseScene::UniverseScene(QWidget *parent, Universe *universe,
 
     stepTimer = new QTimer(this);
     connect(stepTimer, &QTimer::timeout, this, &UniverseScene::step);
+
+    _parent = reinterpret_cast<QMainWindow *>(parent);
+    updateStatusBar();
 }
 
 
@@ -27,8 +32,6 @@ void UniverseScene::play_pause() {
   } else {
     stepTimer->stop();
   }
-
-  printf("UniverseScene::play_pause() not Implemented\n");
 }
 
 bool UniverseScene::get_state_simulation() {
@@ -38,6 +41,7 @@ bool UniverseScene::get_state_simulation() {
 void UniverseScene::step() {
     universe->step();
     r_area->update();
+    updateStatusBar();
 }
 
 void UniverseScene::increase_speed() {
@@ -50,6 +54,7 @@ void UniverseScene::increase_speed() {
       refresh_time_ms = 0;
     }
   }
+  updateStatusBar();
 }
 
 void UniverseScene::decrease_speed() {
@@ -62,22 +67,27 @@ void UniverseScene::decrease_speed() {
       p_step = 0;
     }
   }
+  updateStatusBar();
 }
 
 void UniverseScene::zoom_in(QPoint origin) {
     r_area->zoomin_event(origin);
+    updateStatusBar();
 }
 
 void UniverseScene::zoom_out(QPoint origin) {
     r_area->zoomout_event(origin);
+    updateStatusBar();
 }
 
 void UniverseScene::zoom_in() {
   r_area->zoomin();
+  updateStatusBar();
 }
 
 void UniverseScene::zoom_out() {
   r_area->zoomout();
+  updateStatusBar();
 }
 
 
@@ -86,19 +96,28 @@ void UniverseScene::zoom_out() {
 
 void UniverseScene::left() {
     r_area->left();
+    updateStatusBar();
 }
 void UniverseScene::right() {
     r_area->right();
+    updateStatusBar();
 }
 void UniverseScene::down() {
     r_area->down();
+    updateStatusBar();
 }
 void UniverseScene::up() {
     r_area->up();
+    updateStatusBar();
 }
 
 void UniverseScene::fit_pattern() {
   r_area->fitPattern();
+  updateStatusBar();
+}
+
+void UniverseScene::move_camera(QPointF vector) {
+  r_area->move_camera(vector);
 }
 
 
@@ -155,13 +174,16 @@ QString UniverseScene::get_generation() {
 }
 
 QString UniverseScene::get_speed() {
-  QString message;
+  std::string str;
   if (p_step == 0) {
-    message.asprintf("%d ms/step\n", refresh_time_ms);
+    str += std::to_string(refresh_time_ms);
+    str += " ms/step";
   } else {
-    message.asprintf("2^%d step\n", p_step);
+    str += "2^";
+    str += std::to_string(p_step);
+    str += " step size";
   }
-  return message;
+  return QString(str.c_str());
 }
 
 Universe* UniverseScene::get_zone() {
@@ -182,6 +204,24 @@ void UniverseScene::resizeEvent(QResizeEvent *event) {
     r_area->resize(event->size().width(), event->size().height());
 }
 
+
+void UniverseScene::updateStatusBar() {
+  QString s;
+  s += "Generation : ";
+  s += get_generation();
+  s += " | ";
+  QStatusBar *bar = _parent->statusBar();
+  bar->showMessage(s);
+}
+
+void UniverseScene::set_cell(Coord coord, CellState state) {
+  universe->set(coord, state);
+  r_area->update();
+}
+
+Coord UniverseScene::map_coords(QPoint mouse) {
+  return r_area->map_coords_from_mouse(mouse);
+}
 
 /*
 Vec2 UniverseScene::map_Vec2_from_mouse(QPoint mouse) {
