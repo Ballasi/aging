@@ -47,7 +47,7 @@ const BigInt &LifeUniverse::step_size() const { return _step_size; }
 
 // Aptitudes
 void LifeUniverse::set(const Vec2 &target, CellState state) {
-  _set(target.x.get_ui(), target.y.get_ui(), state.id);
+  _set(target.x.get_ui(), target.y.get_ui(), state);
 }
 const CellState LifeUniverse::get(const Vec2 &target) const {
   return CellState(_get(target.x.get_ui(), target.y.get_ui()));

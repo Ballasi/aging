@@ -9,47 +9,79 @@
 
 #include <vector>
 
+/*
+  Universe interface describes un number of methods
+  that can be use by the UI to interact with your universe.
+ */
 class Universe {
 public:
-  // TODO(ME): Do constructor question with Tristan
+  /* Required methods */
 
-  // Required methods
+  /*
+    Updates the content of the universe.
+  */
   virtual void update() = 0;
 
+  /*
+    Returns the bounds of smiluation of the universe.
+    These are not the smallest one that hold the living cells.
+  */
   virtual const Rect &bounds() const = 0;
+
+  /*
+    Returns the number of generations that have been simulated
+    since the beginning of the simulation.
+  */
   virtual const BigInt &generation() const = 0;
+
+  /*
+    Returns the number of generations simulated every
+    time the update method is called.
+  */
   virtual const BigInt &step_size() const = 0;
 
-  // Aptitudes
-  virtual const bool can_set() const;
+
+  /* Aptitudes */
+
+  /*
+    Aptitudes are methods that have to be overriden to be used
+    if no default method is provided.
+    They all come with a method prefixed by `can_` describing
+    if the given method can be used.
+    It set to zero if no default method is provided
+   */
+
+  /*
+    Sets the cell at the coord `coord` to the value `cell_state`.
+   */
   virtual void set(const Vec2 &coord, CellState cell_state);
+  virtual const bool can_set() const;
 
-  virtual const bool can_get() const;
+  /*
+    Returns the value of the cell of coord `coord`
+   */
   virtual const CellState get(const Vec2 &coord) const;
+  virtual const bool can_get() const;
 
-  virtual const bool can_clear() const;
+  /*
+    Sets every cell in the universe to the default CellState value.
+   */
   virtual void clear();
+  virtual const bool can_clear() const;
 
-  virtual const bool can_set_step_size() const;
+  /*
+    Sets sets the size of simulation steps.
+   */
   virtual void set_step_size(const size_t step_size);
+  virtual const bool can_set_step_size() const;
 
-  virtual const bool can_resize() const;
-  virtual void resize();
-
-  // Meta aptitudes
-  bool can_get_set() const;
+  /*
+    Changes the universe shape by giving it new bounds.
+    Every new cell is set to the default CellState.
+    Cells out of the new bounds are destroyed.
+   */
+  virtual void reshape(Rect bounds);
+  virtual const bool can_reshape() const;
 };
-
-// class UniverseType {
-// public:
-//   UniverseType(QString name,
-//                QString description,
-//                Universe* (*constructor)(void));
-
-//   Universe* (*constructor)(void);
-
-//   const QString name;
-//   const QString description;
-// };
 
 #endif // UNIVERSE_H_
