@@ -1,3 +1,4 @@
+#include <cstdio>
 #include <ui/UniverseScene.hpp>
 
 UniverseScene::UniverseScene(QWidget *parent, Universe *universe,
@@ -150,19 +151,17 @@ void UniverseScene::up_rank_grid() { rank_grid += 1; }
 void UniverseScene::down_rank_grid() { rank_grid -= 1; }
 
 QString UniverseScene::get_generation() {
-  std::string s;
-  s = bigint_to_str(universe->get_generation());
-  return QString(s.c_str());
+  return QString(bigint_to_str(universe->get_generation()).c_str());
 }
 
 QString UniverseScene::get_speed() {
-  char s[256];
+  QString message;
   if (p_step == 0) {
-    sprintf(s, "%d ms/step\n", refresh_time_ms);
+    message.asprintf("%d ms/step\n", refresh_time_ms);
   } else {
-    sprintf(s, "2^%d step\n", p_step);
+    message.asprintf("2^%d step\n", p_step);
   }
-  return QString(s);
+  return message;
 }
 
 Universe* UniverseScene::get_zone() {

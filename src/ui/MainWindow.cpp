@@ -407,7 +407,7 @@ void MainWindow::funcAction_licence() {
   s += "Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>";
   s += "Everyone is permitted to copy and distribute verbatim copies";
   s += "of this license document, but changing it is not allowed.";
-  msgBox.setText(s);
+  msgBox.setText(s.c_str());
   msgBox.exec();
 }
 void MainWindow::funcAction_about() {
