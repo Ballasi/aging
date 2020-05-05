@@ -8,6 +8,7 @@
 #include "MacroCell.h"
 #include "MiniCell.h"
 
+namespace cell {
 union Quadrant {
 public:
   MiniCell minicell;
@@ -26,5 +27,6 @@ private:
   raw_generate_random(size_t level, std::default_random_engine random_engine,
                       std::uniform_int_distribution<CellState> range);
 };
+} // namespace cell
 
 #endif // QUADRANT_HPP

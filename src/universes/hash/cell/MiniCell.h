@@ -5,8 +5,8 @@
 
 #include <model/CellState.h>
 
+namespace cell {
 union Quadrant;
-
 class MiniCell {
 public:
   MiniCell() = default;
@@ -21,8 +21,10 @@ public:
   CellState nw, ne;
   CellState sw, se;
 };
+} // namespace cell
 
 namespace std {
+using cell::MiniCell;
 template <> struct hash<MiniCell> {
   hash() = default;
 
@@ -34,5 +36,4 @@ template <> struct hash<MiniCell> {
   hash<CellState> hasher;
 };
 } // namespace std
-
 #endif // MINICELL_HPP

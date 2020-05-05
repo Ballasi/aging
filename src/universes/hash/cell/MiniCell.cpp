@@ -1,5 +1,6 @@
-#include <universes/hashlife/cell/MiniCell.h>
+#include <universes/hash/cell/MiniCell.h>
 
+namespace cell {
 MiniCell::MiniCell(CellState nw, CellState ne, CellState sw, CellState se)
     : nw(nw), ne(ne), se(se), sw(sw) {}
 
@@ -19,3 +20,4 @@ CellState MiniCell::operator[](const size_t index) const {
     return se;
   }
 }
+} // namespace cell

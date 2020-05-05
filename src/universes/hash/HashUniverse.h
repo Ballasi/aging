@@ -14,11 +14,15 @@
 #include "cell/MiniCell.h"
 #include "cell/Quadrant.h"
 
-class HashlifeUniverse : public Universe {
+using cell::MiniCell;
+using cell::MacroCell;
+using cell::Quadrant;
+
+class HashUniverse : public Universe {
 public:
   // Constructors
-  explicit HashlifeUniverse(size_t top_level, Vec2 top_left = Vec2());
-  explicit HashlifeUniverse(QString filename, Vec2 top_left = Vec2());
+  explicit HashUniverse(size_t top_level, Vec2 top_left = Vec2());
+  explicit HashUniverse(QString filename, Vec2 top_left = Vec2());
 
   // Interface
   void update();

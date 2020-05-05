@@ -5,8 +5,8 @@
 
 #include <cstddef>
 
+namespace cell {
 union Quadrant;
-
 class MacroCell {
 public:
   MacroCell(Quadrant *nw, Quadrant *ne, Quadrant *sw, Quadrant *se);
@@ -24,9 +24,12 @@ public:
   Quadrant *nw, *ne;
   Quadrant *sw, *se;
 };
+} // namespace cell
 
 // Defining default hashers
 namespace std {
+using cell::MacroCell;
+using cell::Quadrant;
 template <> struct hash<MacroCell> {
   size_t operator()(const MacroCell &macrocell) const {
     return hasher(macrocell.nw) ^ hasher(macrocell.ne) ^ hasher(macrocell.sw) ^
@@ -35,5 +38,4 @@ template <> struct hash<MacroCell> {
   hash<Quadrant *> hasher;
 };
 } // namespace std
-
 #endif // MACROCELL_H

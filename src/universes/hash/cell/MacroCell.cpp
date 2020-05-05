@@ -1,5 +1,6 @@
-#include <universes/hashlife/cell/MacroCell.h>
+#include <universes/hash/cell/MacroCell.h>
 
+namespace cell {
 MacroCell::MacroCell(Quadrant *nw, Quadrant *ne, Quadrant *sw, Quadrant *se)
     : nw(nw), ne(ne), sw(sw), se(se), result(nullptr) {}
 
@@ -19,3 +20,4 @@ Quadrant *MacroCell::operator[](const size_t index) const {
     return se;
   }
 }
+} // namespace cell

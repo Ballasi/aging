@@ -1,6 +1,7 @@
-#include <universes/hashlife/cell/Quadrant.h>
+#include <universes/hash/cell/Quadrant.h>
 #include <string>
 
+namespace cell {
 Quadrant *Quadrant::generate(size_t level) {
   if (level <= 1) {
     return reinterpret_cast<Quadrant *>(new MiniCell);
@@ -68,3 +69,4 @@ Quadrant *Quadrant::operator[](const size_t index) const {
     return macrocell.se;
   }
 }
+} // namespace cell
