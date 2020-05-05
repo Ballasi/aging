@@ -3,6 +3,7 @@ image: asperatus/aging
 stages:
         - lint
         - build
+        - deploy
 
 cppcheck:
         stage: lint
@@ -15,3 +16,22 @@ cpplint:
 make:
         stage: build
         script: make
+
+docs:
+        before_script:
+          - pacman -S openssh --noconfirm
+          - mkdir -p ~/.ssh
+          - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+          - chmod 700 ~/.ssh/id_rsa
+          - eval "$(ssh-agent -s)"
+          - ssh-add ~/.ssh/id_rsa
+          - ssh-keyscan -H '93.7.113.241' >> ~/.ssh/known_hosts
+        stage: deploy
+        type: deploy
+        environment:
+          name: staging
+          url: 93.7.113.241/aging
+        script:
+          - ssh root@93.7.113.241 "cd /root/aging/ && git pull origin master && make doc && rm -R /var/www/html/aging/ && mkdir /var/www/html/aging && cp -Rf docs/html/* /var/www/html/aging/ && exit"
+        only:
+          - master
