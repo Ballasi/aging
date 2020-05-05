@@ -20,7 +20,6 @@ MainWindow::MainWindow() {
   resize(720, 720);
   setFocusPolicy(Qt::FocusPolicy::ClickFocus);
   isDarkTheme = false;
-  ctxt.MouseIsPress = false;
 
   universe = new HashlifeUniverse(8);
   univ_type = UniverseType::Hashlife;
@@ -49,7 +48,6 @@ void MainWindow::createUI() {
   setCentralWidget(ctxt.universe_scene);
   createToolBar();
   createMenuBar();
-  createStatusBar();
 }
 
 void MainWindow::createToolBar() {
@@ -113,20 +111,31 @@ void MainWindow::createToolBar() {
 
   controlToolbar->addSeparator();
 
+  QActionGroup *checkableGroup = new QActionGroup(controlToolbar);
+  checkableGroup->setExclusive(true);
+
   // MouseMode
-  connect(controlToolbar->addAction(QIcon(icon_dir + "pencil.svg"),
-    "Edit"),
-    &QAction::triggered, this, &MainWindow::funcAction_modeEdit);
-  connect(controlToolbar->addAction(QIcon(icon_dir + "table.svg"),
-    "Select"),
-    &QAction::triggered, this, &MainWindow::funcAction_modeSelect);
+  QAction *pencilAction = controlToolbar->addAction(
+    QIcon(icon_dir + "pencil.svg"), "Edit");
+  connect(pencilAction,
+          &QAction::triggered, this, &MainWindow::funcAction_modeEdit);
+  pencilAction->setCheckable(true);
+  pencilAction->setActionGroup(checkableGroup);
 
-  controlToolbar->addSeparator();
+  QAction *selectAction = controlToolbar->addAction(
+    QIcon(icon_dir + "table.svg"), "Select");
+  connect(selectAction,
+          &QAction::triggered, this, &MainWindow::funcAction_modeSelect);
+  selectAction->setCheckable(true);
+  selectAction->setActionGroup(checkableGroup);
 
-  //mouse mode
-  connect(controlToolbar->addAction(QIcon(icon_dir + "cursor-move.svg"),
-    "Move"),
-    &QAction::triggered, this, &MainWindow::funcAction_modeMove);
+  QAction *moveAction = controlToolbar->addAction(
+    QIcon(icon_dir + "cursor-move.svg"), "Move");
+  connect(moveAction,
+          &QAction::triggered, this, &MainWindow::funcAction_modeMove);
+  moveAction->setCheckable(true);
+  moveAction->setActionGroup(checkableGroup);
+
   // bouton d'un zoom centré
   connect(controlToolbar->addAction(QIcon(icon_dir + "zoom-in.svg"),
     "Zoom In"),
@@ -249,21 +258,6 @@ void MainWindow::createMenuBar() {
     menuBar()->addMenu(helpMenu);
 }
 
-
-void MainWindow::createStatusBar() {
-  QString s;
-  s += "Generation : ";
-  s += ctxt.universe_scene->get_generation();
-  s += " | ";
-  s += "Speed : ";
-  s += ctxt.universe_scene->get_speed();
-  statusBar()->showMessage(s);
-}
-
-void MainWindow::updateStatusBar() {
-  createStatusBar();
-}
-
 /////////////////////////////////////////////////////
 ////                   Actions                   ////
 /////////////////////////////////////////////////////
@@ -322,17 +316,14 @@ void MainWindow::funcAction_playPause() {
 }
 void MainWindow::funcAction_step() {
   ctxt.universe_scene->step();
-  updateStatusBar();
 }
 void MainWindow::funcAction_incSpeed() {
   ctxt.universe_scene->increase_speed();
   ctxt.universe_scene->get_speed();
-  updateStatusBar();
 }
 void MainWindow::funcAction_decSpeed() {
   ctxt.universe_scene->decrease_speed();
   ctxt.universe_scene->get_speed();
-  updateStatusBar();
 }
 
 void MainWindow::funcAction_fitPattern() {
@@ -412,8 +403,8 @@ void MainWindow::funcAction_licence() {
 }
 void MainWindow::funcAction_about() {
   QMessageBox msgBox;
-  msgBox.setWindowTitle("azerty");
-  msgBox.setText("This Application was coding by our.");
+  msgBox.setWindowTitle("About");
+  msgBox.setText("Lorem ipsum ?");
   msgBox.exec();
 }
 
@@ -482,36 +473,58 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
 }
 
 void MainWindow::wheelEvent(QWheelEvent *event) {
-  if (event->delta() < 0)
+  if (event->delta() > 0)
     ctxt.universe_scene->zoom_in(event->pos());
   else
     ctxt.universe_scene->zoom_out(event->pos());
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event) {
-  if ( event->button() == Qt::LeftButton ) {
-    ctxt.MouseIsPress = true;
+  QPoint rpos = ctxt.universe_scene->mapFromParent(event->pos());
+  ctxt.buffer_coord = ctxt.universe_scene->map_coords(rpos);
+  ctxt.pressed_button = event->button();
+  switch (ctxt.universe_scene->get_mode()) {
+    case SceneMode::MOVE:
+      if (ctxt.pressed_button = Qt::LeftButton) {
+        ctxt.drag_position = rpos;
+      }
+      break;
+    case SceneMode::EDIT:
+      ctxt.universe_scene->set_cell(ctxt.buffer_coord,
+                ctxt.pressed_button == Qt::LeftButton);
+      break;
+    case SceneMode::SELECT:
+      break;
+    default:
+      break;
   }
 }
 
-void MainWindow::mouseReleaseEvent(QMouseEvent *event) {
-  ctxt.MouseIsPress = false;
-}
-
 void MainWindow::mouseMoveEvent(QMouseEvent *event) {
-  if (ctxt.MouseIsPress) {
-    switch (ctxt.universe_scene->get_mode()) {
-      case SceneMode::MOVE:
-        printf("MOVE Coord Mouse (%d, %d)\n", event->x(), event->y());
-        break;
-      case SceneMode::EDIT:
-        printf("EDIT Coord Mouse (%d, %d)\n", event->x(), event->y());
-        break;
-      case SceneMode::SELECT:
-        printf("SELECT Coord Mouse (%d, %d)\n", event->x(), event->y());
-        break;
-      default:
-        break;
-    }
+  QPoint rpos = ctxt.universe_scene->mapFromParent(event->pos());
+  Coord coord = ctxt.universe_scene->map_coords(rpos);
+  switch (ctxt.universe_scene->get_mode()) {
+    case SceneMode::MOVE:
+      if (ctxt.pressed_button == Qt::LeftButton) {
+        QPointF diff = rpos - ctxt.drag_position;
+        if (diff.manhattanLength() > 42) {
+          ctxt.drag_position = rpos;
+          ctxt.universe_scene->
+            move_camera({-diff.x() / ctxt.universe_scene->width(),
+                         -diff.y() / ctxt.universe_scene->height()});
+        }
+      }
+      break;
+    case SceneMode::EDIT:
+      if (!(ctxt.buffer_coord == coord)) {
+        ctxt.buffer_coord = coord;
+        ctxt.universe_scene->set_cell(ctxt.buffer_coord,
+                  ctxt.pressed_button == Qt::LeftButton);
+      }
+      break;
+    case SceneMode::SELECT:
+      break;
+    default:
+      break;
   }
 }

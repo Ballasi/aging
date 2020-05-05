@@ -22,6 +22,8 @@ public:
   void down();
   void up();
 
+  void move_camera(QPointF vector);
+
 
   void zoomin_event(QPoint origin);
   void zoomout_event(QPoint origin);

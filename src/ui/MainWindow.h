@@ -15,7 +15,9 @@ typedef struct SwidgetsCtxt {
     QIcon *playIcon;  // Play
     QIcon *pauseIcon; // Pause
 
-  bool MouseIsPress;
+  Coord buffer_coord;
+  Qt::MouseButton pressed_button;
+  QPointF drag_position;
 } WidgetsCtxt;
 
 
@@ -33,7 +35,6 @@ protected:
   void keyPressEvent(QKeyEvent *event) override;
   void wheelEvent(QWheelEvent *event) override;
   void mousePressEvent(QMouseEvent *event) override;
-  void mouseReleaseEvent(QMouseEvent *event) override;
   void mouseMoveEvent(QMouseEvent *event) override;
   // Fonctions actions lance par des connects
   void funcAction_newFile();
@@ -81,8 +82,6 @@ private:
   void createUI();
   void createToolBar();
   void createMenuBar();
-  void createStatusBar();
-  void updateStatusBar();
 };
 
 #endif /* UI_MAINWINDOW_H_ */
