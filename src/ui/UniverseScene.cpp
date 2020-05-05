@@ -117,7 +117,7 @@ void UniverseScene::fit_pattern() {
 }
 
 void UniverseScene::move_camera(QPointF vector) {
-  r_area->move(vector);
+  r_area->move_camera(vector);
 }
 
 
