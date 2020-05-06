@@ -39,6 +39,7 @@ public:
   Rect get_bounds() const;
   BigInt get_generation() const;
   size_t get_step_size();
+  virtual const Coord get_size() const = 0;
 
   BigInt generation_count;
   Rect bounds;

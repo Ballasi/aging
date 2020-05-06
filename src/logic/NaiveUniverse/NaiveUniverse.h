@@ -29,6 +29,7 @@ public:
   size_t width;
   size_t height;
 
+  const Coord get_size() const;
 private:
   Cell *cells;
   size_t length_in_bytes;

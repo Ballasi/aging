@@ -9,7 +9,7 @@ typedef mpz_class BigInt;
 static std::string bigint_to_str(BigInt i) {
   std::string str_i = i.get_str();
   std::string result;
-  if (str_i.size() <= 20) {
+  if (str_i.size() <= 12) {
     return str_i;
   } else {
     result += str_i[0];

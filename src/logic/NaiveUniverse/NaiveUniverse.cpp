@@ -171,7 +171,7 @@ void NaiveUniverse::read_rle_data(QFile *file, Coord boundingbox, Coord size) {
   int boundingbox_y = boundingbox.y.get_si();
 
   int init_x = size.x.get_si() / 2 - boundingbox_x / 2;
-  int init_y = size.y.get_si() / 2;
+  int init_y = size.y.get_si() / 2 - boundingbox_y / 2;
   int curr_x = init_x;
   int curr_y = init_y;
 
@@ -182,7 +182,7 @@ void NaiveUniverse::read_rle_data(QFile *file, Coord boundingbox, Coord size) {
     int q;
     if (data[i] == '$') {
       q = qs.isEmpty() ? 1 : qs.toInt();
-      curr_y -= q;
+      curr_y += q;
       curr_x = init_x;
       qs.clear();
     }
@@ -202,3 +202,6 @@ void NaiveUniverse::read_rle_data(QFile *file, Coord boundingbox, Coord size) {
   }
 }
 
+const Coord NaiveUniverse::get_size() const {
+  return Coord(BigInt(width), BigInt(height));
+}
