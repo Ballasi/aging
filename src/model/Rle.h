@@ -6,7 +6,6 @@
 #include <model/Rule.h>
 #include <QFile>
 #include <QString>
-#include <QStringAlgorithms>
 
 class Rle {
 public:
