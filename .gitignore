@@ -11,9 +11,13 @@ Hashlife
 **.o
 **.swp
 
-# Clangd
+# C++ servers
 .clangd/
+.ccls-cache/
 compile_commands.json
 
 # Emacs swapfiles
 ./#*
+
+# Doc files
+docs/html/
