@@ -5,7 +5,8 @@
 #include <iostream>
 
 UniverseScene::UniverseScene(QWidget *parent, Universe *universe,
-                UniverseType type): universe(universe), univ_type(type) {
+                UniverseType type): universe(universe), univ_type(type),
+                settings("agingUS.conf", QSettings::NativeFormat) {
     r_area = new RenderArea(this, universe, type);
     mode = MOVE;
     isSimulationRun = false;
@@ -14,9 +15,27 @@ UniverseScene::UniverseScene(QWidget *parent, Universe *universe,
     refresh_time_ms = 0;
     p_step = 1;
 
-    color_grid = Qt::white;
-    colors[0] = Qt::black;
-    colors[1] = Qt::white;
+
+    QVariant variant1;
+    QVariant variant2;
+    QVariant variant3;
+
+    variant1 = QVariant(QColor(Qt::white));
+    variant2 = QVariant(QColor(Qt::black));
+    variant3 = QVariant(QColor(Qt::white));
+
+    variant1 = settings.value("colorGrid", variant1);
+    variant2 = settings.value("colorBg", variant2);
+    variant3 = settings.value("colorFg", variant3);
+
+    set_grid_color(variant1.value<QColor>());
+    set_cell_color(0, variant2.value<QColor>());
+    set_cell_color(1, variant3.value<QColor>());
+
+    std::cout << "bg :" << colors[0].red() << ", " << colors[0].green()
+    << ", " << colors[0].blue() << "\n";
+    std::cout << "fg :" << colors[1].red() << ", " << colors[1].green()
+    << ", " << colors[1].blue() << "\n";
 
     stepTimer = new QTimer(this);
     connect(stepTimer, &QTimer::timeout, this, &UniverseScene::step);
@@ -156,6 +175,9 @@ bool UniverseScene::get_infinite_grid() {
 
 void UniverseScene::set_cell_color(CellState state, QColor color) {
     colors[state] = color;
+    settings.setValue("colorBg", colors[0]);
+    settings.setValue("colorFg", colors[1]);
+
     r_area->set_colors(colors[1], colors[0]);
     r_area->update();
 }
@@ -164,7 +186,10 @@ QColor UniverseScene::get_cell_color(CellState state) {
 }
 
 QColor UniverseScene::get_grid_color() { return color_grid ;}
-void UniverseScene::set_grid_color(QColor color) { color_grid = color ;}
+void UniverseScene::set_grid_color(QColor color) {
+  color_grid = color;
+  settings.setValue("colorGrid", color_grid);
+}
 int UniverseScene::get_rank_grid() { return rank_grid ;}
 void UniverseScene::set_rank_grid(int rank) { rank_grid = rank ;}
 void UniverseScene::up_rank_grid() { rank_grid += 1; }

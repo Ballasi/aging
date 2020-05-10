@@ -8,6 +8,7 @@
 #include <ui/RenderArea.h>
 #include <QMainWindow>
 #include <QTimer>
+#include <QSettings>
 #include <logic/UniverseType.h>
 
 enum SceneMode {EDIT, MOVE, SELECT};
@@ -148,6 +149,7 @@ private:
   Rect select_zone;
 
   QMainWindow *_parent;
+  QSettings settings;
 };
 
 
