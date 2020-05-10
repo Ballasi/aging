@@ -3,8 +3,8 @@
 
 #include <ui/UniverseScene.hpp>
 #include <QMainWindow>
-#include <QSettings>
 #include <QTimer>
+#include <QSettings>
 #include <QToolButton>
 #include <logic/UniverseType.h>
 
@@ -18,6 +18,7 @@ typedef struct SwidgetsCtxt {
   Coord buffer_coord;
   Qt::MouseButton pressed_button;
   QPointF drag_position;
+  QToolBar* toolbar;
 } WidgetsCtxt;
 
 
@@ -79,9 +80,13 @@ private:
   Universe *universe;
   UniverseType univ_type;
 
+  QSettings settings;
+
   void createUI();
   void createToolBar();
   void createMenuBar();
+  void resetUI();
+  void set_theme();
 };
 
 #endif /* UI_MAINWINDOW_H_ */

@@ -14,20 +14,27 @@
 #include <iostream>
 #include <string>
 #include <QMessageBox>
+#include <QSettings>
 
+MainWindow::MainWindow() :
+    settings("aging.conf", QSettings::NativeFormat) {
+  bool first_use = settings.value("first_use", true).toBool();
+  if (first_use) {
+    printf("1ere fois\n");
+    settings.setValue("first_use", false);
+  } else {
+    printf("plus d'une fois\n");
+  }
 
-MainWindow::MainWindow() {
   resize(720, 720);
   setFocusPolicy(Qt::FocusPolicy::ClickFocus);
+
+  // isDarkTheme = window.palette().window().color().lightnessF() < 0.5;
   isDarkTheme = false;
+  isDarkTheme = settings.value("isDarkTheme", isDarkTheme).toBool();
 
   universe = new HashlifeUniverse(8);
   univ_type = UniverseType::Hashlife;
-  for (int i = 64; i < 192; ++i) {
-    for (int j = 64; j < 192; ++j) {
-      universe->set(Coord(i, j),  ( (i + j) % 12 == 0 || (i - j) % 11 == 0) );
-    }
-  }
 
   createUI();
 }
@@ -46,12 +53,15 @@ void MainWindow::createUI() {
     universe,
     univ_type);
   setCentralWidget(ctxt.universe_scene);
+
+  set_theme();
   createToolBar();
   createMenuBar();
 }
 
 void MainWindow::createToolBar() {
   QToolBar *controlToolbar = addToolBar("Simulation Controls");
+  ctxt.toolbar = controlToolbar;
   addToolBar(Qt::LeftToolBarArea, controlToolbar);
 
   // chargement des icones
@@ -233,6 +243,7 @@ void MainWindow::createMenuBar() {
 
     QAction* dark_theme = prefMenu->addAction("Dark Theme");
       dark_theme->setCheckable(true);
+      dark_theme->setChecked(isDarkTheme);
       connect(dark_theme,
         &QAction::toggled, this, &MainWindow::funcAction_darkTheme);
 
@@ -258,6 +269,37 @@ void MainWindow::createMenuBar() {
     menuBar()->addMenu(helpMenu);
 }
 
+void MainWindow::set_theme() {
+  /*
+  La couleur de theme ne se propage pas, et de coup, l'interface est un peu
+  moche...
+  Je ne sais pas si c'est parce que je n'ai pas trouvé, ou que c'est un bug.
+
+  https://bugreports.qt.io/browse/QTBUG-81958
+  https://doc.qt.io/qt-5/stylesheet-syntax.html#inheritance
+  */
+  if (isDarkTheme) {
+    setStyleSheet(
+        "* {color: #E0E0E0;" // color-text
+        "selection-color: #101010;" // color-text selected
+        "background: #101010;" // bg
+        "selection-background-color: lightgreen ;}"); // bg selected
+  } else {
+    setStyleSheet(
+        "* {color: #101010;" // color-text
+        "selection-color: #E0E0E0;" // color-text selected
+        "background: #E0E0E0;" // bg
+        "selection-background-color: darkgreen ;}"); // bg selected
+  }
+}
+
+void MainWindow::resetUI() {
+  menuBar()->clear();
+  removeToolBar(ctxt.toolbar);
+  set_theme();
+  createToolBar();
+  createMenuBar();
+}
 /////////////////////////////////////////////////////
 ////                   Actions                   ////
 /////////////////////////////////////////////////////
@@ -381,7 +423,9 @@ void MainWindow::funcAction_setRankGrid() {
   }
 }
 void MainWindow::funcAction_darkTheme() {
-  printf("MainWindow::funcAction_darkTheme not Implemented\n");
+  isDarkTheme = !isDarkTheme;
+  settings.setValue("isDarkTheme", isDarkTheme);
+  resetUI();
 }
 
 void MainWindow::funcAction_help() {
