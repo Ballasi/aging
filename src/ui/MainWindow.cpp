@@ -93,67 +93,82 @@ void MainWindow::createToolBar() {
   ctxt.pauseIcon = new QIcon(icon_dir + "pause.svg");
   ctxt.playPauseAction = controlToolbar->addAction(*(ctxt.playIcon),
     "Play/Pause");
+  ctxt.playPauseAction->setShortcut(QKeySequence(Qt::Key_Space));
   connect(ctxt.playPauseAction, &QAction::triggered, this,
     &MainWindow::funcAction_playPause);
 
   // Button One Step
-  connect(controlToolbar->addAction(QIcon(icon_dir + "step.svg"),
-    "Advance one step"),
+  QAction * act_step = controlToolbar->addAction(QIcon(icon_dir + "step.svg"),
+    "Advance one step");
+    act_step->setShortcut(QKeySequence(Qt::Key_P));
+    connect(act_step,
     &QAction::triggered, this, &MainWindow::funcAction_step);
 
   // Button Increase Speed
-  connect(controlToolbar->addAction(QIcon(icon_dir + "fast-forward.svg"),
-    "Increase Speed"),
+  QAction * act_inc_speed = controlToolbar->addAction(
+    QIcon(icon_dir + "fast-forward.svg"), "Increase Speed");
+    act_inc_speed->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Plus));
+    connect(act_inc_speed,
     &QAction::triggered, this, &MainWindow::funcAction_incSpeed);
 
   // Button Decrease Speed
-  connect(controlToolbar->addAction(QIcon(icon_dir + "rewind.svg"),
-    "Decrease Speed"),
+  QAction * act_dec_speed = controlToolbar->addAction(
+    QIcon(icon_dir + "rewind.svg"), "Decrease Speed");
+    act_dec_speed->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Minus));
+    connect(act_dec_speed,
     &QAction::triggered, this, &MainWindow::funcAction_decSpeed);
 
 
   controlToolbar->addSeparator();
 
   // Bouton Fit Pattern
-  connect(controlToolbar->addAction(QIcon(icon_dir + "bullseye.svg"),
-    "Fit Pattern"),
+  QAction * act_fit = controlToolbar->addAction(
+    QIcon(icon_dir + "bullseye.svg"), "Fit Pattern");
+    act_fit->setShortcut(QKeySequence(Qt::Key_F));
+    connect(act_fit,
     &QAction::triggered, this, &MainWindow::funcAction_fitPattern);
 
   controlToolbar->addSeparator();
 
-  QActionGroup *checkableGroup = new QActionGroup(controlToolbar);
-  checkableGroup->setExclusive(true);
-
   // MouseMode
-  QAction *pencilAction = controlToolbar->addAction(
-    QIcon(icon_dir + "pencil.svg"), "Edit");
-  connect(pencilAction,
-          &QAction::triggered, this, &MainWindow::funcAction_modeEdit);
-  pencilAction->setCheckable(true);
-  pencilAction->setActionGroup(checkableGroup);
+  QActionGroup *checkableGroup = new QActionGroup(controlToolbar);
+    checkableGroup->setExclusive(true);
 
-  QAction *selectAction = controlToolbar->addAction(
-    QIcon(icon_dir + "table.svg"), "Select");
-  connect(selectAction,
-          &QAction::triggered, this, &MainWindow::funcAction_modeSelect);
-  selectAction->setCheckable(true);
-  selectAction->setActionGroup(checkableGroup);
+    QAction *pencilAction = controlToolbar->addAction(
+      QIcon(icon_dir + "pencil.svg"), "Edit");
+      connect(pencilAction,
+            &QAction::triggered, this, &MainWindow::funcAction_modeEdit);
+      pencilAction->setCheckable(true);
+      pencilAction->setActionGroup(checkableGroup);
 
-  QAction *moveAction = controlToolbar->addAction(
-    QIcon(icon_dir + "cursor-move.svg"), "Move");
-  connect(moveAction,
-          &QAction::triggered, this, &MainWindow::funcAction_modeMove);
-  moveAction->setCheckable(true);
-  moveAction->setActionGroup(checkableGroup);
+    QAction *selectAction = controlToolbar->addAction(
+      QIcon(icon_dir + "table.svg"), "Select");
+      connect(selectAction,
+            &QAction::triggered, this, &MainWindow::funcAction_modeSelect);
+      selectAction->setCheckable(true);
+      selectAction->setActionGroup(checkableGroup);
+
+    QAction *moveAction = controlToolbar->addAction(
+      QIcon(icon_dir + "cursor-move.svg"), "Move");
+      connect(moveAction,
+            &QAction::triggered, this, &MainWindow::funcAction_modeMove);
+      moveAction->setCheckable(true);
+      moveAction->setActionGroup(checkableGroup);
+
+  controlToolbar->addSeparator();
 
   // bouton d'un zoom centré
-  connect(controlToolbar->addAction(QIcon(icon_dir + "zoom-in.svg"),
-    "Zoom In"),
+  QAction * act_zoomIn = controlToolbar->addAction(
+    QIcon(icon_dir + "zoom-in.svg"), "Zoom In");
+    act_zoomIn->setShortcut(QKeySequence(Qt::Key_Plus));
+    connect(act_zoomIn,
     &QAction::triggered, this, &MainWindow::funcAction_zoomIn);
 
   // bouton d'un dezoom centré
-  connect(controlToolbar->addAction(QIcon(icon_dir + "zoom-out.svg"),
-    "Zoomt Out"),
+  QAction * act_zoomOut = controlToolbar->addAction(
+    QIcon(icon_dir + "zoom-out.svg"), "Zoomt Out");
+    act_zoomOut->setShortcut(QKeySequence(Qt::Key_Minus));
+    connect(act_zoomOut,
     &QAction::triggered, this, &MainWindow::funcAction_zoomOut);
 
   controlToolbar->addSeparator();
@@ -166,23 +181,32 @@ void MainWindow::createToolBar() {
 
 
 void MainWindow::createMenuBar() {
+  // File
   QMenu *fileMenu = new QMenu("File");
     // new file
-    connect(fileMenu->addAction("New File"),
+    QAction* act_new_file = fileMenu->addAction("New File");
+    act_new_file->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
+    connect(act_new_file,
       &QAction::triggered, this, &MainWindow::funcAction_newFile);
 
     // open file
-    connect(fileMenu->addAction("Open File"),
+    QAction* act_open_file = fileMenu->addAction("Open File");
+      act_open_file->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
+      connect(act_open_file,
       &QAction::triggered, this, &MainWindow::funcAction_openFile);
 
     // save file
-    connect(fileMenu->addAction("Save File"),
+    QAction * act_save_file = fileMenu->addAction("Save File");
+      act_save_file->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
+      connect(act_save_file,
       &QAction::triggered, this, &MainWindow::funcAction_saveFile);
 
     fileMenu->addSeparator();
 
     // exit
-    connect(fileMenu->addAction("Quit"),
+    QAction* act_quit = fileMenu->addAction("Quit");
+      act_quit->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q));
+      connect(act_quit,
       &QAction::triggered, this, &MainWindow::close);
     menuBar()->addMenu(fileMenu);
 
@@ -212,6 +236,13 @@ void MainWindow::createMenuBar() {
       connect(algo2,
         &QAction::triggered, this, &MainWindow::funcAction_newUnivTypeNaive);
       optMenu->addMenu(algoMenu);
+
+    optMenu->addSeparator();
+
+    QAction* expansive = optMenu->addAction("Force expansive");
+    expansive->setCheckable(true);
+    connect(expansive,
+      &QAction::toggled, this, &MainWindow::funcAction_forceExpanse);
 
     menuBar()->addMenu(optMenu);
 
@@ -390,6 +421,9 @@ void MainWindow::funcAction_zoomOut() {
   ctxt.universe_scene->zoom_out();
 }
 
+void MainWindow::funcAction_forceExpanse() {
+  printf("Toggle hyperspeed mode not Implemented\n");
+}
 
 void MainWindow::funcAction_setColorBg() {
   QColor color =
@@ -429,18 +463,32 @@ void MainWindow::funcAction_darkTheme() {
 }
 
 void MainWindow::funcAction_help() {
+  QMessageBox msgBox;
+  msgBox.setWindowTitle("Help");
+  std::string s;
+  s += "Ce programme permet de calculer l'evolution d'une grille ";
+  s += "du jeu de la vie selon 2 algorithmes.";
+  msgBox.setText(s.c_str());
+  msgBox.exec();
 }
 void MainWindow::funcAction_documentation() {
+  QMessageBox msgBox;
+  msgBox.setWindowTitle("Documentation");
+  std::string s;
+  s += "Aging's documentation : ";
+  s += "http://93.7.113.241/aging/index.html";
+  msgBox.setText(s.c_str());
+  msgBox.exec();
 }
 void MainWindow::funcAction_licence() {
   QMessageBox msgBox;
   msgBox.setWindowTitle("Licence");
   // msgBox.setTextFormat(Qt::TextFormat::AlignHCenter);
   std::string s;
-  s += "GNU GENERAL PUBLIC LICENSE";
-  s += "Version 3, 29 June 2007";
-  s += "Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>";
-  s += "Everyone is permitted to copy and distribute verbatim copies";
+  s += "GNU GENERAL PUBLIC LICENSE\n";
+  s += "Version 3, 29 June 2007 ";
+  s += "Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>\n";
+  s += "Everyone is permitted to copy and distribute verbatim copies ";
   s += "of this license document, but changing it is not allowed.";
   msgBox.setText(s.c_str());
   msgBox.exec();
@@ -448,7 +496,10 @@ void MainWindow::funcAction_licence() {
 void MainWindow::funcAction_about() {
   QMessageBox msgBox;
   msgBox.setWindowTitle("About");
-  msgBox.setText("Lorem ipsum ?");
+  std::string s;
+  s += "Ce projet à été réalisé dans le cadre de notre 3eme année ";
+  s += "d'informatique à l'université Savoie Mont-blanc.";
+  msgBox.setText(s.c_str());
   msgBox.exec();
 }
 
@@ -500,15 +551,6 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
     case Qt::Key_D:
     case Qt::Key_Right:
       ctxt.universe_scene->right();
-      break;
-    case Qt::Key_Space:
-      ctxt.universe_scene->step();
-      break;
-    case Qt::Key_Plus:
-      ctxt.universe_scene->zoom_in();
-      break;
-    case Qt::Key_Minus:
-      ctxt.universe_scene->zoom_out();
       break;
     default:
       break;

@@ -56,6 +56,8 @@ protected:
   void funcAction_zoomIn();
   void funcAction_zoomOut();
 
+  void funcAction_forceExpanse();
+
   void funcAction_setColorBg();
   void funcAction_setColorFg();
   void funcAction_setColorGrid();
