@@ -3,6 +3,8 @@
 #include <ui/MainWindow.h>
 #include <logic/NaiveUniverse/NaiveUniverse.h>
 
+#include <QFile>
+#include <QTextStream>
 #include <QButtonGroup>
 #include <QColorDialog>
 #include <QFileDialog>
@@ -495,43 +497,51 @@ void MainWindow::action_darkTheme() {
 }
 
 void MainWindow::action_help() {
+  QFile file("../res/html/help.html");
+  if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) { return; }
+  QString text;
+  QTextStream in(&file);
+  while (!in.atEnd()) { text += in.readLine(); }
   QMessageBox msgBox;
   msgBox.setWindowTitle("Help");
-  std::string s;
-  s += "Ce programme permet de calculer l'evolution d'une grille ";
-  s += "du jeu de la vie selon 2 algorithmes.";
-  msgBox.setText(s.c_str());
+  msgBox.setTextFormat(Qt::RichText);
+  msgBox.setText(text);
   msgBox.exec();
 }
 void MainWindow::action_documentation() {
+  QFile file("../res/html/doc.html");
+  if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) { return; }
+  QString text;
+  QTextStream in(&file);
+  while (!in.atEnd()) { text += in.readLine(); }
   QMessageBox msgBox;
   msgBox.setWindowTitle("Documentation");
-  std::string s;
-  s += "Aging's documentation : ";
-  s += "http://93.7.113.241/aging/index.html";
-  msgBox.setText(s.c_str());
+  msgBox.setTextFormat(Qt::RichText);
+  msgBox.setText(text);
   msgBox.exec();
 }
 void MainWindow::action_licence() {
+  QFile file("../res/html/licence.html");
+  if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) { return; }
+  QString text;
+  QTextStream in(&file);
+  while (!in.atEnd()) { text += in.readLine(); }
   QMessageBox msgBox;
   msgBox.setWindowTitle("Licence");
-  // msgBox.setTextFormat(Qt::TextFormat::AlignHCenter);
-  std::string s;
-  s += "GNU GENERAL PUBLIC LICENSE\n";
-  s += "Version 3, 29 June 2007 ";
-  s += "Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>\n";
-  s += "Everyone is permitted to copy and distribute verbatim copies ";
-  s += "of this license document, but changing it is not allowed.";
-  msgBox.setText(s.c_str());
+  msgBox.setTextFormat(Qt::RichText);
+  msgBox.setText(text);
   msgBox.exec();
 }
 void MainWindow::action_about() {
+  QFile file("../res/html/about.html");
+  if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) { return; }
+  QString text;
+  QTextStream in(&file);
+  while (!in.atEnd()) { text += in.readLine(); }
   QMessageBox msgBox;
   msgBox.setWindowTitle("About");
-  std::string s;
-  s += "Ce projet à été réalisé dans le cadre de notre 3eme année ";
-  s += "d'informatique à l'université Savoie Mont-blanc.";
-  msgBox.setText(s.c_str());
+  msgBox.setTextFormat(Qt::RichText);
+  msgBox.setText(text);
   msgBox.exec();
 }
 
