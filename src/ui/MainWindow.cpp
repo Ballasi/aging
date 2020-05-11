@@ -309,18 +309,50 @@ void MainWindow::set_theme() {
   https://bugreports.qt.io/browse/QTBUG-81958
   https://doc.qt.io/qt-5/stylesheet-syntax.html#inheritance
   */
+  QString color_theme_light;
+  QString color_theme_dark;
+  switch (1) {
+    case 1:
+      color_theme_light = "#222c16";
+      color_theme_dark = "#8bb158";
+      break;
+    case 2:
+      color_theme_light = "#22162c";
+      color_theme_dark = "#8b58b1";
+      break;
+    case 3:
+      color_theme_light = "#2c2216";
+      color_theme_dark = "#b18b58";
+      break;
+    case 4:
+      color_theme_light = "#2c1622";
+      color_theme_dark = "#b1588b";
+      break;
+    case 5:
+      color_theme_light = "#16222c";
+      color_theme_dark = "#588bb1";
+      break;
+    case 6:
+      color_theme_light = "#162c22";
+      color_theme_dark = "#58b18b";
+      break;
+    default:
+      color_theme_light = "#222c16";
+      color_theme_dark = "#8bb158";
+      break;
+  }
   if (isDarkTheme) {
     setStyleSheet(
         "* {color: #E0E0E0;" // color-text
-        "selection-color: #101010;" // color-text selected
-        "background: #101010;" // bg
-        "selection-background-color: lightgreen ;}"); // bg selected
+        "selection-color: #2f2f2f;" // color-text selected
+        "background: #2f2f2f;" // bg
+        "selection-background-color: "+ color_theme_dark +";}"); // bg selected
   } else {
     setStyleSheet(
-        "* {color: #101010;" // color-text
+        "* {color: #202020;" // color-text
         "selection-color: #E0E0E0;" // color-text selected
         "background: #E0E0E0;" // bg
-        "selection-background-color: darkgreen ;}"); // bg selected
+        "selection-background-color: "+ color_theme_light +";}"); // bg selected
   }
 }
 
