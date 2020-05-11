@@ -73,17 +73,17 @@ void MainWindow::createToolBar() {
   // new file
   connect(controlToolbar->addAction(QIcon(icon_dir + "file.svg"),
     "New File"),
-    &QAction::triggered, this, &MainWindow::funcAction_newFile);
+    &QAction::triggered, this, &MainWindow::action_newFile);
 
   // open file
   connect(controlToolbar->addAction(QIcon(icon_dir + "folder-open.svg"),
     "Open File"),
-    &QAction::triggered, this, &MainWindow::funcAction_openFile);
+    &QAction::triggered, this, &MainWindow::action_openFile);
 
   // save file
   connect(controlToolbar->addAction(QIcon(icon_dir + "floppy.svg"),
     "Save File"),
-    &QAction::triggered, this, &MainWindow::funcAction_saveFile);
+    &QAction::triggered, this, &MainWindow::action_saveFile);
 
 
   controlToolbar->addSeparator();
@@ -95,28 +95,28 @@ void MainWindow::createToolBar() {
     "Play/Pause");
   ctxt.playPauseAction->setShortcut(QKeySequence(Qt::Key_Space));
   connect(ctxt.playPauseAction, &QAction::triggered, this,
-    &MainWindow::funcAction_playPause);
+    &MainWindow::action_playPause);
 
   // Button One Step
   QAction * act_step = controlToolbar->addAction(QIcon(icon_dir + "step.svg"),
     "Advance one step");
     act_step->setShortcut(QKeySequence(Qt::Key_P));
     connect(act_step,
-    &QAction::triggered, this, &MainWindow::funcAction_step);
+    &QAction::triggered, this, &MainWindow::action_step);
 
   // Button Increase Speed
   QAction * act_inc_speed = controlToolbar->addAction(
     QIcon(icon_dir + "fast-forward.svg"), "Increase Speed");
     act_inc_speed->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Plus));
     connect(act_inc_speed,
-    &QAction::triggered, this, &MainWindow::funcAction_incSpeed);
+    &QAction::triggered, this, &MainWindow::action_incSpeed);
 
   // Button Decrease Speed
   QAction * act_dec_speed = controlToolbar->addAction(
     QIcon(icon_dir + "rewind.svg"), "Decrease Speed");
     act_dec_speed->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Minus));
     connect(act_dec_speed,
-    &QAction::triggered, this, &MainWindow::funcAction_decSpeed);
+    &QAction::triggered, this, &MainWindow::action_decSpeed);
 
 
   controlToolbar->addSeparator();
@@ -126,7 +126,7 @@ void MainWindow::createToolBar() {
     QIcon(icon_dir + "bullseye.svg"), "Fit Pattern");
     act_fit->setShortcut(QKeySequence(Qt::Key_F));
     connect(act_fit,
-    &QAction::triggered, this, &MainWindow::funcAction_fitPattern);
+    &QAction::triggered, this, &MainWindow::action_fitPattern);
 
   controlToolbar->addSeparator();
 
@@ -137,21 +137,21 @@ void MainWindow::createToolBar() {
     QAction *pencilAction = controlToolbar->addAction(
       QIcon(icon_dir + "pencil.svg"), "Edit");
       connect(pencilAction,
-            &QAction::triggered, this, &MainWindow::funcAction_modeEdit);
+            &QAction::triggered, this, &MainWindow::action_modeEdit);
       pencilAction->setCheckable(true);
       pencilAction->setActionGroup(checkableGroup);
 
     QAction *selectAction = controlToolbar->addAction(
       QIcon(icon_dir + "table.svg"), "Select");
       connect(selectAction,
-            &QAction::triggered, this, &MainWindow::funcAction_modeSelect);
+            &QAction::triggered, this, &MainWindow::action_modeSelect);
       selectAction->setCheckable(true);
       selectAction->setActionGroup(checkableGroup);
 
     QAction *moveAction = controlToolbar->addAction(
       QIcon(icon_dir + "cursor-move.svg"), "Move");
       connect(moveAction,
-            &QAction::triggered, this, &MainWindow::funcAction_modeMove);
+            &QAction::triggered, this, &MainWindow::action_modeMove);
       moveAction->setCheckable(true);
       moveAction->setActionGroup(checkableGroup);
 
@@ -162,14 +162,14 @@ void MainWindow::createToolBar() {
     QIcon(icon_dir + "zoom-in.svg"), "Zoom In");
     act_zoomIn->setShortcut(QKeySequence(Qt::Key_Plus));
     connect(act_zoomIn,
-    &QAction::triggered, this, &MainWindow::funcAction_zoomIn);
+    &QAction::triggered, this, &MainWindow::action_zoomIn);
 
   // bouton d'un dezoom centré
   QAction * act_zoomOut = controlToolbar->addAction(
     QIcon(icon_dir + "zoom-out.svg"), "Zoomt Out");
     act_zoomOut->setShortcut(QKeySequence(Qt::Key_Minus));
     connect(act_zoomOut,
-    &QAction::triggered, this, &MainWindow::funcAction_zoomOut);
+    &QAction::triggered, this, &MainWindow::action_zoomOut);
 
   controlToolbar->addSeparator();
 
@@ -187,19 +187,19 @@ void MainWindow::createMenuBar() {
     QAction* act_new_file = fileMenu->addAction("New File");
     act_new_file->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
     connect(act_new_file,
-      &QAction::triggered, this, &MainWindow::funcAction_newFile);
+      &QAction::triggered, this, &MainWindow::action_newFile);
 
     // open file
     QAction* act_open_file = fileMenu->addAction("Open File");
       act_open_file->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
       connect(act_open_file,
-      &QAction::triggered, this, &MainWindow::funcAction_openFile);
+      &QAction::triggered, this, &MainWindow::action_openFile);
 
     // save file
     QAction * act_save_file = fileMenu->addAction("Save File");
       act_save_file->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
       connect(act_save_file,
-      &QAction::triggered, this, &MainWindow::funcAction_saveFile);
+      &QAction::triggered, this, &MainWindow::action_saveFile);
 
     fileMenu->addSeparator();
 
@@ -232,9 +232,9 @@ void MainWindow::createMenuBar() {
           break;
       }
       connect(algo1,
-        &QAction::triggered, this, &MainWindow::funcAction_newUnivTypeHashlife);
+        &QAction::triggered, this, &MainWindow::action_newUnivTypeHashlife);
       connect(algo2,
-        &QAction::triggered, this, &MainWindow::funcAction_newUnivTypeNaive);
+        &QAction::triggered, this, &MainWindow::action_newUnivTypeNaive);
       optMenu->addMenu(algoMenu);
 
     optMenu->addSeparator();
@@ -242,7 +242,7 @@ void MainWindow::createMenuBar() {
     QAction* expansive = optMenu->addAction("Force expansive");
     expansive->setCheckable(true);
     connect(expansive,
-      &QAction::toggled, this, &MainWindow::funcAction_forceExpanse);
+      &QAction::toggled, this, &MainWindow::action_forceExpanse);
 
     menuBar()->addMenu(optMenu);
 
@@ -251,13 +251,13 @@ void MainWindow::createMenuBar() {
     // set color
     QMenu *prefColor = new QMenu("Set Color");
       connect(prefColor->addAction("Dead Cell"),
-        &QAction::triggered, this, &MainWindow::funcAction_setColorBg);
+        &QAction::triggered, this, &MainWindow::action_setColorBg);
 
       connect(prefColor->addAction("Alive Cell"),
-        &QAction::triggered, this, &MainWindow::funcAction_setColorFg);
+        &QAction::triggered, this, &MainWindow::action_setColorFg);
 
       connect(prefColor->addAction("Grid"),
-        &QAction::triggered, this, &MainWindow::funcAction_setColorGrid);
+        &QAction::triggered, this, &MainWindow::action_setColorGrid);
       prefMenu->addMenu(prefColor);
 
     // Toggle Bord
@@ -265,10 +265,10 @@ void MainWindow::createMenuBar() {
     QAction* toggle_bord = prefMenu->addAction("Infinite Grid"); 
       toggle_bord->setCheckable(true);
       connect(toggle_bord,
-        &QAction::toggled, this, &MainWindow::funcAction_setInfiniteGrid);
+        &QAction::toggled, this, &MainWindow::action_setInfiniteGrid);
     */
     connect(prefMenu->addAction("Set Rank Grid"),
-      &QAction::triggered, this, &MainWindow::funcAction_setRankGrid);
+      &QAction::triggered, this, &MainWindow::action_setRankGrid);
 
     prefMenu->addSeparator();
 
@@ -276,7 +276,7 @@ void MainWindow::createMenuBar() {
       dark_theme->setCheckable(true);
       dark_theme->setChecked(isDarkTheme);
       connect(dark_theme,
-        &QAction::toggled, this, &MainWindow::funcAction_darkTheme);
+        &QAction::toggled, this, &MainWindow::action_darkTheme);
 
     menuBar()->addMenu(prefMenu);
 
@@ -284,18 +284,18 @@ void MainWindow::createMenuBar() {
   QMenu *helpMenu = new QMenu("Help");
 
     connect(helpMenu->addAction("Help"),
-      &QAction::triggered, this, &MainWindow::funcAction_help);
+      &QAction::triggered, this, &MainWindow::action_help);
 
     connect(helpMenu->addAction("Documentation"),
-      &QAction::triggered, this, &MainWindow::funcAction_documentation);
+      &QAction::triggered, this, &MainWindow::action_documentation);
 
     helpMenu->addSeparator();
 
     connect(helpMenu->addAction("Licence"),
-      &QAction::triggered, this, &MainWindow::funcAction_licence);
+      &QAction::triggered, this, &MainWindow::action_licence);
 
     connect(helpMenu->addAction("About"),
-      &QAction::triggered, this, &MainWindow::funcAction_about);
+      &QAction::triggered, this, &MainWindow::action_about);
 
     menuBar()->addMenu(helpMenu);
 }
@@ -335,17 +335,17 @@ void MainWindow::resetUI() {
 ////                   Actions                   ////
 /////////////////////////////////////////////////////
 
-void MainWindow::funcAction_newFile() {
+void MainWindow::action_newFile() {
   switch (univ_type) {
     case UniverseType::Hashlife:
-      funcAction_newUnivTypeHashlife();
+      action_newUnivTypeHashlife();
       break;
     case UniverseType::Life:
-      funcAction_newUnivTypeNaive();
+      action_newUnivTypeNaive();
       break;
   }
 }
-void MainWindow::funcAction_openFile() {
+void MainWindow::action_openFile() {
   QString fileName, acceptedFormats;
   switch (univ_type) {
     case UniverseType::Hashlife:
@@ -375,11 +375,11 @@ void MainWindow::funcAction_openFile() {
     setCentralWidget(ctxt.universe_scene);
   }
 }
-void MainWindow::funcAction_saveFile() {
-  printf("MainWindow::funcAction_saveFile() not Implemented\n");
+void MainWindow::action_saveFile() {
+  printf("MainWindow::action_saveFile() not Implemented\n");
 }
 
-void MainWindow::funcAction_playPause() {
+void MainWindow::action_playPause() {
   ctxt.universe_scene->play_pause();
   if (ctxt.universe_scene->get_state_simulation()) {
     ctxt.playPauseAction->setIcon(*(ctxt.pauseIcon));
@@ -387,67 +387,67 @@ void MainWindow::funcAction_playPause() {
     ctxt.playPauseAction->setIcon(*(ctxt.playIcon));
   }
 }
-void MainWindow::funcAction_step() {
+void MainWindow::action_step() {
   ctxt.universe_scene->step();
 }
-void MainWindow::funcAction_incSpeed() {
+void MainWindow::action_incSpeed() {
   ctxt.universe_scene->increase_speed();
   ctxt.universe_scene->get_speed();
 }
-void MainWindow::funcAction_decSpeed() {
+void MainWindow::action_decSpeed() {
   ctxt.universe_scene->decrease_speed();
   ctxt.universe_scene->get_speed();
 }
 
-void MainWindow::funcAction_fitPattern() {
+void MainWindow::action_fitPattern() {
   ctxt.universe_scene->fit_pattern();
 }
 
 
-void MainWindow::funcAction_modeEdit() {
+void MainWindow::action_modeEdit() {
   ctxt.universe_scene->set_mode(EDIT);
 }
-void MainWindow::funcAction_modeSelect() {
+void MainWindow::action_modeSelect() {
   ctxt.universe_scene->set_mode(SELECT);
 }
-void MainWindow::funcAction_modeMove() {
+void MainWindow::action_modeMove() {
   ctxt.universe_scene->set_mode(MOVE);
 }
 
-void MainWindow::funcAction_zoomIn() {
+void MainWindow::action_zoomIn() {
   ctxt.universe_scene->zoom_in();
 }
-void MainWindow::funcAction_zoomOut() {
+void MainWindow::action_zoomOut() {
   ctxt.universe_scene->zoom_out();
 }
 
-void MainWindow::funcAction_forceExpanse() {
+void MainWindow::action_forceExpanse() {
   printf("Toggle hyperspeed mode not Implemented\n");
 }
 
-void MainWindow::funcAction_setColorBg() {
+void MainWindow::action_setColorBg() {
   QColor color =
       QColorDialog::getColor(ctxt.universe_scene->get_cell_color(0),
        this, "Choose Background Color");
   ctxt.universe_scene->set_cell_color(0, color);
 }
-void MainWindow::funcAction_setColorFg() {
+void MainWindow::action_setColorFg() {
   QColor color =
       QColorDialog::getColor(ctxt.universe_scene->get_cell_color(1),
        this, "Choose Cell Color");
   ctxt.universe_scene->set_cell_color(1, color);
 }
-void MainWindow::funcAction_setColorGrid() {
+void MainWindow::action_setColorGrid() {
   QColor color =
       QColorDialog::getColor(ctxt.universe_scene->get_grid_color(),
         this, "Choose Grid Color");
   ctxt.universe_scene->set_grid_color(color);
 }
 
-void MainWindow::funcAction_setInfiniteGrid() {
+void MainWindow::action_setInfiniteGrid() {
   ctxt.universe_scene->toggle_bord();
 }
-void MainWindow::funcAction_setRankGrid() {
+void MainWindow::action_setRankGrid() {
   bool ok;
   std::string s;
   int rank = QInputDialog::getInt(this, "Set Rang Grid", s.c_str(),
@@ -456,13 +456,13 @@ void MainWindow::funcAction_setRankGrid() {
     ctxt.universe_scene->set_rank_grid(rank);
   }
 }
-void MainWindow::funcAction_darkTheme() {
+void MainWindow::action_darkTheme() {
   isDarkTheme = !isDarkTheme;
   settings.setValue("isDarkTheme", isDarkTheme);
   resetUI();
 }
 
-void MainWindow::funcAction_help() {
+void MainWindow::action_help() {
   QMessageBox msgBox;
   msgBox.setWindowTitle("Help");
   std::string s;
@@ -471,7 +471,7 @@ void MainWindow::funcAction_help() {
   msgBox.setText(s.c_str());
   msgBox.exec();
 }
-void MainWindow::funcAction_documentation() {
+void MainWindow::action_documentation() {
   QMessageBox msgBox;
   msgBox.setWindowTitle("Documentation");
   std::string s;
@@ -480,7 +480,7 @@ void MainWindow::funcAction_documentation() {
   msgBox.setText(s.c_str());
   msgBox.exec();
 }
-void MainWindow::funcAction_licence() {
+void MainWindow::action_licence() {
   QMessageBox msgBox;
   msgBox.setWindowTitle("Licence");
   // msgBox.setTextFormat(Qt::TextFormat::AlignHCenter);
@@ -493,7 +493,7 @@ void MainWindow::funcAction_licence() {
   msgBox.setText(s.c_str());
   msgBox.exec();
 }
-void MainWindow::funcAction_about() {
+void MainWindow::action_about() {
   QMessageBox msgBox;
   msgBox.setWindowTitle("About");
   std::string s;
@@ -504,7 +504,7 @@ void MainWindow::funcAction_about() {
 }
 
 
-void MainWindow::funcAction_newUnivTypeHashlife() {
+void MainWindow::action_newUnivTypeHashlife() {
   delete universe;
   delete ctxt.universe_scene;
 
@@ -516,7 +516,7 @@ void MainWindow::funcAction_newUnivTypeHashlife() {
     univ_type);
   setCentralWidget(ctxt.universe_scene);
 }
-void MainWindow::funcAction_newUnivTypeNaive() {
+void MainWindow::action_newUnivTypeNaive() {
   delete universe;
   delete ctxt.universe_scene;
 

@@ -38,41 +38,41 @@ protected:
   void mousePressEvent(QMouseEvent *event) override;
   void mouseMoveEvent(QMouseEvent *event) override;
   // Fonctions actions lance par des connects
-  void funcAction_newFile();
-  void funcAction_openFile();
-  void funcAction_saveFile();
+  void action_newFile();
+  void action_openFile();
+  void action_saveFile();
 
-  void funcAction_playPause();
-  void funcAction_step();
-  void funcAction_incSpeed();
-  void funcAction_decSpeed();
+  void action_playPause();
+  void action_step();
+  void action_incSpeed();
+  void action_decSpeed();
 
-  void funcAction_fitPattern();
+  void action_fitPattern();
 
-  void funcAction_modeEdit();
-  void funcAction_modeSelect();
-  void funcAction_modeMove();
+  void action_modeEdit();
+  void action_modeSelect();
+  void action_modeMove();
 
-  void funcAction_zoomIn();
-  void funcAction_zoomOut();
+  void action_zoomIn();
+  void action_zoomOut();
 
-  void funcAction_forceExpanse();
+  void action_forceExpanse();
 
-  void funcAction_setColorBg();
-  void funcAction_setColorFg();
-  void funcAction_setColorGrid();
+  void action_setColorBg();
+  void action_setColorFg();
+  void action_setColorGrid();
 
-  void funcAction_setInfiniteGrid();
-  void funcAction_setRankGrid();
-  void funcAction_darkTheme();
+  void action_setInfiniteGrid();
+  void action_setRankGrid();
+  void action_darkTheme();
 
-  void funcAction_help();
-  void funcAction_documentation();
-  void funcAction_licence();
-  void funcAction_about();
+  void action_help();
+  void action_documentation();
+  void action_licence();
+  void action_about();
 
-  void funcAction_newUnivTypeHashlife();
-  void funcAction_newUnivTypeNaive();
+  void action_newUnivTypeHashlife();
+  void action_newUnivTypeNaive();
 
 private:
   WidgetsCtxt ctxt;
