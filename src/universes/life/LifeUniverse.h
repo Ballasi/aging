@@ -21,6 +21,7 @@ class LifeUniverse: public Universe {
 public:
   // Constructors
   explicit LifeUniverse(const Vec2 &size);
+  explicit LifeUniverse(QString file_path);
   ~LifeUniverse();
 
   // Universe interface

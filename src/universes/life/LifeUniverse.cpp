@@ -14,6 +14,10 @@ LifeUniverse::LifeUniverse(const Vec2 &size) {
   _cell_blocks = new uint8_t[_length_in_bytes]();
 }
 
+LifeUniverse::LifeUniverse(QString file_path) {
+  throw "Unimplemented";
+}
+
 LifeUniverse::~LifeUniverse() { delete[] _cell_blocks; }
 
 void LifeUniverse::update() {

@@ -60,11 +60,11 @@ Rect Camera2D::get_view_bounds(float aspect_ratio, Universe *universe) {
   QRectF rectf = inv.mapRect(
       QRectF(QPointF(0.0f, 0.0f), QPointF(1.0f * aspect_ratio, 1.0f)));
 
-  Coord top_left =
-      Coord(BigInt(static_cast<int>(std::ceil(rectf.topLeft().x())) - 1),
+  Vec2 top_left =
+      Vec2(BigInt(static_cast<int>(std::ceil(rectf.topLeft().x())) - 1),
             BigInt(static_cast<int>(std::ceil(rectf.bottomRight().y()))));
-  Coord bottom_right =
-      Coord(BigInt(static_cast<int>(std::ceil(rectf.bottomRight().x()))),
+  Vec2 bottom_right =
+      Vec2(BigInt(static_cast<int>(std::ceil(rectf.bottomRight().x()))),
             BigInt(static_cast<int>(std::ceil(rectf.topLeft().y()))) - 1);
 
   BigInt temp = top_left.y;
@@ -75,7 +75,7 @@ Rect Camera2D::get_view_bounds(float aspect_ratio, Universe *universe) {
   return rect;
 }
 
-void Camera2D::look_at(Coord c) {
+void Camera2D::look_at(Vec2 c) {
   pos.setX((static_cast<float>(c.x.get_si()) / static_cast<float>(zoom))
             - 0.5f + 0.5f / static_cast<float>(zoom));
   pos.setY((static_cast<float>(c.y.get_si()) / static_cast<float>(zoom))

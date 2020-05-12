@@ -84,4 +84,6 @@ public:
   virtual const bool can_reshape() const;
 };
 
+enum class UniverseType {Life, Hashlife};
+
 #endif // UNIVERSE_H_

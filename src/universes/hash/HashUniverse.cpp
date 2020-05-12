@@ -1,4 +1,5 @@
 #include "model/BigInt.h"
+#include "model/Vec2.h"
 #include <universes/hash/HashUniverse.h>
 #include <unordered_set>
 #include <vector>
@@ -31,7 +32,6 @@ HashUniverse::HashUniverse(QString filename, Vec2 _top_left)
 }
 
 // Interface
-
 void HashUniverse::update() {
   // Assert that the creation of higher level is possible
   _assert_handles(_top_level + 2);
@@ -76,6 +76,79 @@ const BigInt &HashUniverse::generation() const { return _generation; }
 
 const BigInt &HashUniverse::step_size() const { return _step_size; }
 
+std::pair<Rect, size_t> HashUniverse::get_pattern_bounding_box() {
+  Rect r = bounds();
+  size_t l = _pattern_bounding_box_rec(&r, _top_level,
+                                      reinterpret_cast<Quadrant *>(_root));
+
+  std::cout << "Top left : (" << r.top_left.x << ',' << r.top_left.y << ")"
+            << std::endl;
+  std::cout << "Bottom right : (" << r.bottom_right().x << ','
+            << r.bottom_right().y << ")" << std::endl;
+
+  std::pair<Rect, size_t> pair(r, l);
+  return pair;
+}
+
+size_t HashUniverse::_pattern_bounding_box_rec(Rect *box,
+                              size_t level, Quadrant *q) {
+  if (level <= 4 || q == _zeros[level]) {
+    return level;
+  } else {
+    std::cout << "Searching..." << std::endl;
+    Quadrant *z1 = _zeros[level - 1];
+    Quadrant *z2 = _zeros[level - 2];
+    bool nw = q->macrocell.nw != z1;
+    bool ne = q->macrocell.ne != z1;
+    bool sw = q->macrocell.sw != z1;
+    bool se = q->macrocell.se != z1;
+    if (nw && !ne && !sw && !se) {
+      std::cout << "NW" << std::endl;
+      box->size.x -= BigInt(1) << mp_size_t(level - 1);
+      box->size.y -= BigInt(1) << mp_size_t(level - 1);
+      return _pattern_bounding_box_rec(box, level - 1, q->macrocell.nw);
+    } else if (!nw && ne && !sw && !se) {
+      std::cout << "NE" << std::endl;
+      box->top_left.x += BigInt(1) << mp_size_t(level - 1);
+      box->size.x -= BigInt(1) << mp_size_t(level - 1);
+      box->size.y -= BigInt(1) << mp_size_t(level - 1);
+      return _pattern_bounding_box_rec(box, level - 1, q->macrocell.ne);
+    } else if (!nw && !ne && sw && !se) {
+      std::cout << "SW" << std::endl;
+      box->top_left.y += BigInt(1) << mp_size_t(level - 1);
+      box->size.y -= BigInt(1) << mp_size_t(level - 1);
+      box->size.x -= BigInt(1) << mp_size_t(level - 1);
+      return _pattern_bounding_box_rec(box, level - 1, q->macrocell.sw);
+    } else if (!nw && !ne && !sw && se) {
+      std::cout << "SE" << std::endl;
+      box->top_left.x += BigInt(1) << mp_size_t(level - 1);
+      box->top_left.y += BigInt(1) << mp_size_t(level - 1);
+      box->size.x -= BigInt(1) << mp_size_t(level - 1);
+      box->size.y -= BigInt(1) << mp_size_t(level - 1);
+      return _pattern_bounding_box_rec(box, level - 1, q->macrocell.se);
+    }
+    /*
+    else if (q->macrocell.nw->macrocell.se == z2 && q->macrocell.nw->macrocell.nw == z2 &&
+        q->macrocell.nw->macrocell.ne == z2 && q->macrocell.ne->macrocell.nw == z2 &&
+        q->macrocell.ne->macrocell.ne == z2 && q->macrocell.ne->macrocell.se == z2 &&
+        q->macrocell.se->macrocell.ne == z2 && q->macrocell.se->macrocell.se == z2 &&
+        q->macrocell.se->macrocell.sw == z2 && q->macrocell.sw->macrocell.se == z2 &&
+        q->macrocell.sw->macrocell.sw == z2 && q->macrocell.sw->macrocell.nw == z2 &&
+        q->macrocell.nw->macrocell.se != z2 && q->macrocell.ne->macrocell.sw != z2 &&
+        q->macrocell.sw->macrocell.ne != z2 && q->macrocell.se->macrocell.nw != z2) {
+          std::cout << "CENTER" << std::endl;
+          MacroCell q2(q->macrocell.nw->macrocell.se, q->macrocell.ne->macrocell.sw,
+                      q->macrocell.sw->macrocell.ne, q->macrocell.se->macrocell.nw);
+          box->top_left.x += BigInt(1) << mp_size_t(level - 2);
+          box->top_left.y += BigInt(1) << mp_size_t(level - 2);
+          box->bottom_right.x -= BigInt(1) << mp_size_t(level - 2);
+          box->bottom_right.y -= BigInt(1) << mp_size_t(level - 2);
+          pattern_bounding_box_rec(box, level - 1, reinterpret_cast<Quadrant *>(&q2));
+        }
+      */
+  }
+  return level;
+}
 // Loading methods
 void HashUniverse::_build_from_rle(QFile *file) {
   Vec2 boundingbox = _read_rle_size(file);
@@ -271,7 +344,7 @@ void HashUniverse::_assert_handles(size_t asserted_level) {
   }
 }
 
-const CellState HashUniverse::get(Vec2 target) const {
+const CellState HashUniverse::get(const Vec2& target) const {
   if (target.y >= _top_left.y &&
       target.y < _top_left.y + (BigInt(1) << mp_size_t(_top_level)) &&
       target.x >= _top_left.x &&
@@ -281,7 +354,7 @@ const CellState HashUniverse::get(Vec2 target) const {
     return 0;
 }
 
-void HashUniverse::set(Vec2 target, CellState state) {
+void HashUniverse::set(const Vec2& target, CellState state) {
   _root = reinterpret_cast<MacroCell *>(
       _set_rec(_top_left, _top_level, reinterpret_cast<Quadrant *>(_root),
                target, state));
@@ -745,33 +818,46 @@ void HashUniverse::print_grid(Quadrant *r, size_t level) {
 }
 
 void HashUniverse::_get_cell_in_bounds_rec(Rect bounds,
-                                               std::vector<Vec2> *coords,
-                                               size_t current_level,
-                                               Quadrant *current_cell,
-                                               Vec2 current_coord) const {
+                                              std::vector<Vec2> *coords,
+                                              size_t current_level,
+                                              Quadrant *current_cell,
+                                              Vec2 current_coord,
+                                              size_t min_level) const {
   BigInt x = current_coord.x;
   BigInt y = current_coord.y;
 
-  if (current_level == 1) {
-    MiniCell minicell = current_cell->minicell;
-    if (bounds & Vec2{x, y}) {
-      if (minicell.nw)
+  if (current_level == min_level) {
+    if (min_level == 1) {
+      MiniCell minicell = current_cell->minicell;
+      if (bounds & Vec2{x, y}) {
+        if (minicell.nw)
+          coords->push_back({x, y});
+      }
+
+      if (bounds & Vec2{x + 1, y}) {
+        if (minicell.ne)
+          coords->push_back({x + 1, y});
+      }
+
+      if (bounds & Vec2{x, y + 1}) {
+        if (minicell.sw)
+          coords->push_back({x, y + 1});
+      }
+
+      if (bounds & Vec2{x + 1, y + 1}) {
+        if (minicell.se)
+          coords->push_back({x + 1, y + 1});
+      }
+    } else {
+      BigInt size = BigInt(1) << mp_size_t(current_level - 1);
+      if (current_cell->macrocell.nw != _zeros[current_level])
         coords->push_back({x, y});
-    }
-
-    if (bounds & Vec2{x + 1, y}) {
-      if (minicell.ne)
-        coords->push_back({x + 1, y});
-    }
-
-    if (bounds & Vec2{x, y + 1}) {
-      if (minicell.sw)
-        coords->push_back({x, y + 1});
-    }
-
-    if (bounds & Vec2{x + 1, y + 1}) {
-      if (minicell.se)
-        coords->push_back({x + 1, y + 1});
+      if (current_cell->macrocell.ne != _zeros[current_level])
+        coords->push_back({x + size, y});
+      if (current_cell->macrocell.sw != _zeros[current_level])
+        coords->push_back({x, y + size});
+      if (current_cell->macrocell.se != _zeros[current_level])
+        coords->push_back({x + size, y + size});
     }
   } else {
     MacroCell macrocell = current_cell->macrocell;
@@ -779,32 +865,33 @@ void HashUniverse::_get_cell_in_bounds_rec(Rect bounds,
       BigInt size = BigInt(1) << mp_size_t(current_level - 1);
       if (bounds & Rect{{x, y}, {x + size, y + size}}) {
         _get_cell_in_bounds_rec(bounds, coords, current_level - 1, macrocell.nw,
-                                {x, y});
+                               {x, y}, min_level);
       }
 
       if (bounds & Rect{{x + size, y}, {x + BigInt(2) * size, y + size}}) {
         _get_cell_in_bounds_rec(bounds, coords, current_level - 1, macrocell.ne,
-                                {x + size, y});
+                               {x + size, y}, min_level);
       }
 
       if (bounds & Rect{{x, y + size}, {x + size, y + BigInt(2) * size}}) {
         _get_cell_in_bounds_rec(bounds, coords, current_level - 1, macrocell.sw,
-                                {x, y + size});
+                               {x, y + size}, min_level);
       }
 
       if (bounds & Rect{{x + size, y + size},
-                        {x + BigInt(2) * size, y + BigInt(2) * size}}) {
+                           {x + BigInt(2) * size, y + BigInt(2) * size}}) {
         _get_cell_in_bounds_rec(bounds, coords, current_level - 1, macrocell.se,
-                                {x + size, y + size});
+                               {x + size, y + size}, min_level);
       }
     }
   }
 }
 
 void HashUniverse::get_cell_in_bounds(Rect bounds,
-                                          std::vector<Vec2> *coords) const {
+                                      std::vector<Vec2> *coords,
+                                      size_t min_level) const {
   _get_cell_in_bounds_rec(bounds, coords, _top_level,
-                          reinterpret_cast<Quadrant *>(_root), _top_left);
+          reinterpret_cast<Quadrant *>(_root), _top_left, min_level);
 }
 
 void HashUniverse::set_step_size(size_t new_step_size) {

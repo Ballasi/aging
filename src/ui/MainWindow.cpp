@@ -1,7 +1,7 @@
-#include <logic/HashlifeUniverse/HashlifeUniverse.h>
-#include <logic/Universe.h>
+#include <model/Universe.h>
 #include <ui/MainWindow.h>
-#include <logic/NaiveUniverse/NaiveUniverse.h>
+#include <universes/hash/HashUniverse.h>
+#include <universes/life/LifeUniverse.h>
 
 #include <QButtonGroup>
 #include <QColorDialog>
@@ -21,11 +21,11 @@ MainWindow::MainWindow() {
   setFocusPolicy(Qt::FocusPolicy::ClickFocus);
   isDarkTheme = false;
 
-  universe = new HashlifeUniverse(8);
+  universe = new HashUniverse(8);
   univ_type = UniverseType::Hashlife;
   for (int i = 64; i < 192; ++i) {
     for (int j = 64; j < 192; ++j) {
-      universe->set(Coord(i, j),  ( (i + j) % 12 == 0 || (i - j) % 11 == 0) );
+      universe->set(Vec2(i, j),  ( (i + j) % 12 == 0 || (i - j) % 11 == 0) );
     }
   }
 
@@ -290,10 +290,10 @@ void MainWindow::funcAction_openFile() {
     delete ctxt.universe_scene;
     switch (univ_type) {
       case UniverseType::Hashlife :
-        universe = new HashlifeUniverse(fileName);
+        universe = new HashUniverse(fileName);
         break;
       case UniverseType::Life :
-        universe = new NaiveUniverse(fileName);
+        universe = new LifeUniverse(fileName);
         break;
     }
     ctxt.universe_scene = new UniverseScene(this,
@@ -413,7 +413,7 @@ void MainWindow::funcAction_newUnivTypeHashlife() {
   delete universe;
   delete ctxt.universe_scene;
 
-  universe = new HashlifeUniverse(8);
+  universe = new HashUniverse(8);
   univ_type = UniverseType::Hashlife;
 
   ctxt.universe_scene = new UniverseScene(this,
@@ -425,7 +425,7 @@ void MainWindow::funcAction_newUnivTypeNaive() {
   delete universe;
   delete ctxt.universe_scene;
 
-  universe = new NaiveUniverse(Coord(BigInt(1024), BigInt(1024)));
+  universe = new LifeUniverse(Vec2(BigInt(1024), BigInt(1024)));
   univ_type = UniverseType::Life;
 
   ctxt.universe_scene = new UniverseScene(this,
@@ -502,7 +502,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event) {
 
 void MainWindow::mouseMoveEvent(QMouseEvent *event) {
   QPoint rpos = ctxt.universe_scene->mapFromParent(event->pos());
-  Coord coord = ctxt.universe_scene->map_coords(rpos);
+  Vec2 coord = ctxt.universe_scene->map_coords(rpos);
   switch (ctxt.universe_scene->get_mode()) {
     case SceneMode::MOVE:
       if (ctxt.pressed_button == Qt::LeftButton) {
