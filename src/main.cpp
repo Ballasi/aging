@@ -6,7 +6,6 @@
 #include <QColor>
 
 void set_theme(QApplication* app) {
-
   QSettings settings("aging.conf", QSettings::NativeFormat);
 
   bool isDarkTheme = false;
@@ -50,9 +49,6 @@ void set_theme(QApplication* app) {
         "selection-background-color: "+ color_theme +";}"); // bg selected
   }
 }
-
-
-
 
 int main(int argc, char **argv) {
   QCoreApplication::setApplicationName("aging");

@@ -436,7 +436,7 @@ void MainWindow::action_darkTheme() {
   msgBox.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
   msgBox.setDefaultButton(QMessageBox::Cancel);
   int ret = msgBox.exec();
-  
+
   if (ret == QMessageBox::Ok) {
     isDarkTheme = !isDarkTheme;
     settings.setValue("isDarkTheme", isDarkTheme);

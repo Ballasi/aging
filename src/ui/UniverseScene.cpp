@@ -7,6 +7,7 @@
 UniverseScene::UniverseScene(QWidget *parent, Universe *universe,
                 UniverseType type): universe(universe), univ_type(type),
                 settings("agingUS.conf", QSettings::NativeFormat) {
+    settings.sync();
     r_area = new RenderArea(this, universe, type);
     mode = MOVE;
     isSimulationRun = false;
@@ -24,18 +25,16 @@ UniverseScene::UniverseScene(QWidget *parent, Universe *universe,
     variant2 = QVariant(QColor("#181913").name());
     variant3 = QVariant(QColor("#8bb158").name());
 
+    std::cout << variant1.toString().toStdString()  << std::endl;
     variant1 = settings.value("colorGrid", variant1);
     variant2 = settings.value("colorBg", variant2);
     variant3 = settings.value("colorFg", variant3);
 
+    std::cout << variant1.toString().toStdString()  << std::endl;
     set_grid_color(QColor(variant1.toString()));
     set_cell_color(0, QColor(variant2.toString()));
     set_cell_color(1, QColor(variant3.toString()));
 
-    std::cout << "bg :" << colors[0].red() << ", " << colors[0].green()
-    << ", " << colors[0].blue() << "\n";
-    std::cout << "fg :" << colors[1].red() << ", " << colors[1].green()
-    << ", " << colors[1].blue() << "\n";
 
     stepTimer = new QTimer(this);
     connect(stepTimer, &QTimer::timeout, this, &UniverseScene::step);
@@ -177,6 +176,7 @@ void UniverseScene::set_cell_color(CellState state, QColor color) {
     colors[state] = color;
     settings.setValue("colorBg", colors[0].name());
     settings.setValue("colorFg", colors[1].name());
+    settings.sync();
 
     r_area->set_colors(colors[1], colors[0]);
     r_area->update();
@@ -189,6 +189,8 @@ QColor UniverseScene::get_grid_color() { return color_grid ;}
 void UniverseScene::set_grid_color(QColor color) {
   color_grid = color;
   settings.setValue("colorGrid", color_grid.name());
+  settings.sync();
+
 }
 int UniverseScene::get_rank_grid() { return rank_grid ;}
 void UniverseScene::set_rank_grid(int rank) { rank_grid = rank ;}

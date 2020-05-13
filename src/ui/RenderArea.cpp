@@ -14,12 +14,10 @@ RenderArea::RenderArea(QWidget *parent,
     : QOpenGLWidget(parent), hashlife_universe(hashlife_universe), type(type) {}
 
 void RenderArea::initializeGL() {
-  QSettings settings("aging-team", "aging");
-  settings.sync();
-  QColor bg_color = settings.value("renderer/bg-color").value<QColor>();
-  QColor c_color = settings.value("renderer/cell-color").value<QColor>();
 
-  set_colors(c_color, bg_color);
+
+  QColor bg_color = QColor("#000000");
+  QColor c_color = QColor("#ffffff");
 
   this->vertexShaderSource =
       "attribute vec2 posAttr;\n"
