@@ -88,7 +88,6 @@ private:
   void createToolBar();
   void createMenuBar();
   void resetUI();
-  void set_theme();
 };
 
 #endif /* UI_MAINWINDOW_H_ */

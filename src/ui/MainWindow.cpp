@@ -28,12 +28,11 @@ MainWindow::MainWindow() :
     printf("plus d'une fois\n");
   }
 
-  resize(720, 720);
-  setFocusPolicy(Qt::FocusPolicy::ClickFocus);
-
-  // isDarkTheme = window.palette().window().color().lightnessF() < 0.5;
   isDarkTheme = false;
   isDarkTheme = settings.value("isDarkTheme", isDarkTheme).toBool();
+
+  resize(720, 720);
+  setFocusPolicy(Qt::FocusPolicy::ClickFocus);
 
   universe = new HashlifeUniverse(8);
   univ_type = UniverseType::Hashlife;
@@ -56,7 +55,6 @@ void MainWindow::createUI() {
     univ_type);
   setCentralWidget(ctxt.universe_scene);
 
-  set_theme();
   createToolBar();
   createMenuBar();
 }
@@ -274,11 +272,9 @@ void MainWindow::createMenuBar() {
 
     prefMenu->addSeparator();
 
-    QAction* dark_theme = prefMenu->addAction("Dark Theme");
-      dark_theme->setCheckable(true);
-      dark_theme->setChecked(isDarkTheme);
+    QAction* dark_theme = prefMenu->addAction("Toggle Theme");
       connect(dark_theme,
-        &QAction::toggled, this, &MainWindow::action_darkTheme);
+        &QAction::triggered, this, &MainWindow::action_darkTheme);
 
     menuBar()->addMenu(prefMenu);
 
@@ -302,66 +298,10 @@ void MainWindow::createMenuBar() {
     menuBar()->addMenu(helpMenu);
 }
 
-void MainWindow::set_theme() {
-  /*
-  La couleur de theme ne se propage pas, et de coup, l'interface est un peu
-  moche...
-  Je ne sais pas si c'est parce que je n'ai pas trouvé, ou que c'est un bug.
-
-  https://bugreports.qt.io/browse/QTBUG-81958
-  https://doc.qt.io/qt-5/stylesheet-syntax.html#inheritance
-  */
-  QString color_theme_light;
-  QString color_theme_dark;
-  switch (1) {
-    case 1:
-      color_theme_light = "#222c16";
-      color_theme_dark = "#8bb158";
-      break;
-    case 2:
-      color_theme_light = "#22162c";
-      color_theme_dark = "#8b58b1";
-      break;
-    case 3:
-      color_theme_light = "#2c2216";
-      color_theme_dark = "#b18b58";
-      break;
-    case 4:
-      color_theme_light = "#2c1622";
-      color_theme_dark = "#b1588b";
-      break;
-    case 5:
-      color_theme_light = "#16222c";
-      color_theme_dark = "#588bb1";
-      break;
-    case 6:
-      color_theme_light = "#162c22";
-      color_theme_dark = "#58b18b";
-      break;
-    default:
-      color_theme_light = "#222c16";
-      color_theme_dark = "#8bb158";
-      break;
-  }
-  if (isDarkTheme) {
-    setStyleSheet(
-        "* {color: #E0E0E0;" // color-text
-        "selection-color: #2f2f2f;" // color-text selected
-        "background: #2f2f2f;" // bg
-        "selection-background-color: "+ color_theme_dark +";}"); // bg selected
-  } else {
-    setStyleSheet(
-        "* {color: #202020;" // color-text
-        "selection-color: #E0E0E0;" // color-text selected
-        "background: #E0E0E0;" // bg
-        "selection-background-color: "+ color_theme_light +";}"); // bg selected
-  }
-}
 
 void MainWindow::resetUI() {
   menuBar()->clear();
   removeToolBar(ctxt.toolbar);
-  set_theme();
   createToolBar();
   createMenuBar();
 }
@@ -491,9 +431,17 @@ void MainWindow::action_setRankGrid() {
   }
 }
 void MainWindow::action_darkTheme() {
-  isDarkTheme = !isDarkTheme;
-  settings.setValue("isDarkTheme", isDarkTheme);
-  resetUI();
+  QMessageBox msgBox;
+  msgBox.setText("Changing the theme will restart the application.");
+  msgBox.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
+  msgBox.setDefaultButton(QMessageBox::Cancel);
+  int ret = msgBox.exec();
+  
+  if (ret == QMessageBox::Ok) {
+    isDarkTheme = !isDarkTheme;
+    settings.setValue("isDarkTheme", isDarkTheme);
+    close();
+  }
 }
 
 void MainWindow::action_help() {
