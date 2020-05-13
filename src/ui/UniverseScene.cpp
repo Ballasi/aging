@@ -190,7 +190,6 @@ void UniverseScene::set_grid_color(QColor color) {
   color_grid = color;
   settings.setValue("colorGrid", color_grid.name());
   settings.sync();
-
 }
 int UniverseScene::get_rank_grid() { return rank_grid ;}
 void UniverseScene::set_rank_grid(int rank) { rank_grid = rank ;}

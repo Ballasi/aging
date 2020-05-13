@@ -14,8 +14,6 @@ RenderArea::RenderArea(QWidget *parent,
     : QOpenGLWidget(parent), hashlife_universe(hashlife_universe), type(type) {}
 
 void RenderArea::initializeGL() {
-
-
   QColor bg_color = QColor("#000000");
   QColor c_color = QColor("#ffffff");
 
