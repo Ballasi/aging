@@ -254,7 +254,14 @@ void RenderArea::render_hashlife(const QMatrix4x4 &viewMatrix) {
   m_program->setUniformValue(m_viewUniform, viewMatrix);
   m_program->setUniformValue(m_projectionUniform, projectionMatrix);
 
-  
+    std::cout << "UNIVERSE ----------------------------" << std::endl;
+
+  std::cout << "Size : " << univ_bounds.size.x << ", " << univ_bounds.size.y << std::endl;
+
+  std::cout << "Top left : (" << univ_bounds.top_left.x << ',' << univ_bounds.top_left.y << ")"
+            << std::endl;
+  std::cout << "Bottom right : (" << univ_bounds.bottom_right().x << ','
+            << univ_bounds.bottom_right().y << ")" << std::endl;
 
   bounds.top_left.x = (bounds.top_left.x < univ_bounds.top_left.x) ?
                       univ_bounds.top_left.x : bounds.top_left.x;
@@ -268,8 +275,15 @@ void RenderArea::render_hashlife(const QMatrix4x4 &viewMatrix) {
   bounds.size.y = (bounds.bottom_right().y > univ_bounds.bottom_right().y - 1)
                       ? univ_bounds.bottom_right().y - bounds.top_left.y
                       : bounds.size.y;
-  
-  
+
+  std::cout << "VIEW ----------------------------" << std::endl;
+
+  std::cout << "Size : " << bounds.size.x << ", " << bounds.size.y << std::endl;
+
+  std::cout << "Top left : (" << bounds.top_left.x << ',' << bounds.top_left.y << ")"
+            << std::endl;
+  std::cout << "Bottom right : (" << bounds.bottom_right().x << ','
+            << bounds.bottom_right().y << ")" << std::endl;
 
   if (camera->get_zoom() <= 32) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, line_ebo);

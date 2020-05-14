@@ -26,7 +26,7 @@ public:
     Returns the bounds of smiluation of the universe.
     These are not the smallest one that hold the living cells.
   */
-  virtual const Rect &bounds() const = 0;
+  virtual Rect &bounds() = 0;
 
   /*
     Returns the number of generations that have been simulated

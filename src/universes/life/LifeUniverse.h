@@ -26,7 +26,7 @@ public:
 
   // Universe interface
   void update() override;
-  const Rect &bounds() const override;
+  Rect &bounds() override;
   const BigInt &generation() const override;
   const BigInt &step_size() const override;
 

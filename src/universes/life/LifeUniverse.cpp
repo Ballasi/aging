@@ -45,7 +45,7 @@ void LifeUniverse::update() {
   ++_generation_count;
 }
 
-const Rect &LifeUniverse::bounds() const { return _bound_rect; }
+Rect &LifeUniverse::bounds() { return _bound_rect; }
 const BigInt &LifeUniverse::generation() const { return _generation_count; }
 const BigInt &LifeUniverse::step_size() const { return _step_size; }
 
