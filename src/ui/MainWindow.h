@@ -65,6 +65,7 @@ protected:
   void action_setInfiniteGrid();
   void action_setRankGrid();
   void action_colorTheme();
+  void action_systemeTheme();
   void action_darkTheme();
 
   void action_help();
@@ -79,7 +80,7 @@ private:
   WidgetsCtxt ctxt;
 
   bool isDarkTheme;
-
+  bool isSystemTheme;
   Universe *universe;
   UniverseType univ_type;
 

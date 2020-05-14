@@ -15,13 +15,13 @@ void set_theme(QApplication* app) {
     app->setStyleSheet(
         " * {color: #E0E0E0;" // color-text
         "selection-color: #2f2f2f;" // color-text selected
-        "background: #2f2f2f;" // bg
+        "background-color: #2f2f2f;" // bg
         "selection-background-color: "+ color_theme +";}"); // bg selected
   } else {
     app->setStyleSheet(
         " * {color: #202020;" // color-text
         "selection-color: #E0E0E0;" // color-text selected
-        "background: #E0E0E0;" // bg
+        "background-color: #E0E0E0;" // bg
         "selection-background-color: "+ color_theme +";}"); // bg selected
   }
 }
@@ -32,7 +32,13 @@ int main(int argc, char **argv) {
 
   QApplication app(argc, argv);
 
-  set_theme(&app);
+
+
+  QSettings settings("aging.conf", QSettings::NativeFormat);
+  bool isSystemTheme = settings.value("isSystemTheme", true).toBool();
+  if (!isSystemTheme) {
+    set_theme(&app);
+  }
 
   MainWindow window;
   window.show();

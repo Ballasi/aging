@@ -20,16 +20,17 @@
 
 MainWindow::MainWindow() :
     settings("aging.conf", QSettings::NativeFormat) {
-  bool first_use = settings.value("first_use", true).toBool();
-  if (first_use) {
-    printf("1ere fois\n");
-    settings.setValue("first_use", false);
+
+
+
+  isSystemTheme = settings.value("isSystemTheme", true).toBool();
+
+  if (isSystemTheme) {
+    isDarkTheme = window()->palette().window().color().lightnessF() < 0.5;
   } else {
-    printf("plus d'une fois\n");
+    isDarkTheme = settings.value("isDarkTheme", false).toBool();
   }
 
-  isDarkTheme = false;
-  isDarkTheme = settings.value("isDarkTheme", isDarkTheme).toBool();
 
   resize(720, 720);
   setFocusPolicy(Qt::FocusPolicy::ClickFocus);
@@ -41,7 +42,6 @@ MainWindow::MainWindow() :
 }
 
 MainWindow::~MainWindow() {}
-
 
 
 /////////////////////////////////////////////////////
@@ -291,11 +291,26 @@ void MainWindow::createMenuBar() {
 
     prefMenu->addSeparator();
 
-      connect(prefMenu->addAction("Toggle Theme"),
+      QAction* sysThem = prefMenu->addAction("Systeme Theme");
+      sysThem->setCheckable(true);
+      sysThem->setChecked(isSystemTheme);
+      connect(sysThem,
+        &QAction::triggered, this, &MainWindow::action_systemeTheme);
+
+      QAction* darkThem = prefMenu->addAction("Dark Theme");
+      darkThem->setCheckable(true);
+      darkThem->setChecked(isDarkTheme);
+      connect(darkThem,
         &QAction::triggered, this, &MainWindow::action_darkTheme);
 
-      connect(prefMenu->addAction("Color Theme"),
+      QAction* colThem = prefMenu->addAction("Color Theme");
+      connect(colThem,
         &QAction::triggered, this, &MainWindow::action_colorTheme);
+
+      if (isSystemTheme) {
+        darkThem->setEnabled(false);
+        colThem->setEnabled(false);
+      }
 
     menuBar()->addMenu(prefMenu);
 
@@ -464,6 +479,22 @@ void MainWindow::action_colorTheme() {
         this, "Choose Cell Color");
 
     settings.setValue("colorTheme", color.name());
+    close();
+  }
+}
+
+
+void MainWindow::action_systemeTheme() {
+  QMessageBox msgBox;
+  msgBox.setText("Changing the theme will take effect after "
+    "restarting the application.");
+  msgBox.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
+  msgBox.setDefaultButton(QMessageBox::Cancel);
+  int ret = msgBox.exec();
+
+  if (ret == QMessageBox::Ok) {
+    isSystemTheme = !isSystemTheme;
+    settings.setValue("isSystemTheme", isSystemTheme);
     close();
   }
 }
