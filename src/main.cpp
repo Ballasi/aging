@@ -8,33 +8,9 @@
 void set_theme(QApplication* app) {
   QSettings settings("aging.conf", QSettings::NativeFormat);
 
-  bool isDarkTheme = false;
-  isDarkTheme = settings.value("isDarkTheme", isDarkTheme).toBool();
+  bool isDarkTheme = settings.value("isDarkTheme", false).toBool();
+  QString color_theme = settings.value("colorTheme", "#8bb158").toString();
 
-  QString color_theme;
-  switch (2) {
-    case 1:
-      color_theme = "#8bb158";
-      break;
-    case 2:
-      color_theme = "#8b58b1";
-      break;
-    case 3:
-      color_theme = "#b18b58";
-      break;
-    case 4:
-      color_theme = "#b1588b";
-      break;
-    case 5:
-      color_theme = "#588bb1";
-      break;
-    case 6:
-      color_theme = "#58b18b";
-      break;
-    default:
-      color_theme = "#8bb158";
-      break;
-  }
   if (isDarkTheme) {
     app->setStyleSheet(
         " * {color: #E0E0E0;" // color-text

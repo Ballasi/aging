@@ -50,13 +50,32 @@ MainWindow::~MainWindow() {}
 
 
 void MainWindow::createUI() {
-  ctxt.universe_scene = new UniverseScene(this,
-    universe,
-    univ_type);
-  setCentralWidget(ctxt.universe_scene);
-
+  createCentralWidget();
   createToolBar();
   createMenuBar();
+}
+
+void MainWindow::createCentralWidget() {
+  ctxt.universe_scene = new UniverseScene(this,
+  universe,
+  univ_type);
+  setCentralWidget(ctxt.universe_scene);
+
+  QString color_theme = settings.value("colorTheme", "#8bb158").toString();
+  QString bg;
+  if (isDarkTheme) {
+    bg = "#181913";
+  } else {
+    bg = "#C5C5C5";
+  }
+
+  QString color1 = settings.value("colorGrid", color_theme).toString();
+  QString color2 = settings.value("colorBg", bg).toString();
+  QString color3 = settings.value("colorFg", color_theme).toString();
+
+  ctxt.universe_scene->set_grid_color(QColor(color1));
+  ctxt.universe_scene->set_cell_color(0, QColor(color2));
+  ctxt.universe_scene->set_cell_color(1, QColor(color3));
 }
 
 void MainWindow::createToolBar() {
@@ -272,9 +291,11 @@ void MainWindow::createMenuBar() {
 
     prefMenu->addSeparator();
 
-    QAction* dark_theme = prefMenu->addAction("Toggle Theme");
-      connect(dark_theme,
+      connect(prefMenu->addAction("Toggle Theme"),
         &QAction::triggered, this, &MainWindow::action_darkTheme);
+
+      connect(prefMenu->addAction("Color Theme"),
+        &QAction::triggered, this, &MainWindow::action_colorTheme);
 
     menuBar()->addMenu(prefMenu);
 
@@ -299,12 +320,6 @@ void MainWindow::createMenuBar() {
 }
 
 
-void MainWindow::resetUI() {
-  menuBar()->clear();
-  removeToolBar(ctxt.toolbar);
-  createToolBar();
-  createMenuBar();
-}
 /////////////////////////////////////////////////////
 ////                   Actions                   ////
 /////////////////////////////////////////////////////
@@ -343,10 +358,7 @@ void MainWindow::action_openFile() {
         universe = new NaiveUniverse(fileName);
         break;
     }
-    ctxt.universe_scene = new UniverseScene(this,
-      universe,
-      univ_type);
-    setCentralWidget(ctxt.universe_scene);
+    createCentralWidget();
   }
 }
 void MainWindow::action_saveFile() {
@@ -403,12 +415,15 @@ void MainWindow::action_setColorBg() {
   QColor color =
       QColorDialog::getColor(ctxt.universe_scene->get_cell_color(0),
        this, "Choose Background Color");
+  settings.setValue("colorBg", color.name());
   ctxt.universe_scene->set_cell_color(0, color);
 }
 void MainWindow::action_setColorFg() {
   QColor color =
       QColorDialog::getColor(ctxt.universe_scene->get_cell_color(1),
        this, "Choose Cell Color");
+
+  settings.setValue("colorFg", color.name());
   ctxt.universe_scene->set_cell_color(1, color);
 }
 void MainWindow::action_setColorGrid() {
@@ -416,6 +431,7 @@ void MainWindow::action_setColorGrid() {
       QColorDialog::getColor(ctxt.universe_scene->get_grid_color(),
         this, "Choose Grid Color");
   ctxt.universe_scene->set_grid_color(color);
+  settings.setValue("colorGrid", color.name());
 }
 
 void MainWindow::action_setInfiniteGrid() {
@@ -430,9 +446,32 @@ void MainWindow::action_setRankGrid() {
     ctxt.universe_scene->set_rank_grid(rank);
   }
 }
+
+
+
+void MainWindow::action_colorTheme() {
+  QColor color =
+    QColorDialog::getColor(
+      QColor(settings.value("colorTheme", "#8bb158").toString()),
+      this, "Choose Cell Color");
+
+  QMessageBox msgBox;
+  msgBox.setText("Changing the theme will take effect after "
+    "restarting the application.");
+  msgBox.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
+  msgBox.setDefaultButton(QMessageBox::Cancel);
+  int ret = msgBox.exec();
+
+  if (ret == QMessageBox::Ok) {
+    settings.setValue("colorTheme", color.name());
+    close();
+  }
+}
+
 void MainWindow::action_darkTheme() {
   QMessageBox msgBox;
-  msgBox.setText("Changing the theme will restart the application.");
+  msgBox.setText("Changing the theme will take effect after "
+    "restarting the application.");
   msgBox.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
   msgBox.setDefaultButton(QMessageBox::Cancel);
   int ret = msgBox.exec();
@@ -501,10 +540,7 @@ void MainWindow::action_newUnivTypeHashlife() {
   universe = new HashlifeUniverse(8);
   univ_type = UniverseType::Hashlife;
 
-  ctxt.universe_scene = new UniverseScene(this,
-    universe,
-    univ_type);
-  setCentralWidget(ctxt.universe_scene);
+  createCentralWidget();
 }
 void MainWindow::action_newUnivTypeNaive() {
   delete universe;
@@ -513,10 +549,7 @@ void MainWindow::action_newUnivTypeNaive() {
   universe = new NaiveUniverse(Coord(BigInt(1024), BigInt(1024)));
   univ_type = UniverseType::Life;
 
-  ctxt.universe_scene = new UniverseScene(this,
-    universe,
-    univ_type);
-  setCentralWidget(ctxt.universe_scene);
+  createCentralWidget();
 }
 
 

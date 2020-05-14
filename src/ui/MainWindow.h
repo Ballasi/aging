@@ -64,6 +64,7 @@ protected:
 
   void action_setInfiniteGrid();
   void action_setRankGrid();
+  void action_colorTheme();
   void action_darkTheme();
 
   void action_help();
@@ -87,7 +88,7 @@ private:
   void createUI();
   void createToolBar();
   void createMenuBar();
-  void resetUI();
+  void createCentralWidget();
 };
 
 #endif /* UI_MAINWINDOW_H_ */
