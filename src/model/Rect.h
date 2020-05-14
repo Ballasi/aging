@@ -23,8 +23,8 @@ public:
   bool operator!=(const Rect &) const;
 
   // Collides operator
-  bool operator&(const Vec2 &)const;
-  bool operator&(const Rect &)const;
+  bool operator&(const Vec2 &) const;
+  bool operator&(const Rect &) const;
 
   // Does not collide operator
   bool operator|(const Vec2 &) const;

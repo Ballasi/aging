@@ -71,7 +71,7 @@ Rect Camera2D::get_view_bounds(float aspect_ratio, Universe *universe) {
   top_left.y = bottom_right.y;
   bottom_right.y = temp;
 
-  Rect rect(top_left, bottom_right);
+  Rect rect(top_left, bottom_right - top_left);
   return rect;
 }
 

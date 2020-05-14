@@ -253,10 +253,10 @@ void HashUniverse::_build_from_mc(QFile *file) {
       }
       // Reading macrocell
       Quadrant *nw, *ne, *sw, *se;
-      size_t nw_pos = line_data[1].toULong();
-      size_t ne_pos = line_data[2].toULong();
-      size_t sw_pos = line_data[3].toULong();
-      size_t se_pos = line_data[4].toULong();
+      size_t nw_pos = line_data[1].trimmed().toULong();
+      size_t ne_pos = line_data[2].trimmed().toULong();
+      size_t sw_pos = line_data[3].trimmed().toULong();
+      size_t se_pos = line_data[4].trimmed().toULong();
       nw = (nw_pos == 0) ? _zeros[level - 1] : mcells[nw_pos];
       ne = (ne_pos == 0) ? _zeros[level - 1] : mcells[ne_pos];
       sw = (sw_pos == 0) ? _zeros[level - 1] : mcells[sw_pos];
@@ -268,8 +268,9 @@ void HashUniverse::_build_from_mc(QFile *file) {
 
   file->close();
   _top_level = max_top_level;
+  _recursion_depth = _top_level - 2;
   _root = reinterpret_cast<MacroCell *>(mcells.back());
-  _step_size = BigInt(1) << mp_size_t(_recursion_depth - 2);
+  //_step_size = BigInt(1) << mp_size_t(_recursion_depth - 2);
 }
 
 void HashUniverse::debug() {
@@ -868,23 +869,23 @@ void HashUniverse::_get_cell_in_bounds_rec(Rect bounds,
     MacroCell macrocell = current_cell->macrocell;
     if (!(macrocell == _zeros[current_level]->macrocell)) {
       BigInt size = BigInt(1) << mp_size_t(current_level - 1);
-      if (bounds & Rect{{x, y}, {x + size, y + size}}) {
+      if (bounds & Rect{{x, y}, {size, size}}) {
         _get_cell_in_bounds_rec(bounds, coords, current_level - 1, macrocell.nw,
                                {x, y}, min_level);
       }
 
-      if (bounds & Rect{{x + size, y}, {x + BigInt(2) * size, y + size}}) {
+      if (bounds & Rect{{x + size, y}, {size, size}}) {
         _get_cell_in_bounds_rec(bounds, coords, current_level - 1, macrocell.ne,
                                {x + size, y}, min_level);
       }
 
-      if (bounds & Rect{{x, y + size}, {x + size, y + BigInt(2) * size}}) {
+      if (bounds & Rect{{x, y + size}, {size, size}}) {
         _get_cell_in_bounds_rec(bounds, coords, current_level - 1, macrocell.sw,
                                {x, y + size}, min_level);
       }
 
       if (bounds & Rect{{x + size, y + size},
-                           {x + BigInt(2) * size, y + BigInt(2) * size}}) {
+                           {size, size}}) {
         _get_cell_in_bounds_rec(bounds, coords, current_level - 1, macrocell.se,
                                {x + size, y + size}, min_level);
       }
