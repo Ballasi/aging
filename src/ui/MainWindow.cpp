@@ -20,11 +20,7 @@
 
 MainWindow::MainWindow() :
     settings("aging.conf", QSettings::NativeFormat) {
-
-
-
   isSystemTheme = settings.value("isSystemTheme", true).toBool();
-
   if (isSystemTheme) {
     isDarkTheme = window()->palette().window().color().lightnessF() < 0.5;
   } else {
