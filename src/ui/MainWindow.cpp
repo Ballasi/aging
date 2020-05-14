@@ -450,19 +450,19 @@ void MainWindow::action_setRankGrid() {
 
 
 void MainWindow::action_colorTheme() {
-  QColor color =
-    QColorDialog::getColor(
-      QColor(settings.value("colorTheme", "#8bb158").toString()),
-      this, "Choose Cell Color");
-
   QMessageBox msgBox;
   msgBox.setText("Changing the theme will take effect after "
-    "restarting the application.");
-  msgBox.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
+    "restarting the application.\nContinue ?");
+  msgBox.setStandardButtons(QMessageBox::Cancel | QMessageBox::Yes);
   msgBox.setDefaultButton(QMessageBox::Cancel);
   int ret = msgBox.exec();
 
-  if (ret == QMessageBox::Ok) {
+  if (ret == QMessageBox::Yes) {
+    QColor color =
+      QColorDialog::getColor(
+        QColor(settings.value("colorTheme", "#8bb158").toString()),
+        this, "Choose Cell Color");
+
     settings.setValue("colorTheme", color.name());
     close();
   }
