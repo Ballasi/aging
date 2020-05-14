@@ -7,6 +7,7 @@
 #include <ui/RenderArea.h>
 #include <universes/hash/HashUniverse.h>
 #include <universes/life/LifeUniverse.h>
+#include <ui/UniverseScene.hpp>
 #include <utility>
 #include <vector>
 
@@ -150,14 +151,18 @@ void RenderArea::render_gol(const QMatrix4x4 &viewMatrix) {
   bounds.top_left.y = (bounds.top_left.y < 0) ? 0 : bounds.top_left.y;
 
   bounds.size.x = (bounds.bottom_right().x > univ->bounds().width() - 1)
-    ? univ->bounds().width() - 1: bounds.bottom_right().x;
+    ? univ->bounds().width() - bounds.top_left.x: bounds.size.x;
 
   bounds.size.y = (bounds.bottom_right().y > univ->bounds().height() - 1)
-                      ? univ->bounds().width() - 1
-                      : bounds.bottom_right().y;
+    ? univ->bounds().height() - bounds.top_left.y: bounds.size.y;
+
+  std::cout << "Top left : (" << bounds.top_left.x << ',' << bounds.top_left.y << ")"
+            << std::endl;
+  std::cout << "Bottom right : (" << bounds.bottom_right().x << ','
+            << bounds.bottom_right().y << ")" << std::endl;
 
   float width_f = static_cast<float>(univ->bounds().width().get_si()) - 1;
-  float height_f = static_cast<float>(univ->bounds().width().get_si()) - 1;
+  float height_f = static_cast<float>(univ->bounds().height().get_si()) - 1;
 
   float border_vertices[8] = {
       0.0f, 0.0f, // Top-left
@@ -249,18 +254,22 @@ void RenderArea::render_hashlife(const QMatrix4x4 &viewMatrix) {
   m_program->setUniformValue(m_viewUniform, viewMatrix);
   m_program->setUniformValue(m_projectionUniform, projectionMatrix);
 
+  
+
   bounds.top_left.x = (bounds.top_left.x < univ_bounds.top_left.x) ?
                       univ_bounds.top_left.x : bounds.top_left.x;
   bounds.top_left.y = (bounds.top_left.y < univ_bounds.top_left.y) ?
                       univ_bounds.top_left.y : bounds.top_left.y;
-
+ 
   bounds.size.x = (bounds.bottom_right().x > univ_bounds.bottom_right().x - 1)
-                      ? univ_bounds.bottom_right().x - 1
-                      : bounds.bottom_right().x;
+                      ? univ_bounds.bottom_right().x - bounds.top_left.x
+                      : bounds.size.x;
 
   bounds.size.y = (bounds.bottom_right().y > univ_bounds.bottom_right().y - 1)
-                      ? univ_bounds.bottom_right().x - 1
-                      : bounds.bottom_right().y;
+                      ? univ_bounds.bottom_right().y - bounds.top_left.y
+                      : bounds.size.y;
+  
+  
 
   if (camera->get_zoom() <= 32) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, line_ebo);
@@ -273,6 +282,7 @@ void RenderArea::render_hashlife(const QMatrix4x4 &viewMatrix) {
       }
     }
   }
+
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, square_ebo);
   for (size_t i = 0; i < coords.size(); ++i) {

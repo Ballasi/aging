@@ -37,7 +37,7 @@ void LifeUniverse::update() {
           _set(c, l, 0);
       } else {
         if (neighbours == 3)
-          _set(c, l, 0);
+          _set(c, l, 1);
       }
     }
   }
