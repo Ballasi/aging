@@ -1,5 +1,5 @@
 #include <cstdio>
-#include <ui/UniverseScene.hpp>
+#include <ui/UniverseScene.h>
 #include <QStatusBar>
 #include <string>
 #include <iostream>

@@ -38,10 +38,10 @@ int main(int argc, char **argv) {
 
     QSettings settings("aging.conf", QSettings::NativeFormat);
     bool isSystemTheme = settings.value("isSystemTheme", true).toBool();
-	if (!isSystemTheme) {
+    if (!isSystemTheme) {
       set_theme(&app);
     }
-    
+
     MainWindow window;
     window.show();
 

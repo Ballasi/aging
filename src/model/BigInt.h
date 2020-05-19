@@ -2,6 +2,7 @@
 #define BIG_INT_H_
 
 #include <gmpxx.h>
+#include <string>
 
 typedef mpz_class BigInt;
 

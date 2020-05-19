@@ -1,7 +1,7 @@
 #ifndef UI_MAINWINDOW_H_
 #define UI_MAINWINDOW_H_
 
-#include <ui/UniverseScene.hpp>
+#include <ui/UniverseScene.h>
 #include <QMainWindow>
 #include <QTimer>
 #include <QSettings>

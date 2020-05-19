@@ -74,7 +74,7 @@ Rect &HashUniverse::bounds() {
   _bounds.top_left = _top_left;
   _bounds.size.x = BigInt(1) << _top_level;
   _bounds.size.y = BigInt(1) << _top_level;
-  return _bounds; 
+  return _bounds;
 }
 
 const BigInt &HashUniverse::generation() const { return _generation; }

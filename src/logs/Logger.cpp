@@ -1,4 +1,4 @@
-#include "Logger.h"
+#include <logs/Logger.h>
 
 Logger::Logger(QObject *parent, QString fileName,
                   bool append) : QObject(parent) {
