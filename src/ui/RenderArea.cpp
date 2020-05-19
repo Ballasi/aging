@@ -5,7 +5,7 @@
 #include <model/Rect.h>
 #include <model/Universe.h>
 #include <ui/RenderArea.h>
-#include <ui/UniverseScene.hpp>
+#include <ui/UniverseScene.h>
 #include <universes/hash/HashUniverse.h>
 #include <universes/life/LifeUniverse.h>
 #include <utility>

@@ -1,4 +1,4 @@
-#include "MCellFile.h"
+#include <model/mcell/MCellFile.h>
 
 MCellFile::MCellFile(QFile *file) : _rule("B3/S23"), _file(file) {
     if (!_file->isOpen()) {
