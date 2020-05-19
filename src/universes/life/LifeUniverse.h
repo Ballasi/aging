@@ -1,7 +1,6 @@
 #ifndef LIFE_UNIVERSE_H_
 #define LIFE_UNIVERSE_H_
 
-#include <bits/stdint-uintn.h>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>

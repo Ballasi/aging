@@ -1,0 +1,20 @@
+Aging's Shortcut :
+Play/pause     -> Key_Space
+OneStep        -> Key_P
+increase_speed -> CTRL + Key_Plus
+decrease_speed -> CTRL + Key_Minus
+fit_patern     -> Key_F
+zoom_In        -> Key_Plus
+zoom_Out       -> Key_Minus
+new_file       -> CTRL + Key_N
+open_file      -> CTRL + Key_O
+save_file      -> CTRL + Key_S
+act_quit       -> CTRL + Key_Q
+move_up        -> Key_Z
+move_up        -> Key_Up
+move_down      -> Key_S
+move_down      -> Key_Down
+move_left      -> Key_Q
+move_left      -> Key_Left
+move_right     -> Key_D
+move_right     -> Key_Right

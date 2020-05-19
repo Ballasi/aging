@@ -5,7 +5,8 @@
 #include <iostream>
 
 UniverseScene::UniverseScene(QWidget *parent, Universe *universe,
-                UniverseType type): universe(universe), univ_type(type) {
+                UniverseType type): universe(universe), univ_type(type),
+                settings("agingUS.conf", QSettings::NativeFormat) {
     r_area = new RenderArea(this, universe, type);
     mode = MOVE;
     isSimulationRun = false;
@@ -14,9 +15,8 @@ UniverseScene::UniverseScene(QWidget *parent, Universe *universe,
     refresh_time_ms = 0;
     p_step = 1;
 
-    color_grid = Qt::white;
-    colors[0] = Qt::black;
-    colors[1] = Qt::white;
+
+
 
     stepTimer = new QTimer(this);
     connect(stepTimer, &QTimer::timeout, this, &UniverseScene::step);
@@ -164,7 +164,9 @@ QColor UniverseScene::get_cell_color(CellState state) {
 }
 
 QColor UniverseScene::get_grid_color() { return color_grid ;}
-void UniverseScene::set_grid_color(QColor color) { color_grid = color ;}
+void UniverseScene::set_grid_color(QColor color) {
+  color_grid = color;
+}
 int UniverseScene::get_rank_grid() { return rank_grid ;}
 void UniverseScene::set_rank_grid(int rank) { rank_grid = rank ;}
 void UniverseScene::up_rank_grid() { rank_grid += 1; }

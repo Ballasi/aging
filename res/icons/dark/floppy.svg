@@ -29,7 +29,7 @@
   <defs
      id="defs12" />
   <sodipodi:namedview
-     pagecolor="#ffffff"
+     pagecolor="#E0E0E0"
      bordercolor="#666666"
      borderopacity="1"
      objecttolerance="10"
@@ -54,7 +54,7 @@
      d="M27.36,4H6A2,2,0,0,0,4,6V30a2,2,0,0,0,2,2H30a2,2,0,0,0,2-2V8.78ZM26,30H10V21.5A1.5,1.5,0,0,1,11.5,20h13A1.5,1.5,0,0,1,26,21.5ZM24,14H12a2,2,0,0,1-2-2V6h2v6H26A2,2,0,0,1,24,14Z"
      class="clr-i-solid clr-i-solid-path-1"
      id="path4"
-     style="fill:#ffffff" />
+     style="fill:#E0E0E0" />
   <rect
      x="0"
      y="0"

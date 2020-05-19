@@ -1,5 +1,4 @@
 #include "model/Vec2.h"
-#include <bits/stdint-uintn.h>
 #include <sys/types.h>
 #include <universes/life/LifeUniverse.h>
 
