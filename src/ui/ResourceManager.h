@@ -7,9 +7,9 @@
  * \author aging-team
  */
 
-#include <QStandardPaths>
 #include <QDir>
 #include <QIcon>
+#include <QStandardPaths>
 
 class ResourceManager {
   /*! \class ResourceManager
@@ -21,53 +21,53 @@ class ResourceManager {
    *  if it's a debug build).
    */
 public:
-    /*!
-     *  \brief Constructor
-     *
-     *  Base constructeur of ResourceManager
-     */
-	ResourceManager();
-    /*!
-     *  \brief Constructor
-     *
-     *  Constructeur of ResourceManager
-     *
-     *  \param isDarkTheme : boolean that describe the set of resources we use
-     */
-	ResourceManager(bool isDarkTheme);
-    /*!
-     *  \brief QIcon getter
-     *
-     *  Returns the QIcon of the corresponding icon
-     *
-     *  Example usage:
-     *  @code
-     *  ResourceManager resources(true);
-     *  QIcon playIcon = resources.getIcon("play");
-     *  @endcode
-     *
-     *  \param name : name of the icon
-     */
-	QIcon getIcon(QString name);
-    /*!
-     *  \brief Icon's path getter
-     *
-     *  Returns the path of the corresponding icon
-     *
-     *  Example usage:
-     *  @code
-     *  ResourceManager resources(true);
-     *  QString playIconPath = resources.getIconPath("play");
-     *  // playIconPath can be equal to ../res/icons/dark/play.svg
-     *  @endcode
-     *
-     *  \param name : name of the icon
-     */
-	QString getIconPath(QString name);
+  /*!
+   *  \brief Constructor
+   *
+   *  Base constructeur of ResourceManager
+   */
+  ResourceManager();
+  /*!
+   *  \brief Constructor
+   *
+   *  Constructeur of ResourceManager
+   *
+   *  \param isDarkTheme : boolean that describe the set of resources we use
+   */
+  explicit ResourceManager(bool isDarkTheme);
+  /*!
+   *  \brief QIcon getter
+   *
+   *  Returns the QIcon of the corresponding icon
+   *
+   *  Example usage:
+   *  @code
+   *  ResourceManager resources(true);
+   *  QIcon playIcon = resources.getIcon("play");
+   *  @endcode
+   *
+   *  \param name : name of the icon
+   */
+  QIcon getIcon(QString name);
+  /*!
+   *  \brief Icon's path getter
+   *
+   *  Returns the path of the corresponding icon
+   *
+   *  Example usage:
+   *  @code
+   *  ResourceManager resources(true);
+   *  QString playIconPath = resources.getIconPath("play");
+   *  // playIconPath can be equal to ../res/icons/dark/play.svg
+   *  @endcode
+   *
+   *  \param name : name of the icon
+   */
+  QString getIconPath(QString name);
 
 private:
-	bool isDarkTheme;
-	QDir icon_dir;
+  bool isDarkTheme;
+  QDir icon_dir;
 };
 
 #endif // UI_RESOURCEMANAGER_H_
