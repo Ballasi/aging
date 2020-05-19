@@ -7,6 +7,7 @@
 #include <QSettings>
 #include <QToolButton>
 #include <model/Universe.h>
+#include <ui/ResourceManager.h>
 
 typedef struct SwidgetsCtxt {
   UniverseScene *universe_scene;
@@ -90,6 +91,8 @@ private:
   void createToolBar();
   void createMenuBar();
   void createCentralWidget();
+
+	ResourceManager resources;
 };
 
 #endif /* UI_MAINWINDOW_H_ */

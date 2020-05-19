@@ -33,7 +33,8 @@ cserver_setup:
 	@rm -Rf tmp
 
 doc:
-	doxygen Doxyfile
+	@echo -e "=> \e[1mBuilding the documentation\e[0m"
+	@doxygen Doxyfile
 
 clean:
 	@echo -e "=> \e[1mCleaning $(BIN_FOLDER)/\e[0m"
