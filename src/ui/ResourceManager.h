@@ -24,13 +24,13 @@ public:
   /*!
    *  \brief Constructor
    *
-   *  Base constructeur of ResourceManager
+   *  Base constructor of ResourceManager
    */
   ResourceManager();
   /*!
    *  \brief Constructor
    *
-   *  Constructeur of ResourceManager
+   *  Constructor of ResourceManager
    *
    *  \param isDarkTheme : boolean that describe the set of resources we use
    */
