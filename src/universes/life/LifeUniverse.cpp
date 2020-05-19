@@ -14,6 +14,10 @@ LifeUniverse::LifeUniverse(const Vec2 &size) {
   _cell_blocks = new uint8_t[_length_in_bytes]();
 }
 
+LifeUniverse::LifeUniverse(QString file_path) {
+  throw "Unimplemented";
+}
+
 LifeUniverse::~LifeUniverse() { delete[] _cell_blocks; }
 
 void LifeUniverse::update() {
@@ -33,7 +37,7 @@ void LifeUniverse::update() {
           _set(c, l, 0);
       } else {
         if (neighbours == 3)
-          _set(c, l, 0);
+          _set(c, l, 1);
       }
     }
   }
@@ -41,7 +45,7 @@ void LifeUniverse::update() {
   ++_generation_count;
 }
 
-const Rect &LifeUniverse::bounds() const { return _bound_rect; }
+Rect &LifeUniverse::bounds() { return _bound_rect; }
 const BigInt &LifeUniverse::generation() const { return _generation_count; }
 const BigInt &LifeUniverse::step_size() const { return _step_size; }
 

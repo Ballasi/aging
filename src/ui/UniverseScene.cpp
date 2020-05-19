@@ -40,7 +40,7 @@ bool UniverseScene::get_state_simulation() {
 }
 
 void UniverseScene::step() {
-    universe->step();
+    universe->update();
     r_area->update();
     updateStatusBar();
 }
@@ -171,7 +171,7 @@ void UniverseScene::up_rank_grid() { rank_grid += 1; }
 void UniverseScene::down_rank_grid() { rank_grid -= 1; }
 
 QString UniverseScene::get_generation() {
-  return QString(bigint_to_str(universe->get_generation()).c_str());
+  return QString(bigint_to_str(universe->generation()).c_str());
 }
 
 QString UniverseScene::get_speed() {
@@ -205,7 +205,7 @@ void UniverseScene::resizeEvent(QResizeEvent *event) {
     r_area->resize(event->size().width(), event->size().height());
 }
 
-Coord UniverseScene::map_coords(QPoint mouse) {
+Vec2 UniverseScene::map_coords(QPoint mouse) {
   return r_area->map_coords_from_mouse(mouse);
 }
 
@@ -214,12 +214,12 @@ void UniverseScene::updateStatusBar() {
   s += "Generation : ";
   s += get_generation();
   s += " | Position : (";
-  Coord center = map_coords(QPoint(width() / 2, height() / 2));
+  Vec2 center = map_coords(QPoint(width() / 2, height() / 2));
   s += bigint_to_str(center.x).c_str();
   s += ", ";
   s += bigint_to_str(center.y).c_str();
   s += ") | Universe size : ";
-  Coord size = universe->get_size();
+  Vec2 size = universe->bounds().size;
   s += bigint_to_str(size.x).c_str();
   s += " x ";
   s += bigint_to_str(size.y).c_str();
@@ -227,7 +227,7 @@ void UniverseScene::updateStatusBar() {
   bar->showMessage(s);
 }
 
-void UniverseScene::set_cell(Coord coord, CellState state) {
+void UniverseScene::set_cell(Vec2 coord, CellState state) {
   universe->set(coord, state);
   r_area->update();
 }

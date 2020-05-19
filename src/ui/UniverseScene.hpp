@@ -8,7 +8,7 @@
 #include <ui/RenderArea.h>
 #include <QMainWindow>
 #include <QTimer>
-#include <logic/UniverseType.h>
+#include <model/Universe.h>
 
 enum SceneMode {EDIT, MOVE, SELECT};
 
@@ -97,8 +97,8 @@ public:
   void remove_out_zone();
 
   void updateStatusBar();
-  void set_cell(Coord coord, CellState state);
-  Coord map_coords(QPoint mouse);
+  void set_cell(Vec2 coord, CellState state);
+  Vec2 map_coords(QPoint mouse);
 
 protected:
   void resizeEvent(QResizeEvent *event);

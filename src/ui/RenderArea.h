@@ -5,15 +5,15 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLWidget>
 #include <QWheelEvent>
-#include <gameoflife/Game.h>
-#include <logic/Universe.h>
 #include <string>
 #include <ui/Camera2D.h>
-#include <logic/UniverseType.h>
+#include <model/Rect.h>
+#include <model/Universe.h>
 
 class RenderArea : public QOpenGLWidget, protected QOpenGLFunctions {
 public:
-  explicit RenderArea(QWidget *parent = 0, Universe *hashlife_universe = 0,
+  explicit RenderArea(QWidget *parent = 0,
+                      Universe *hashlife_universe = 0,
                       UniverseType type = UniverseType::Hashlife);
 
 
@@ -30,7 +30,7 @@ public:
   void zoomin();
   void zoomout();
 
-  Coord map_coords_from_mouse(QPoint mouseCoords);
+  Vec2 map_coords_from_mouse(QPoint mouseVec2s);
   void set_colors(QColor cell_color, QColor bg_color);
 
   void fitPattern();

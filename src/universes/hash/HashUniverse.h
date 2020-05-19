@@ -25,23 +25,26 @@ public:
   explicit HashUniverse(QString filename, Vec2 top_left = Vec2());
 
   // Interface
-  void update();
+  void update() override;
 
-  const Rect &bounds() const;
-  const BigInt &generation() const;
-  const BigInt &step_size() const;
+  Rect &bounds() override;
+  const BigInt &generation() const override;
+  const BigInt &step_size() const override;
 
   // Others
-  const CellState get(Vec2 coord) const;
-  void set(Vec2 target, CellState state);
+  const CellState get(const Vec2& coord) const override;
+  void set(const Vec2& target, CellState state) override;
   void debug();
 
-  void get_cell_in_bounds(Rect bounds, std::vector<Vec2> *coords) const;
+  std::pair<Rect, size_t> get_pattern_bounding_box();
+  void get_cell_in_bounds(Rect bounds,
+                          std::vector<Vec2> *coords,
+                          size_t min_level) const;
 
   Vec2 get_top_left();
   size_t get_top_level();
 
-  void set_step_size(size_t new_step_size);
+  void set_step_size(size_t new_step_size) override;
   void set_step_size_maximized(bool is_maximized);
 
   void grid(int *L, int width, Quadrant *r, int level, int x, int y);
@@ -86,8 +89,10 @@ private:
   Quadrant *_set_rec(Vec2 current, size_t level, Quadrant *cell, Vec2 target,
                     CellState state);
 
-  // Finding
-  CellState *_find(Vec2) const;
+  size_t _pattern_bounding_box_rec(Rect *box, size_t level, Quadrant *q);
+
+      // Finding
+      CellState *_find(Vec2) const;
   CellState *_find_path(Vec2 coord, std::vector<Quadrant *> *path) const;
 
   // Minicells
@@ -103,8 +108,9 @@ private:
   Quadrant *_quadrant(size_t level);
 
   void _get_cell_in_bounds_rec(Rect bounds, std::vector<Vec2> *coords,
-                              size_t current_level, Quadrant *current_cell,
-                              Vec2 current_coord) const;
+                               size_t current_level, Quadrant *current_cell,
+                               Vec2 current_coord,
+                               size_t min_level) const;
 };
 
 #endif // HASHLIFE_UNIVERSE_HPP

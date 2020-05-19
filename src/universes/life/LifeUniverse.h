@@ -21,11 +21,12 @@ class LifeUniverse: public Universe {
 public:
   // Constructors
   explicit LifeUniverse(const Vec2 &size);
+  explicit LifeUniverse(QString file_path);
   ~LifeUniverse();
 
   // Universe interface
   void update() override;
-  const Rect &bounds() const override;
+  Rect &bounds() override;
   const BigInt &generation() const override;
   const BigInt &step_size() const override;
 

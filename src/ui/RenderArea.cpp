@@ -1,13 +1,15 @@
 #include <QSettings>
 #include <QSurfaceFormat>
-#include <iostream>
-#include <logic/HashlifeUniverse/HashlifeUniverse.h>
-#include <logic/Rect.h>
-#include <ui/RenderArea.h>
-#include <vector>
-#include <logic/NaiveUniverse/NaiveUniverse.h>
 #include <cmath>
+#include <iostream>
+#include <model/Rect.h>
+#include <model/Universe.h>
+#include <ui/RenderArea.h>
+#include <universes/hash/HashUniverse.h>
+#include <universes/life/LifeUniverse.h>
+#include <ui/UniverseScene.hpp>
 #include <utility>
+#include <vector>
 
 RenderArea::RenderArea(QWidget *parent,
     Universe *hashlife_universe, UniverseType type)
@@ -77,14 +79,14 @@ void RenderArea::initializeGL() {
     size_t zoom_level;
     case UniverseType::Life :
       zoom_level = static_cast<size_t>(ceil(log2(
-        reinterpret_cast<NaiveUniverse*>
-                    (hashlife_universe)->width)));
+        reinterpret_cast<LifeUniverse*>
+        (hashlife_universe)->bounds().width().get_si())));
       camera->set_zoom(1 << zoom_level);
       camera->pos.setX(-0.25f);
       camera->pos.setY(-0.25f);
       break;
     case UniverseType::Hashlife :
-      zoom_level = static_cast<size_t>(reinterpret_cast<HashlifeUniverse *>
+      zoom_level = static_cast<size_t>(reinterpret_cast<HashUniverse *>
                     (hashlife_universe)->get_top_level() + 1);
       camera->set_zoom(1 << zoom_level);
       camera->pos.setX(-0.25f);
@@ -139,7 +141,7 @@ void RenderArea::render_gol(const QMatrix4x4 &viewMatrix) {
   m_program->setUniformValue(m_viewUniform, viewMatrix);
   m_program->setUniformValue(m_projectionUniform, projectionMatrix);
 
-  NaiveUniverse *univ = reinterpret_cast<NaiveUniverse *>(hashlife_universe);
+  LifeUniverse *univ = reinterpret_cast<LifeUniverse *>(hashlife_universe);
 
   Rect bounds = camera->get_view_bounds(static_cast<float>(width()) /
                                             static_cast<float>(height()),
@@ -148,16 +150,19 @@ void RenderArea::render_gol(const QMatrix4x4 &viewMatrix) {
   bounds.top_left.x = (bounds.top_left.x < 0) ? 0 : bounds.top_left.x;
   bounds.top_left.y = (bounds.top_left.y < 0) ? 0 : bounds.top_left.y;
 
-  bounds.bottom_right.x = (bounds.bottom_right.x > univ->width - 1)
-                          ? univ->width - 1
-                          : bounds.bottom_right.x;
+  bounds.size.x = (bounds.bottom_right().x > univ->bounds().width() - 1)
+    ? univ->bounds().width() - bounds.top_left.x: bounds.size.x;
 
-  bounds.bottom_right.y = (bounds.bottom_right.y > univ->height - 1)
-                          ? univ->height - 1
-                          : bounds.bottom_right.y;
+  bounds.size.y = (bounds.bottom_right().y > univ->bounds().height() - 1)
+    ? univ->bounds().height() - bounds.top_left.y: bounds.size.y;
 
-  float width_f = static_cast<float>(univ->width) - 1;
-  float height_f = static_cast<float>(univ->height) - 1;
+  std::cout << "Top left : (" << bounds.top_left.x << ',' << bounds.top_left.y << ")"
+            << std::endl;
+  std::cout << "Bottom right : (" << bounds.bottom_right().x << ','
+            << bounds.bottom_right().y << ")" << std::endl;
+
+  float width_f = static_cast<float>(univ->bounds().width().get_si()) - 1;
+  float height_f = static_cast<float>(univ->bounds().height().get_si()) - 1;
 
   float border_vertices[8] = {
       0.0f, 0.0f, // Top-left
@@ -176,8 +181,8 @@ void RenderArea::render_gol(const QMatrix4x4 &viewMatrix) {
 
   if (camera->get_zoom() <= 32) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, line_ebo);
-    for (BigInt i = bounds.top_left.x; i < bounds.bottom_right.x; ++i) {
-      for (BigInt j = bounds.top_left.y; j < bounds.bottom_right.y; ++j) {
+    for (BigInt i = bounds.top_left.x; i < bounds.bottom_right().x; ++i) {
+      for (BigInt j = bounds.top_left.y; j < bounds.bottom_right().y; ++j) {
         modelMatrix.setToIdentity();
         modelMatrix.translate(i.get_si(), j.get_si(), 0);
         m_program->setUniformValue(m_modelUniform, modelMatrix);
@@ -187,12 +192,12 @@ void RenderArea::render_gol(const QMatrix4x4 &viewMatrix) {
   }
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, square_ebo);
-  for (BigInt i = bounds.top_left.x; i < bounds.bottom_right.x; ++i) {
-    for (BigInt j = bounds.top_left.y; j < bounds.bottom_right.y; ++j) {
+  for (BigInt i = bounds.top_left.x; i < bounds.bottom_right().x; ++i) {
+    for (BigInt j = bounds.top_left.y; j < bounds.bottom_right().y; ++j) {
       modelMatrix.setToIdentity();
       modelMatrix.translate(i.get_si(), j.get_si(), 0);
       m_program->setUniformValue(m_modelUniform, modelMatrix);
-      if (univ->get(Coord(i, j))) {
+      if (univ->get(Vec2(i, j))) {
         glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0);
       }
     }
@@ -201,18 +206,17 @@ void RenderArea::render_gol(const QMatrix4x4 &viewMatrix) {
 
 void RenderArea::render_hashlife(const QMatrix4x4 &viewMatrix) {
   Rect univ_bounds =
-      (static_cast<HashlifeUniverse *>(hashlife_universe))->get_bounds();
+      (static_cast<HashUniverse *>(hashlife_universe))->bounds();
 
   size_t level =
-      (static_cast<HashlifeUniverse *>(hashlife_universe))->get_top_level();
+      (static_cast<HashUniverse *>(hashlife_universe))->get_top_level();
 
   Rect bounds = camera->get_view_bounds(static_cast<float>(width()) /
                                             static_cast<float>(height()),
                                         hashlife_universe);
 
   BigInt nb_pixels(width() * height());
-  BigInt nb_cells = (bounds.bottom_right.x - bounds.top_left.x) *
-                    (bounds.bottom_right.y - bounds.top_left.y);
+  BigInt nb_cells = bounds.size.x * bounds.size.y;
   mpf_class res_ratio(nb_cells);
   res_ratio /= nb_pixels;
   BigInt ratio_mpz(res_ratio);
@@ -220,9 +224,9 @@ void RenderArea::render_hashlife(const QMatrix4x4 &viewMatrix) {
   int min_rendered_level = mpz_sizeinbase(ratio_mpz.get_mpz_t(), 2) >> 1;
 
   min_rendered_level = (min_rendered_level >
-            static_cast<HashlifeUniverse *>(hashlife_universe)
+            static_cast<HashUniverse *>(hashlife_universe)
                                             ->get_top_level()) ?
-            static_cast<HashlifeUniverse *>(hashlife_universe)
+            static_cast<HashUniverse *>(hashlife_universe)
                                             ->get_top_level()  :
             min_rendered_level;
 
@@ -239,9 +243,9 @@ void RenderArea::render_hashlife(const QMatrix4x4 &viewMatrix) {
 
   glVertexAttribPointer(m_posAttr, 2, GL_FLOAT, GL_FALSE, 0, square_vertices2);
 
-  std::vector<Coord> coords;
+  std::vector<Vec2> coords;
 
-  static_cast<HashlifeUniverse *>(hashlife_universe)
+  static_cast<HashUniverse *>(hashlife_universe)
       ->get_cell_in_bounds(bounds, &coords, min_rendered_level);
 
   QMatrix4x4 modelMatrix;
@@ -254,19 +258,19 @@ void RenderArea::render_hashlife(const QMatrix4x4 &viewMatrix) {
                       univ_bounds.top_left.x : bounds.top_left.x;
   bounds.top_left.y = (bounds.top_left.y < univ_bounds.top_left.y) ?
                       univ_bounds.top_left.y : bounds.top_left.y;
+ 
+  bounds.size.x = (bounds.bottom_right().x > univ_bounds.bottom_right().x - 1)
+                      ? univ_bounds.bottom_right().x - bounds.top_left.x
+                      : bounds.size.x;
 
-  bounds.bottom_right.x = (bounds.bottom_right.x > univ_bounds.bottom_right.x)
-                          ? univ_bounds.bottom_right.x
-                          : bounds.bottom_right.x;
-
-  bounds.bottom_right.y = (bounds.bottom_right.y > univ_bounds.bottom_right.y)
-                          ? univ_bounds.bottom_right.y
-                          : bounds.bottom_right.y;
+  bounds.size.y = (bounds.bottom_right().y > univ_bounds.bottom_right().y - 1)
+                      ? univ_bounds.bottom_right().y - bounds.top_left.y
+                      : bounds.size.y;
 
   if (camera->get_zoom() <= 32) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, line_ebo);
-    for (BigInt i = bounds.top_left.x; i < bounds.bottom_right.x; ++i) {
-      for (BigInt j = bounds.top_left.y; j < bounds.bottom_right.y; ++j) {
+    for (BigInt i = bounds.top_left.x; i < bounds.bottom_right().x; ++i) {
+      for (BigInt j = bounds.top_left.y; j < bounds.bottom_right().y; ++j) {
         modelMatrix.setToIdentity();
         modelMatrix.translate(i.get_si(), j.get_si(), 0);
         m_program->setUniformValue(m_modelUniform, modelMatrix);
@@ -274,6 +278,7 @@ void RenderArea::render_hashlife(const QMatrix4x4 &viewMatrix) {
       }
     }
   }
+
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, square_ebo);
   for (size_t i = 0; i < coords.size(); ++i) {
@@ -286,13 +291,13 @@ void RenderArea::render_hashlife(const QMatrix4x4 &viewMatrix) {
 
 
 void RenderArea::zoomin_event(QPoint origin) {
-  Coord c = map_coords_from_mouse(origin);
+  Vec2 c = map_coords_from_mouse(origin);
   camera->set_zoom(camera->get_zoom() / 2);
   camera->look_at(c);
   update();
 }
 void RenderArea::zoomout_event(QPoint origin) {
-  Coord c = map_coords_from_mouse(origin);
+  Vec2 c = map_coords_from_mouse(origin);
   camera->set_zoom(camera->get_zoom() * 2);
   camera->look_at(c);
   update();
@@ -305,16 +310,16 @@ void RenderArea::zoomout() {
   zoomout_event(QPoint(width() / 2, height() / 2));
 }
 
-Coord RenderArea::map_coords_from_mouse(QPoint mouseCoords) {
+Vec2 RenderArea::map_coords_from_mouse(QPoint mouseVec2s) {
   float aspect_ratio =
       static_cast<float>(width()) / static_cast<float>(height());
-  float x_relative = static_cast<float>(mouseCoords.x()) /
+  float x_relative = static_cast<float>(mouseVec2s.x()) /
                      static_cast<float>(width()) * aspect_ratio;
   float y_relative =
-      static_cast<float>(mouseCoords.y()) / static_cast<float>(height());
+      static_cast<float>(mouseVec2s.y()) / static_cast<float>(height());
 
   QMatrix4x4 viewinv = camera->get_view().inverted();
-  Coord c;
+  Vec2 c;
   QPointF p = viewinv.map(QPointF(x_relative, y_relative));
   c.x = BigInt(std::floor(p.x()));
   c.y = BigInt(std::floor(p.y()));
@@ -359,16 +364,16 @@ void RenderArea::set_colors(QColor c_color, QColor bg_color) {
 
 void RenderArea::fitPattern() {
   if (type == UniverseType::Hashlife) {
-    std::pair<Rect, size_t> p = reinterpret_cast<HashlifeUniverse *>
+    std::pair<Rect, size_t> p = reinterpret_cast<HashUniverse *>
                  (hashlife_universe)->get_pattern_bounding_box();
 
     BigInt cx = p.first.top_left.x;
-    cx += p.first.bottom_right.x;
+    cx += p.first.bottom_right().x;
     cx >>= mp_size_t(1);
     BigInt cy = p.first.top_left.y;
-    cy += p.first.bottom_right.y;
+    cy += p.first.bottom_right().y;
     cy >>= mp_size_t(1);
-    Coord center(cx, cy);
+    Vec2 center(cx, cy);
     camera->set_zoom(1 << (p.second));
     camera->look_at(center);
     update();

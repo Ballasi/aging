@@ -1,8 +1,9 @@
 #ifndef UI_CAMERA2D_H_
 #define UI_CAMERA2D_H_
 
-#include <logic/Rect.h>
-#include <logic/Universe.h>
+#include <model/Rect.h>
+#include <model/Universe.h>
+#include <model/Vec2.h>
 #include <qmatrix4x4.h>
 #include <qvector2d.h>
 
@@ -17,7 +18,7 @@ public:
   QVector2D pos;
   QVector2D origin;
 
-  void look_at(Coord c);
+  void look_at(Vec2 c);
 
 protected:
   void generate_view_matrix();

@@ -6,16 +6,16 @@
 #include <QSettings>
 #include <QTimer>
 #include <QToolButton>
-#include <logic/UniverseType.h>
+#include <model/Universe.h>
 
 typedef struct SwidgetsCtxt {
   UniverseScene *universe_scene;
 
   QAction *playPauseAction; // Bouton qui change d'apparence
-    QIcon *playIcon;  // Play
-    QIcon *pauseIcon; // Pause
+  QIcon *playIcon;  // Play
+  QIcon *pauseIcon; // Pause
 
-  Coord buffer_coord;
+  Vec2 buffer_coord;
   Qt::MouseButton pressed_button;
   QPointF drag_position;
 } WidgetsCtxt;
