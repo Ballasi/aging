@@ -42,6 +42,9 @@ protected:
   void action_openFile();
   void action_saveFile();
 
+  void action_copySelection();
+  void action_pasteSelection();
+
   void action_playPause();
   void action_step();
   void action_incSpeed();

@@ -2,6 +2,7 @@
 #include <ui/MainWindow.h>
 #include <universes/hash/HashUniverse.h>
 #include <universes/life/LifeUniverse.h>
+#include <ui/Selection.h>
 
 #include <QFile>
 #include <QTextStream>
@@ -607,6 +608,9 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
     case Qt::Key_Right:
       ctxt.universe_scene->right();
       break;
+    case Qt::Key_Escape:
+      ctxt.universe_scene->reset_selection();
+      break;
     default:
       break;
   }
@@ -635,10 +639,41 @@ void MainWindow::mousePressEvent(QMouseEvent *event) {
                 ctxt.pressed_button == Qt::LeftButton);
       break;
     case SceneMode::SELECT:
+      if (ctxt.pressed_button == Qt::LeftButton) {
+        ctxt.universe_scene->update_selection(rpos);
+      } else if (ctxt.pressed_button == Qt::RightButton) {
+        Selection s = ctxt.universe_scene->get_selection();
+        if (s.state == SelectionState::Second) {
+          QMenu context_menu("Selection Menu");
+          QAction save_selection_action("Save selected area");
+          QAction copy_selection_action("Copy");
+          connect(&save_selection_action, &QAction::triggered, this,
+                  &MainWindow::action_saveFile);
+          connect(&copy_selection_action, &QAction::triggered, this,
+                  &MainWindow::action_copySelection);
+          context_menu.addAction(&save_selection_action);
+          context_menu.addAction(&copy_selection_action);
+          context_menu.exec(mapToGlobal(event->pos()));
+        } else if (s.state == SelectionState::First && s.copy_available) {
+          QMenu context_menu("Selection Menu");
+          QAction paste_selection_action("Paste");
+          connect(&paste_selection_action, &QAction::triggered, this,
+                  &MainWindow::action_pasteSelection);
+          context_menu.addAction(&paste_selection_action);
+          context_menu.exec(mapToGlobal(event->pos()));
+        }
+      }
       break;
     default:
       break;
   }
+}
+
+void MainWindow::action_copySelection() {
+  ctxt.universe_scene->copy_selection();
+}
+void MainWindow::action_pasteSelection() {
+  ctxt.universe_scene->paste_selection();
 }
 
 void MainWindow::mouseMoveEvent(QMouseEvent *event) {

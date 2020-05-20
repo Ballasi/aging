@@ -10,10 +10,9 @@
 #include <QTimer>
 #include <model/Universe.h>
 #include <QSettings>
+#include <ui/Selection.h>
 
 enum SceneMode {EDIT, MOVE, SELECT};
-
-
 
 class UniverseScene : public QWidget  {
 public:
@@ -57,6 +56,11 @@ public:
   void next_mode();
   void set_mode(SceneMode mode);
   SceneMode get_mode();
+  Selection get_selection();
+
+  void paste_selection();
+  void copy_selection();
+  void reset_selection();
 
 
   //// GETTEUR/SETTEUR DES PARAMETRES ////
@@ -100,6 +104,8 @@ public:
   void updateStatusBar();
   void set_cell(Vec2 coord, CellState state);
   Vec2 map_coords(QPoint mouse);
+
+  void update_selection(QPoint mouse);
 
 protected:
   void resizeEvent(QResizeEvent *event);
@@ -150,6 +156,7 @@ private:
 
   QMainWindow *_parent;
   QSettings settings;
+  Selection selection;
 };
 
 

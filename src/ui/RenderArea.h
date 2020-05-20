@@ -9,12 +9,14 @@
 #include <ui/Camera2D.h>
 #include <model/Rect.h>
 #include <model/Universe.h>
+#include <ui/Selection.h>
 
 class RenderArea : public QOpenGLWidget, protected QOpenGLFunctions {
 public:
   explicit RenderArea(QWidget *parent = 0,
                       Universe *hashlife_universe = 0,
-                      UniverseType type = UniverseType::Hashlife);
+                      UniverseType type = UniverseType::Hashlife,
+                      Selection *selection = 0);
 
 
   void left();
@@ -83,6 +85,7 @@ private:
   Camera2D *camera;
 
   UniverseType type;
+  Selection *selection;
 
   void render_gol(const QMatrix4x4 &matrix);
   void render_hashlife(const QMatrix4x4 &matrix);
