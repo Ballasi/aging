@@ -1,27 +1,26 @@
 #ifndef UI_MAINWINDOW_H_
 #define UI_MAINWINDOW_H_
 
-#include <ui/UniverseScene.h>
 #include <QMainWindow>
-#include <QTimer>
 #include <QSettings>
+#include <QTimer>
 #include <QToolButton>
 #include <model/Universe.h>
+#include <ui/ResourceManager.h>
+#include <ui/UniverseScene.h>
 
 typedef struct SwidgetsCtxt {
   UniverseScene *universe_scene;
 
   QAction *playPauseAction; // Bouton qui change d'apparence
-  QIcon *playIcon;  // Play
-  QIcon *pauseIcon; // Pause
+  QIcon *playIcon;          // Play
+  QIcon *pauseIcon;         // Pause
 
   Vec2 buffer_coord;
   Qt::MouseButton pressed_button;
   QPointF drag_position;
-  QToolBar* toolbar;
+  QToolBar *toolbar;
 } WidgetsCtxt;
-
-
 
 class MainWindow : public QMainWindow {
   Q_OBJECT
@@ -29,7 +28,6 @@ class MainWindow : public QMainWindow {
 public:
   MainWindow();
   virtual ~MainWindow();
-
 
 protected:
   // Reecriture des reactions a la souris et au clavier
@@ -90,6 +88,8 @@ private:
   void createToolBar();
   void createMenuBar();
   void createCentralWidget();
+
+  ResourceManager resources;
 };
 
 #endif /* UI_MAINWINDOW_H_ */
