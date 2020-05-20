@@ -2,6 +2,7 @@
 #include <ui/MainWindow.h>
 #include <universes/hash/HashUniverse.h>
 #include <universes/life/LifeUniverse.h>
+#include <ui/Selection.h>
 
 #include <QButtonGroup>
 #include <QColorDialog>
@@ -556,24 +557,27 @@ void MainWindow::action_newUnivTypeNaive() {
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {
   switch (event->key()) {
-  case Qt::Key_Z:
-  case Qt::Key_Up:
-    ctxt.universe_scene->up();
-    break;
-  case Qt::Key_S:
-  case Qt::Key_Down:
-    ctxt.universe_scene->down();
-    break;
-  case Qt::Key_Q:
-  case Qt::Key_Left:
-    ctxt.universe_scene->left();
-    break;
-  case Qt::Key_D:
-  case Qt::Key_Right:
-    ctxt.universe_scene->right();
-    break;
-  default:
-    break;
+    case Qt::Key_Z:
+    case Qt::Key_Up:
+      ctxt.universe_scene->up();
+      break;
+    case Qt::Key_S:
+    case Qt::Key_Down:
+      ctxt.universe_scene->down();
+      break;
+    case Qt::Key_Q:
+    case Qt::Key_Left:
+      ctxt.universe_scene->left();
+      break;
+    case Qt::Key_D:
+    case Qt::Key_Right:
+      ctxt.universe_scene->right();
+      break;
+    case Qt::Key_Escape:
+      ctxt.universe_scene->reset_selection();
+      break;
+    default:
+      break;
   }
   update();
 }
@@ -590,20 +594,51 @@ void MainWindow::mousePressEvent(QMouseEvent *event) {
   ctxt.buffer_coord = ctxt.universe_scene->map_coords(rpos);
   ctxt.pressed_button = event->button();
   switch (ctxt.universe_scene->get_mode()) {
-  case SceneMode::MOVE:
-    if (ctxt.pressed_button = Qt::LeftButton) {
-      ctxt.drag_position = rpos;
-    }
-    break;
-  case SceneMode::EDIT:
-    ctxt.universe_scene->set_cell(ctxt.buffer_coord,
-                                  ctxt.pressed_button == Qt::LeftButton);
-    break;
-  case SceneMode::SELECT:
-    break;
-  default:
-    break;
+    case SceneMode::MOVE:
+      if (ctxt.pressed_button = Qt::LeftButton) {
+        ctxt.drag_position = rpos;
+      }
+      break;
+    case SceneMode::EDIT:
+      ctxt.universe_scene->set_cell(ctxt.buffer_coord,
+                ctxt.pressed_button == Qt::LeftButton);
+      break;
+    case SceneMode::SELECT:
+      if (ctxt.pressed_button == Qt::LeftButton) {
+        ctxt.universe_scene->update_selection(rpos);
+      } else if (ctxt.pressed_button == Qt::RightButton) {
+        Selection s = ctxt.universe_scene->get_selection();
+        if (s.state == SelectionState::Second) {
+          QMenu context_menu("Selection Menu");
+          QAction save_selection_action("Save selected area");
+          QAction copy_selection_action("Copy");
+          connect(&save_selection_action, &QAction::triggered, this,
+                  &MainWindow::action_saveFile);
+          connect(&copy_selection_action, &QAction::triggered, this,
+                  &MainWindow::action_copySelection);
+          context_menu.addAction(&save_selection_action);
+          context_menu.addAction(&copy_selection_action);
+          context_menu.exec(mapToGlobal(event->pos()));
+        } else if (s.state == SelectionState::First && s.copy_available) {
+          QMenu context_menu("Selection Menu");
+          QAction paste_selection_action("Paste");
+          connect(&paste_selection_action, &QAction::triggered, this,
+                  &MainWindow::action_pasteSelection);
+          context_menu.addAction(&paste_selection_action);
+          context_menu.exec(mapToGlobal(event->pos()));
+        }
+      }
+      break;
+    default:
+      break;
   }
+}
+
+void MainWindow::action_copySelection() {
+  ctxt.universe_scene->copy_selection();
+}
+void MainWindow::action_pasteSelection() {
+  ctxt.universe_scene->paste_selection();
 }
 
 void MainWindow::mouseMoveEvent(QMouseEvent *event) {

@@ -12,8 +12,9 @@
 #include <vector>
 
 RenderArea::RenderArea(QWidget *parent, Universe *hashlife_universe,
-                       UniverseType type)
-    : QOpenGLWidget(parent), hashlife_universe(hashlife_universe), type(type) {}
+                       UniverseType type, Selection *selection)
+    : QOpenGLWidget(parent), hashlife_universe(hashlife_universe), type(type),
+      selection(selection) {}
 
 void RenderArea::initializeGL() {
   QColor bg_color = QColor("#000000");
@@ -284,6 +285,31 @@ void RenderArea::render_hashlife(const QMatrix4x4 &viewMatrix) {
     modelMatrix.translate(coords[i].x.get_si(), coords[i].y.get_si(), 0);
     m_program->setUniformValue(m_modelUniform, modelMatrix);
     glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0);
+  }
+
+  if (selection->state == SelectionState::Second) {
+    Rect r({selection->first.x, selection->first.y},
+           {selection->second.x - selection->first.x,
+            selection->second.y - selection->first.y});
+
+    float width_f = static_cast<float>(r.width().get_si()) + 1;
+    float height_f = static_cast<float>(r.height().get_si()) + 1;
+    float selection_vertices[8] = {
+        0.0f,    0.0f,     // Top-left
+        width_f, 0.0f,     // Top-right
+        width_f, height_f, // Bottom-right
+        0.0f,    height_f, // Bottom-left
+    };
+
+    modelMatrix.setToIdentity();
+    modelMatrix.translate(r.top_left.x.get_si(), r.top_left.y.get_si(), 0);
+    m_program->setUniformValue(m_modelUniform, modelMatrix);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, line_ebo);
+    glVertexAttribPointer(m_posAttr, 2,
+      GL_FLOAT, GL_FALSE, 0, selection_vertices);
+    glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, 0);
+
+    glVertexAttribPointer(m_posAttr, 2, GL_FLOAT, GL_FALSE, 0, square_vertices);
   }
 }
 
