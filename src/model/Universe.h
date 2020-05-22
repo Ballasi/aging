@@ -25,7 +25,7 @@
  * error. It is possible to test if a aptitude is implemented by calling the
  * `can_` prefixed function that comes with it.
  *
- * _Example:_
+ * __Example:__
  * \code
  * if (some_universe->can_set_step_size()) {
  *   some_universe->set_step_size(some_step_size)
@@ -106,7 +106,7 @@ public:
    * The step size is the number of simulation steps made
    * each call to Universe::update
    *
-   * \param step_size: 
+   * \param step_size: TODO(DoomDuck)
    */
   virtual void set_step_size(const size_t step_size);
   virtual const bool can_set_step_size() const;
