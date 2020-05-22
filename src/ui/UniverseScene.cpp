@@ -148,13 +148,6 @@ SceneMode UniverseScene::get_mode() {
   return mode;
 }
 
-void UniverseScene::toggle_bord() {
-  bords = !bords;
-}
-
-bool UniverseScene::get_infinite_grid() {
-  return !bords;
-}
 
 void UniverseScene::set_cell_color(CellState state, QColor color) {
     colors[state] = color;
@@ -169,10 +162,6 @@ QColor UniverseScene::get_grid_color() { return color_grid ;}
 void UniverseScene::set_grid_color(QColor color) {
   color_grid = color;
 }
-int UniverseScene::get_rank_grid() { return rank_grid ;}
-void UniverseScene::set_rank_grid(int rank) { rank_grid = rank ;}
-void UniverseScene::up_rank_grid() { rank_grid += 1; }
-void UniverseScene::down_rank_grid() { rank_grid -= 1; }
 
 QString UniverseScene::get_generation() {
   return QString(bigint_to_str(universe->generation()).c_str());

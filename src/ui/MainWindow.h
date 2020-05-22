@@ -63,8 +63,6 @@ protected:
   void action_setColorFg();
   void action_setColorGrid();
 
-  void action_setInfiniteGrid();
-  void action_setRankGrid();
   void action_colorTheme();
   void action_systemeTheme();
   void action_darkTheme();

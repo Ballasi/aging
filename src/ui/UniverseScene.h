@@ -68,8 +68,6 @@ public:
   //    et on voit les bords de l'univers
   // soit l'affichage de la grille est infinie,
   //    et on ne voit plus les bords de l'univers
-  void toggle_bord();
-  bool get_infinite_grid();
 
   // get/set les couleurs
   void set_cell_color(CellState state, QColor color);

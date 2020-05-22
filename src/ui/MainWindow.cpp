@@ -257,16 +257,6 @@ void MainWindow::createMenuBar() {
           &MainWindow::action_setColorGrid);
   prefMenu->addMenu(prefColor);
 
-  // Toggle Bord
-  /*
-  QAction* toggle_bord = prefMenu->addAction("Infinite Grid");
-    toggle_bord->setCheckable(true);
-    connect(toggle_bord,
-      &QAction::toggled, this, &MainWindow::action_setInfiniteGrid);
-  */
-  connect(prefMenu->addAction("Set Rank Grid"), &QAction::triggered, this,
-          &MainWindow::action_setRankGrid);
-
   prefMenu->addSeparator();
 
   QAction *sysThem = prefMenu->addAction("System Theme");
@@ -403,20 +393,6 @@ void MainWindow::action_setColorGrid() {
                                         this, "Choose Grid Color");
   ctxt.universe_scene->set_grid_color(color);
   settings.setValue("colorGrid", color.name());
-}
-
-void MainWindow::action_setInfiniteGrid() {
-  ctxt.universe_scene->toggle_bord();
-}
-void MainWindow::action_setRankGrid() {
-  bool ok;
-  std::string s;
-  int rank =
-      QInputDialog::getInt(this, "Set Rang Grid", s.c_str(),
-                           ctxt.universe_scene->get_rank_grid(), 0, 50, 1, &ok);
-  if (ok) {
-    ctxt.universe_scene->set_rank_grid(rank);
-  }
 }
 
 void MainWindow::action_colorTheme() {
