@@ -1,89 +1,132 @@
 #ifndef UNIVERSE_H_
 #define UNIVERSE_H_
-
-#include "Vec2.h"
-#include "Rect.h"
 #include "CellState.h"
+#include "Rect.h"
+#include "Vec2.h"
+
+/*!
+ * \file Universe.h
+ * \brief The universal interface for the manipulation of universes
+ * \author aging-team
+ */
 
 #include <QString>
-
 #include <vector>
 
-/*
-  Universe interface describes un number of methods
-  that can be use by the UI to interact with your universe.
+/*!
+ * \class Universe
+ * \brief Universal universe interface
+ *
+ * The universe interface describes un number of methods
+ * that can be use by the UI to interact with any universe.
+ *
+ * Some methods a **have** to be overriden however most are optional.
+ * Those which are optional are called aptitudes and are predefined to throw an
+ * error. It is possible to test if a aptitude is implemented by calling the
+ * `can_` prefixed function that comes with it.
+ *
+ * _Example:_
+ * \code
+ * if (some_universe->can_set_step_size()) {
+ *   some_universe->set_step_size(some_step_size)
+ * }
+ * else {
+ *   // Do something else...
+ * }
+ * \endcode
  */
 class Universe {
 public:
   /* Required methods */
 
-  /*
-    Updates the content of the universe.
-  */
+  /*!
+   * \brief Updates the content of the universe.
+   *
+   * Updates universe advancing the simulation a number of steps determined
+   * by the universe. This number of steps may be modified using
+   * Universe::set_step_size.
+   */
   virtual void update() = 0;
 
-  /*
-    Returns the bounds of smiluation of the universe.
-    These are not the smallest one that hold the living cells.
-  */
+  /*!
+   * \brief Universe dimention getter
+   *
+   * \return The bounds of smiluated universe
+   * \warning The bounds is not the smallest Rect that holds the living cells
+   */
   virtual Rect &bounds() = 0;
 
-  /*
-    Returns the number of generations that have been simulated
-    since the beginning of the simulation.
-  */
+  /*!
+   * \brief Universe generation getter
+   *
+   * Here generations refers to generations that have been simulated since the
+   * beginning of the execution.
+   *
+   * \return the number of simulated generations
+   */
   virtual const BigInt &generation() const = 0;
 
-  /*
-    Returns the number of generations simulated every
-    time the update method is called.
-  */
+  /*!
+   * \brief Step size getter
+   * \returns count of steps simulated per update
+   */
   virtual const BigInt &step_size() const = 0;
-
 
   /* Aptitudes */
 
-  /*
-    Aptitudes are methods that have to be overriden to be used
-    if no default method is provided.
-    They all come with a method prefixed by `can_` describing
-    if the given method can be used.
-    It set to zero if no default method is provided
-   */
-
-  /*
-    Sets the cell at the coord `coord` to the value `cell_state`.
+  /*!
+   * \brief Cell state setter.
+   *
+   * \param coord: coord at which to set the cell state
+   * \param cell_state: cell state that to which to set the destination
    */
   virtual void set(const Vec2 &coord, CellState cell_state);
   virtual const bool can_set() const;
 
-  /*
-    Returns the value of the cell of coord `coord`
+  /*!
+   * \brief Cell state getter.
+   *
+   * \param coord: Coordonnates to look at.
+   * \return The state of the cell.
    */
   virtual const CellState get(const Vec2 &coord) const;
   virtual const bool can_get() const;
 
   /*
-    Sets every cell in the universe to the default CellState value.
+   * \brief Clears the universe.
+   *
+   * Sets every cell in the universe to the default CellState value.
    */
   virtual void clear();
   virtual const bool can_clear() const;
 
-  /*
-    Sets sets the size of simulation steps.
+  /*!
+   * \brief Step size setter
+   *
+   * The step size is the number of simulation steps made
+   * each call to Universe::update
+   *
+   * \param step_size: 
    */
   virtual void set_step_size(const size_t step_size);
   virtual const bool can_set_step_size() const;
 
   /*
-    Changes the universe shape by giving it new bounds.
-    Every new cell is set to the default CellState.
-    Cells out of the new bounds are destroyed.
+   * \brief change universe size
+   *
+   * Changes the universe shape by giving it new bounds.
+   * Every new cell is set to the default CellState.
+   * Cells out of the new bounds are destroyed.
+   *
+   * \param bounds: New universe bounds
    */
-  virtual void reshape(Rect bounds);
+  virtual void reshape(const Rect& bounds);
   virtual const bool can_reshape() const;
 };
 
-enum class UniverseType {Life, Hashlife};
+/*!
+ * \brief Outdated method to determine universe type
+ */
+enum class[[deprecated]] UniverseType { Life, Hashlife };
 
 #endif // UNIVERSE_H_
