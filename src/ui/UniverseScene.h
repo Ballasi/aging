@@ -14,87 +14,191 @@
 
 enum SceneMode {EDIT, MOVE, SELECT};
 
-class UniverseScene : public QWidget  {
+class UniverseScene : public QWidget {
+/*! \class UniverseScene
+   * \brief a class that displays an univers
+   *
+   * The goal of this class is to display a given universe, and to provide
+   * methods to easily manipulate the cellular automaton.
+   */
 public:
+  /*!
+   *  \brief Constructor
+   *
+   *  Constructor of UniverseScene
+   *
+   *  \param parent : Parent Widget
+   *  \param universe : desired universe to be displayed
+   *  \param type : type of universe
+   */
   UniverseScene(QWidget *parent, Universe *universe,
                 UniverseType type);
 
 
-  //// INTERACTION ///
-  // toggle play/pause
+  /*!
+   *  \brief method for changing the state of the simulation
+   *
+   *  This method allows to change the state of the simulation
+   * (Play <-> Pause).
+   */
   void play_pause();
+
+  /*!
+   *  \brief method for getting the state of the simulation
+   *
+   *  This method allows to get the state of the simulation
+   */
   bool get_state_simulation();
 
-  // Lance un seul step
+  /*!
+   *  \brief method of starting a single step
+   *
+   *  This method executes a single step of the simulation
+   */
   void step();
 
-  // Augmente ou diminue la vitesse (à haute vitesse, cela augmente les
-  // pas, a basse vitesse, cela fait 1 par seconde, comme golly)
-  void increase_speed();
+  /*!
+   *  \brief Can Increases Speed
+   *
+   *  Enables you to ask if you can change the speed of the simulation.
+   */
   bool can_increase_speed();
-  void decrease_speed();
+  /*!
+   *  \brief increases speed
+   *
+   *  This method increases the speed of the simulation
+   */
+  void increase_speed();
+  /*!
+   *  \brief Can Decreases Speed
+   *
+   *  Enables you to ask if you can change the speed of the simulation.
+   */
   bool can_decrease_speed();
+  /*!
+   *  \brief decreases speed
+   *
+   *  This method decreases the speed of the simulation
+   */
+  void decrease_speed();
 
+  /*!
+   *  \brief Enables you to ask if you can activate a hyperSpeed mode.
+   *
+   *  On some universes, there is a hyperspeed mode, which will always
+   *  make as many jumps as possible, in order to calculate as quickly as
+   *  possible, a maximum of generation
+   */
   bool can_hyperSpeed();
+  /*!
+   *  \brief getter for hyperSpeed mode
+   *
+   *  This method is used to determine whether the Hyperspeed mode is
+   *  activated or not.
+   */
   bool state_hyperSpeed();
+  /*!
+   *  \brief setter for hyperSpeed mode
+   *
+   *  This method allows you to change the Hyperspeed mode
+   *  (Play <-> False)
+   */
   void toggle_hyperSpeed();
 
-  // zoom centré en avant ou en arriere
+  /*!
+   *  \brief zooms in
+   *
+   *  Zooms in, centered on the point given in the parameters.
+   */
   void zoom_in(QPoint origin);
+  /*!
+   *  \brief zooms back
+   *
+   *  Zooms back, centered on the point given in the parameters.
+   */
   void zoom_out(QPoint origin);
-
+  /*!
+   *  \brief zooms in
+   *
+   *  Zooms in, centered on the center of the window.
+   */
   void zoom_in();
+  /*!
+   *  \brief zooms back
+   *
+   *  Zooms back, centered on the center of the window.
+   */
   void zoom_out();
 
 
-  // deplacement :
+  /*!
+   *  \brief move the camera to the left
+   *
+   *  moves the visible area of the universe in the desired direction.
+   */
   void left();
+  /*!
+   *  \brief move the camera to the right
+   *
+   *  moves the visible area of the universe in the desired direction.
+   */
   void right();
+  /*!
+   *  \brief move the camera down
+   *
+   *  moves the visible area of the universe in the desired direction.
+   */
   void down();
+  /*!
+   *  \brief move the camera up
+   *
+   *  moves the visible area of the universe in the desired direction.
+   */
   void up();
-
+  /*!
+   *  \brief move the camera
+   *
+   *  moves the camera to center the point
+   */
   void move_camera(QPointF vector);
 
-  // Recentre la render area sur la zone interessante
+  /*!
+   *  \brief fit pattern
+   *
+   *  Refocus the camera on the area of interest.
+   */
   void fit_pattern();
 
-  // toggle, change le mode (0:dessin, 1:mouvement, 2:select)
+  /*!
+   *  \brief changes the mode of mouse interaction
+   *
+   * if the mouse was in move mode, it switches to edit mode.
+   * if the mouse was in edit mode, it switches to selection mode.
+   * if the mouse was in Selection mode, it switches to move mode.
+   */
   void next_mode();
-  void set_mode(SceneMode mode);
-  SceneMode get_mode();
-  Selection get_selection();
 
+  /*!
+   *  \brief changes the mode of mouse interaction
+   *
+   *  Set the mouse mode in {edit, selection, move} mouse mode.
+   */
+  void set_mode(SceneMode mode);
+  /*!
+   *  \brief get the mode of mouse interaction
+   *
+   *  Get the mouse mode (in {edit, selection, move})
+   */
+  SceneMode get_mode();
+
+  ////////////////////// TRISTAN //////////////////////
+  ////////////////////// TRISTAN //////////////////////
+  ////////////////////// TRISTAN //////////////////////
+  Selection get_selection();
   void paste_selection();
   void copy_selection();
   void reset_selection();
-
-
-  //// GETTEUR/SETTEUR DES PARAMETRES ////
-  // soit l'affichage de la grille est finie,
-  //    et on voit les bords de l'univers
-  // soit l'affichage de la grille est infinie,
-  //    et on ne voit plus les bords de l'univers
-
-  // get/set les couleurs
-  void set_cell_color(CellState state, QColor color);
-  QColor get_cell_color(CellState state);
-  void set_grid_color(QColor color);
-  QColor get_grid_color();
-
-
-  // precise à partir de quelle taille de cellule on veut la grille
-  // (genre au dessus de 10 pixel/cell)
-  void up_rank_grid();
-  void down_rank_grid();
-  int get_rank_grid();
-  void set_rank_grid(int rank);
-
-
-  //// GETTEUR DES INFOS DE UNIVERSE ////
-
-  QString get_generation();
-  QString get_speed();
-
+  void update_selection(QPoint mouse);
 
   //// METHODE POUR LA ZONE SELECT ////
   // renvoi un nouvel univers, contenant uniquement la zone selectionnee
@@ -104,12 +208,58 @@ public:
   void remove_in_zone();
   // supprime tout ce qui est autour de la zone
   void remove_out_zone();
+  ////////////////////// TRISTAN //////////////////////
+  ////////////////////// TRISTAN //////////////////////
+  ////////////////////// TRISTAN //////////////////////
 
+
+  /*!
+   *  \brief set the color of the given state
+   */
+  void set_cell_color(CellState state, QColor color);
+  /*!
+   *  \brief get the color of the given state
+   */
+  QColor get_cell_color(CellState state);
+  /*!
+   *  \brief set the color of the grid
+   */
+  void set_grid_color(QColor color);
+  /*!
+   *  \brief set the color of the grid
+   */
+  QColor get_grid_color();
+
+  /*!
+   *  \brief get a number of generation
+   */
+  QString get_generation();
+
+  /*!
+   *  \brief get a speed of simulation
+   */
+  QString get_speed();
+
+
+  /*!
+   *  \brief refresh the status bar
+   */
   void updateStatusBar();
+  /*!
+   *  \brief set one cell
+   *
+   * set the state of the specified cell
+   *
+   */
   void set_cell(Vec2 coord, CellState state);
+  /*!
+   *  \brief convert Qpoint to Vec2
+   *
+   * convert a QPoint in a Vec2
+   *
+   */
   Vec2 map_coords(QPoint mouse);
 
-  void update_selection(QPoint mouse);
 
 protected:
   void resizeEvent(QResizeEvent *event);
@@ -152,8 +302,6 @@ private:
   // couleurs
   QColor colors[16];
   QColor color_grid;
-  // rang a partir du quel on affiche la grille
-  int rank_grid;
 
   // La zone selectionné
   Rect select_zone;

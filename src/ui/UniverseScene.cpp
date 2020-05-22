@@ -32,7 +32,11 @@ UniverseScene::UniverseScene(QWidget *parent, Universe *universe,
 void UniverseScene::play_pause() {
   isSimulationRun = !isSimulationRun;
   if (isSimulationRun) {
-    stepTimer->start(refresh_time_ms);
+    if (hyperspeed_state) {
+      stepTimer->start(0);
+    } else {
+      stepTimer->start(refresh_time_ms);
+    }
   } else {
     stepTimer->stop();
   }
@@ -202,16 +206,20 @@ QString UniverseScene::get_generation() {
 }
 
 QString UniverseScene::get_speed() {
-  std::string str;
-  if (refresh_time_ms > 0) {
-    str += std::to_string(refresh_time_ms);
-    str += " ms/step";
+  if (hyperspeed_state) {
+    return QString("HyperSpeed Mode");
   } else {
-    str += "2^";
-    str += std::to_string(p_step);
-    str += " step size";
+    std::string str;
+    if (refresh_time_ms > 0) {
+      str += std::to_string(refresh_time_ms);
+      str += " ms/step";
+    } else {
+      str += "2^";
+      str += std::to_string(p_step);
+      str += " step size";
+    }
+    return QString(str.c_str());
   }
-  return QString(str.c_str());
 }
 
 Universe* UniverseScene::get_zone() {
