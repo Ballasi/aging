@@ -31,7 +31,9 @@ public:
   // Augmente ou diminue la vitesse (à haute vitesse, cela augmente les
   // pas, a basse vitesse, cela fait 1 par seconde, comme golly)
   void increase_speed();
+  bool can_increase_speed();
   void decrease_speed();
+  bool can_decrease_speed();
 
   // zoom centré en avant ou en arriere
   void zoom_in(QPoint origin);

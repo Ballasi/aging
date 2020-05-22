@@ -20,6 +20,9 @@ typedef struct SwidgetsCtxt {
   Qt::MouseButton pressed_button;
   QPointF drag_position;
   QToolBar *toolbar;
+
+  QAction *inc_speed;
+  QAction *dec_speed;
 } WidgetsCtxt;
 
 class MainWindow : public QMainWindow {

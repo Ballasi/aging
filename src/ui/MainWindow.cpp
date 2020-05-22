@@ -114,6 +114,7 @@ void MainWindow::createToolBar() {
   // Button Increase Speed
   QAction *act_inc_speed = controlToolbar->addAction(
       resources.getIcon("fast-forward"), "Increase Speed");
+  ctxt.inc_speed = act_inc_speed;
   act_inc_speed->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Plus));
   connect(act_inc_speed, &QAction::triggered, this,
           &MainWindow::action_incSpeed);
@@ -121,6 +122,7 @@ void MainWindow::createToolBar() {
   // Button Decrease Speed
   QAction *act_dec_speed = controlToolbar->addAction(
       resources.getIcon("rewind"), "Decrease Speed");
+  ctxt.dec_speed = act_dec_speed;
   act_dec_speed->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Minus));
   connect(act_dec_speed, &QAction::triggered, this,
           &MainWindow::action_decSpeed);
@@ -354,12 +356,25 @@ void MainWindow::action_playPause() {
 }
 void MainWindow::action_step() { ctxt.universe_scene->step(); }
 void MainWindow::action_incSpeed() {
-  ctxt.universe_scene->increase_speed();
-  ctxt.universe_scene->get_speed();
+  if (ctxt.universe_scene->can_increase_speed()) {
+    ctxt.universe_scene->increase_speed();
+  }
+  ctxt.inc_speed->setEnabled(ctxt.universe_scene->can_increase_speed());
+  if (ctxt.universe_scene->get_state_simulation()) {
+    ctxt.universe_scene->play_pause();
+    ctxt.universe_scene->play_pause();
+  }
+
 }
 void MainWindow::action_decSpeed() {
-  ctxt.universe_scene->decrease_speed();
-  ctxt.universe_scene->get_speed();
+  if (ctxt.universe_scene->can_decrease_speed()) {
+    ctxt.universe_scene->decrease_speed();
+  }
+  ctxt.inc_speed->setEnabled(ctxt.universe_scene->can_decrease_speed());
+  if (ctxt.universe_scene->get_state_simulation()) {
+    ctxt.universe_scene->play_pause();
+    ctxt.universe_scene->play_pause();
+  }
 }
 
 void MainWindow::action_fitPattern() { ctxt.universe_scene->fit_pattern(); }

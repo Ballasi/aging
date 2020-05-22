@@ -70,7 +70,7 @@ public:
   virtual const bool can_clear() const;
 
   /*
-    Sets sets the size of simulation steps.
+    Sets the size of simulation steps.
    */
   virtual void set_step_size(const size_t step_size);
   virtual const bool can_set_step_size() const;

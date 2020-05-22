@@ -15,7 +15,7 @@ UniverseScene::UniverseScene(QWidget *parent, Universe *universe,
     selection.copy_available = false;
 
     refresh_time_ms = 0;
-    p_step = 1;
+    p_step = 0;
 
     r_area = new RenderArea(this, universe, type, &selection);
 
@@ -48,29 +48,50 @@ void UniverseScene::step() {
 }
 
 void UniverseScene::increase_speed() {
-  if (refresh_time_ms <= 0) {
-    p_step += 1;
-  } else {
-    refresh_time_ms -= 250;
+  if (universe->can_set_step_size()) {
     if (refresh_time_ms <= 0) {
-      p_step = 1;
-      refresh_time_ms = 0;
+        p_step += 1;
+    } else {
+      refresh_time_ms -= 250;
+      if (refresh_time_ms <= 0) {
+        p_step = 0  ;
+        refresh_time_ms = 0;
+      }
+    }
+    updateStatusBar();
+  } else {
+    if (refresh_time_ms > 0) {
+      refresh_time_ms -= 250;
     }
   }
-  updateStatusBar();
 }
 
 void UniverseScene::decrease_speed() {
-  if (p_step == 0) {
-    refresh_time_ms += 250;
-  } else {
-    p_step -= 1;
-    if (p_step <= 0) {
-      refresh_time_ms = 250;
-      p_step = 0;
+  if (universe->can_set_step_size()) {
+    if (p_step == 0) {
+      refresh_time_ms += 250;
+    } else {
+      p_step -= 1;
+      if (p_step <= 0) {
+        refresh_time_ms = 0;
+        p_step = 0;
+      }
     }
+    updateStatusBar();
+  } else {
+    refresh_time_ms += 250;
   }
-  updateStatusBar();
+}
+
+bool UniverseScene::can_increase_speed() {
+  if (universe->can_set_step_size()) {
+    return true;
+  } else {
+    return refresh_time_ms > 0;
+  }
+}
+bool UniverseScene::can_decrease_speed() {
+  return true;
 }
 
 void UniverseScene::zoom_in(QPoint origin) {
@@ -169,7 +190,7 @@ QString UniverseScene::get_generation() {
 
 QString UniverseScene::get_speed() {
   std::string str;
-  if (p_step == 0) {
+  if (refresh_time_ms > 0) {
     str += std::to_string(refresh_time_ms);
     str += " ms/step";
   } else {
@@ -308,24 +329,4 @@ void UniverseScene::reset_selection() {
   updateStatusBar();
   r_area->update();
 }
-
-/*
-Vec2 UniverseScene::map_Vec2_from_mouse(QPoint mouse) {
-  float aspect_ratio =
-      static_cast<float>(width()) / static_cast<float>(height());
-  float x_relative = static_cast<float>(mouseVec2s.x()) /
-                     static_cast<float>(width()) * aspect_ratio;
-  float y_relative =
-      static_cast<float>(mouseVec2s.y()) / static_cast<float>(height());
-
-
-  QMatrix4x4 viewinv = camera->get_view().inverted();
-
-  Vec2 c;
-  QPointF p = viewinv.map(QPointF(x_relative, y_relative));
-  c.x = BigInt(std::floor(p.x()));
-  c.y = BigInt(std::ceil(-p.y()));
-
-  return c;
-}*/
 
