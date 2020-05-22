@@ -7,8 +7,7 @@ ResourceManager::ResourceManager(bool isDarkTheme) {
 
   QString relative_path("../res");
 
-  QString data_path =
-      QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+  QString data_path("/usr/share/aging");
   QDir absolute_dir(data_path);
 
   if (!absolute_dir.exists()) {
