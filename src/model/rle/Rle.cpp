@@ -1,5 +1,5 @@
-#include "model/CellState.h"
-#include <model/Rle.h>
+#include <model/CellState.h>
+#include <model/rle/Rle.h>
 #include <stdexcept>
 
 Rle::Rle(QFile *file) : _file(file) {
