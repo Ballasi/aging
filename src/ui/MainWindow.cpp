@@ -159,6 +159,7 @@ void MainWindow::createToolBar() {
       controlToolbar->addAction(resources.getIcon("cursor-move"), "Move");
   connect(moveAction, &QAction::triggered, this, &MainWindow::action_modeMove);
   moveAction->setCheckable(true);
+  moveAction->setChecked(true);
   moveAction->setActionGroup(checkableGroup);
 
   controlToolbar->addSeparator();
@@ -239,9 +240,11 @@ void MainWindow::createMenuBar() {
 
   optMenu->addSeparator();
 
-  QAction *expansive = optMenu->addAction("Force expansive");
+  QAction *expansive = optMenu->addAction("HyperSpeed Mode");
+  ctxt.hyper_speed = expansive;
   expansive->setCheckable(true);
-  connect(expansive, &QAction::toggled, this, &MainWindow::action_forceExpanse);
+  expansive->setEnabled(ctxt.universe_scene->can_hyperSpeed());
+  connect(expansive, &QAction::toggled, this, &MainWindow::action_hyperSpeed);
 
   menuBar()->addMenu(optMenu);
 
@@ -341,6 +344,7 @@ void MainWindow::action_openFile() {
     }
     createCentralWidget();
   }
+  ctxt.hyper_speed->setEnabled(ctxt.universe_scene->can_hyperSpeed());
 }
 void MainWindow::action_saveFile() {
   printf("MainWindow::action_saveFile() not Implemented\n");
@@ -360,21 +364,25 @@ void MainWindow::action_incSpeed() {
     ctxt.universe_scene->increase_speed();
   }
   ctxt.inc_speed->setEnabled(ctxt.universe_scene->can_increase_speed());
+  ctxt.dec_speed->setEnabled(ctxt.universe_scene->can_decrease_speed());
   if (ctxt.universe_scene->get_state_simulation()) {
     ctxt.universe_scene->play_pause();
     ctxt.universe_scene->play_pause();
   }
-
+  // std::cout << ctxt.universe_scene->get_speed().toStdString() << std::endl ;
 }
+
 void MainWindow::action_decSpeed() {
   if (ctxt.universe_scene->can_decrease_speed()) {
     ctxt.universe_scene->decrease_speed();
   }
-  ctxt.inc_speed->setEnabled(ctxt.universe_scene->can_decrease_speed());
+  ctxt.inc_speed->setEnabled(ctxt.universe_scene->can_increase_speed());
+  ctxt.dec_speed->setEnabled(ctxt.universe_scene->can_decrease_speed());
   if (ctxt.universe_scene->get_state_simulation()) {
     ctxt.universe_scene->play_pause();
     ctxt.universe_scene->play_pause();
   }
+  // std::cout << ctxt.universe_scene->get_speed().toStdString() << std::endl ;
 }
 
 void MainWindow::action_fitPattern() { ctxt.universe_scene->fit_pattern(); }
@@ -386,8 +394,15 @@ void MainWindow::action_modeMove() { ctxt.universe_scene->set_mode(MOVE); }
 void MainWindow::action_zoomIn() { ctxt.universe_scene->zoom_in(); }
 void MainWindow::action_zoomOut() { ctxt.universe_scene->zoom_out(); }
 
-void MainWindow::action_forceExpanse() {
-  printf("Toggle hyperspeed mode not Implemented\n");
+void MainWindow::action_hyperSpeed() {
+  ctxt.universe_scene->toggle_hyperSpeed();
+  if (ctxt.universe_scene->state_hyperSpeed()) {
+    ctxt.inc_speed->setEnabled(false);
+    ctxt.dec_speed->setEnabled(false);
+  } else {
+    ctxt.inc_speed->setEnabled(ctxt.universe_scene->can_increase_speed());
+    ctxt.dec_speed->setEnabled(ctxt.universe_scene->can_decrease_speed());
+  }
 }
 
 void MainWindow::action_setColorBg() {
@@ -529,17 +544,17 @@ void MainWindow::action_newUnivTypeHashlife() {
 
   universe = new HashUniverse(8);
   univ_type = UniverseType::Hashlife;
-
   createCentralWidget();
+  ctxt.hyper_speed->setEnabled(ctxt.universe_scene->can_hyperSpeed());
 }
 void MainWindow::action_newUnivTypeNaive() {
   delete universe;
   delete ctxt.universe_scene;
-
   universe = new LifeUniverse(Vec2(BigInt(1024), BigInt(1024)));
   univ_type = UniverseType::Life;
 
   createCentralWidget();
+  ctxt.hyper_speed->setEnabled(ctxt.universe_scene->can_hyperSpeed());
 }
 
 /////////////////////////////////////////////////////

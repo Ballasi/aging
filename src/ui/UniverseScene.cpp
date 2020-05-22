@@ -16,6 +16,7 @@ UniverseScene::UniverseScene(QWidget *parent, Universe *universe,
 
     refresh_time_ms = 0;
     p_step = 0;
+    hyperspeed_state = false;
 
     r_area = new RenderArea(this, universe, type, &selection);
 
@@ -54,7 +55,7 @@ void UniverseScene::increase_speed() {
     } else {
       refresh_time_ms -= 250;
       if (refresh_time_ms <= 0) {
-        p_step = 0  ;
+        p_step = 0;
         refresh_time_ms = 0;
       }
     }
@@ -93,6 +94,18 @@ bool UniverseScene::can_increase_speed() {
 bool UniverseScene::can_decrease_speed() {
   return true;
 }
+
+bool UniverseScene::can_hyperSpeed() {
+  return universe->can_set_hyperspeed();
+}
+bool UniverseScene::state_hyperSpeed() {
+  return hyperspeed_state;
+}
+void UniverseScene::toggle_hyperSpeed() {
+  hyperspeed_state = !hyperspeed_state;
+}
+
+
 
 void UniverseScene::zoom_in(QPoint origin) {
     r_area->zoomin_event(origin);

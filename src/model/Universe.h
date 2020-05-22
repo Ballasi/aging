@@ -76,6 +76,13 @@ public:
   virtual const bool can_set_step_size() const;
 
   /*
+   Sets hyper speed mode.
+  */
+  virtual void set_hyperspeed(const bool state);
+  virtual const bool can_set_hyperspeed() const;
+
+
+  /*
     Changes the universe shape by giving it new bounds.
     Every new cell is set to the default CellState.
     Cells out of the new bounds are destroyed.

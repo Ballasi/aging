@@ -23,6 +23,8 @@ typedef struct SwidgetsCtxt {
 
   QAction *inc_speed;
   QAction *dec_speed;
+
+  QAction *hyper_speed;
 } WidgetsCtxt;
 
 class MainWindow : public QMainWindow {
@@ -60,7 +62,7 @@ protected:
   void action_zoomIn();
   void action_zoomOut();
 
-  void action_forceExpanse();
+  void action_hyperSpeed();
 
   void action_setColorBg();
   void action_setColorFg();

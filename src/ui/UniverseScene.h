@@ -35,6 +35,10 @@ public:
   void decrease_speed();
   bool can_decrease_speed();
 
+  bool can_hyperSpeed();
+  bool state_hyperSpeed();
+  void toggle_hyperSpeed();
+
   // zoom centré en avant ou en arriere
   void zoom_in(QPoint origin);
   void zoom_out(QPoint origin);
@@ -123,7 +127,7 @@ private:
   UniverseType univ_type;
   QTimer *stepTimer;
 
-
+  bool hyperspeed_state;
 
   /// speed :
   // 2 cas :
