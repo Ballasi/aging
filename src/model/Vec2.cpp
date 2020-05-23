@@ -2,7 +2,7 @@
 
 // Constructors
 Vec2::Vec2(const size_t level)
-  : x(BigInt(1 << level)), y(BigInt(1 << level)) {}
+  : x(BigInt(1) << mp_size_t(level)), y(BigInt(1) << mp_size_t(level)) {}
 Vec2::Vec2(const BigInt &x, const BigInt &y)
   : x(x), y(y) {}
 

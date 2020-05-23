@@ -1,6 +1,7 @@
 #include <model/mcell/MCellFile.h>
+#include <iostream>
 
-MCellFile::MCellFile(QFile *file) : _rule("B3/S23"), _file(file) {
+MCellFile::MCellFile(QFile *file) : _file(file) {
     if (!_file->isOpen()) {
         if (!_file->open(QIODevice::ReadOnly | QIODevice::Text))
             throw "Error opening MCell File";
@@ -14,7 +15,7 @@ MCellFile::MCellFile(QFile *file) : _rule("B3/S23"), _file(file) {
                     QByteArrayList tokens;
                     tokens = line.split(' ');
                     if (tokens.length() >= 2) {
-                        _rule = Rule(tokens[1].trimmed());
+                        //_rule = Rule(tokens[1].trimmed());
                     }
                 }
             }
@@ -39,9 +40,11 @@ MCellFile::LineIter MCellFile::iter_line() {
     return LineIter(_file);
 }
 
-MCellFile::LineIter::LineType MCellFile::LineIter::next(Line *line) {
+MCellFile::LineIter::LineType MCellFile::LineIter::next(Line *line,
+                                                        LineType *type) {
     if (_file->atEnd()) {
       _file->close();
+      *type = DONE;
       return DONE;
     }
 
@@ -49,7 +52,7 @@ MCellFile::LineIter::LineType MCellFile::LineIter::next(Line *line) {
     if (_current_line.trimmed().isEmpty() ||
         _current_line[0] == '#'           ||
         _current_line[0] == '[') {
-        return next(line);
+        return next(line, type);
     } else if ( _current_line[0] == '$' ||
                 _current_line[0] == '.' ||
                 _current_line[0] == '*') {
@@ -76,6 +79,7 @@ MCellFile::LineIter::LineType MCellFile::LineIter::next(Line *line) {
             }
             ++line_i;
         }
+        *type = MACRO_3;
         return MACRO_3;
     } else if (_current_line[0] >= '0' &&
                _current_line[0] <= '9') {
@@ -92,11 +96,16 @@ MCellFile::LineIter::LineType MCellFile::LineIter::next(Line *line) {
             if (!ok)
                 throw "Error in toULong()";
         }
-
+        *type = MACRO_N;
         return MACRO_N;
     }
 
     throw "Unrecognized line";
     _file->close();
+    *type = DONE;
     return DONE;
 }
+
+MCellFile::LineIter::Line::Line() {}
+
+MCellFile::~MCellFile() {}

@@ -44,11 +44,12 @@ public:
       size_t sw_index, se_index;
   };
   union Line {
+    Line();
     Level3_MCell level3;
     LevelN_MCell levelN;
   };
 
-  LineType next(Line *line);
+  LineType next(Line *line, LineType *type);
 
 private:
   QFile* _file;

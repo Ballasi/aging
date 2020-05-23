@@ -1,5 +1,6 @@
 #include "model/BigInt.h"
 #include "model/Vec2.h"
+#include "model/mcell/MCellFile.h"
 #include <universes/hash/HashUniverse.h>
 #include <unordered_set>
 #include <vector>
@@ -72,8 +73,8 @@ void HashUniverse::update() {
 
 Rect &HashUniverse::bounds() {
   _bounds.top_left = _top_left;
-  _bounds.size.x = BigInt(1) << _top_level;
-  _bounds.size.y = BigInt(1) << _top_level;
+  _bounds.size.x = BigInt(1) << mp_size_t(_top_level);
+  _bounds.size.y = BigInt(1) << mp_size_t(_top_level);
   return _bounds;
 }
 
@@ -184,14 +185,15 @@ void HashUniverse::_build_from_mc(QFile *file) {
   _zeros.push_back(reinterpret_cast<Quadrant *>(_macrocell(2)));
   _zeros.push_back(reinterpret_cast<Quadrant *>(_macrocell(3)));
 
-  while (!file->atEnd()) {
-    QByteArray line = file->readLine();
-    if (line[0] == '#' || line[0] == '[') {
-      std::cout << line.toStdString() << std::endl;
-      continue;
-    }
-    // Description of an 8x8 macrocell
-    if (line[0] == '$' || line[0] == '.' || line[0] == '*') {
+  MCellFile m_file(file);
+
+  MCellFile::LineIter iter = m_file.iter_line();
+  MCellFile::LineIter::Line line;
+  MCellFile::LineIter::LineType line_type;
+
+  while (iter.next(&line, &line_type) != MCellFile::LineIter::LineType::DONE) {
+    if (line_type == MCellFile::LineIter::LineType::MACRO_3) {
+      auto mcell_info = line.level3;
       size_t level = 3;
       if (level > max_top_level) {
         _macrocell_sets.resize(level + 1);
@@ -200,33 +202,14 @@ void HashUniverse::_build_from_mc(QFile *file) {
         }
         max_top_level = level;
       }
-
-      // Reading 8x8 macrocell
-      CellState cells[8][8] = {{0}};
-      uint8_t x = 0;
-      uint8_t y = 0;
-      int line_i = 0;
-      while (line[line_i] == '$' || line[line_i] == '.' ||
-             line[line_i] == '*') {
-        char c = line[line_i];
-        if (c == '.') {
-          ++x;
-        } else if (c == '*') {
-          cells[x][y] = 1;
-          ++x;
-        } else if (c == '$') {
-          ++y;
-          x = 0;
-        }
-        ++line_i;
-      }
-
       Quadrant *minis[4][4];
       for (size_t j = 0; j < 4; ++j) {
         for (size_t i = 0; i < 4; ++i) {
           minis[i][j] = reinterpret_cast<Quadrant *>(
-              _minicell(cells[2 * i][2 * j], cells[2 * i + 1][2 * j],
-                        cells[2 * i][2 * j + 1], cells[2 * i + 1][2 * j + 1]));
+              _minicell(mcell_info.cells[2 * i][2 * j],
+                        mcell_info.cells[2 * i + 1][2 * j],
+                        mcell_info.cells[2 * i][2 * j + 1],
+                        mcell_info.cells[2 * i + 1][2 * j + 1]));
         }
       }
       mcells.push_back(reinterpret_cast<Quadrant *>(_macrocell(
@@ -239,30 +222,29 @@ void HashUniverse::_build_from_mc(QFile *file) {
                                                   minis[0][3], minis[1][3])),
           reinterpret_cast<Quadrant *>(_macrocell(2, minis[2][2], minis[3][2],
                                                   minis[2][3], minis[3][3])))));
-    }
-    // Description of a macrocell made from previous levels
-    if (line[0] >= '0' && line[0] <= '9') {
-      QByteArrayList line_data = line.split(' ');
-      size_t level = line_data[0].toULong();
-      if (level > max_top_level) {
-        _macrocell_sets.resize(level + 1);
-        for (size_t i = max_top_level + 1; i <= level; ++i) {
+    } else if (line_type == MCellFile::LineIter::LineType::MACRO_N) {
+      auto mcell_info = line.levelN;
+      if (mcell_info.level > max_top_level) {
+        _macrocell_sets.resize(mcell_info.level + 1);
+        for (size_t i = max_top_level + 1; i <= mcell_info.level; ++i) {
           _zeros.push_back(reinterpret_cast<Quadrant *>(_macrocell(i)));
         }
-        max_top_level = level;
+        max_top_level = mcell_info.level;
       }
-      // Reading macrocell
       Quadrant *nw, *ne, *sw, *se;
-      size_t nw_pos = line_data[1].trimmed().toULong();
-      size_t ne_pos = line_data[2].trimmed().toULong();
-      size_t sw_pos = line_data[3].trimmed().toULong();
-      size_t se_pos = line_data[4].trimmed().toULong();
-      nw = (nw_pos == 0) ? _zeros[level - 1] : mcells[nw_pos];
-      ne = (ne_pos == 0) ? _zeros[level - 1] : mcells[ne_pos];
-      sw = (sw_pos == 0) ? _zeros[level - 1] : mcells[sw_pos];
-      se = (se_pos == 0) ? _zeros[level - 1] : mcells[se_pos];
+      nw = (mcell_info.nw_index == 0) ? _zeros[mcell_info.level - 1] :
+                                        mcells[mcell_info.nw_index];
+      ne = (mcell_info.ne_index == 0) ? _zeros[mcell_info.level - 1] :
+                                        mcells[mcell_info.ne_index];
+      sw = (mcell_info.sw_index == 0) ? _zeros[mcell_info.level - 1] :
+                                        mcells[mcell_info.sw_index];
+      se = (mcell_info.se_index == 0) ? _zeros[mcell_info.level - 1] :
+                                        mcells[mcell_info.se_index];
       mcells.push_back(
-          reinterpret_cast<Quadrant *>(_macrocell(level, nw, ne, sw, se)));
+          reinterpret_cast<Quadrant *>(
+            _macrocell(mcell_info.level, nw, ne, sw, se)));
+    } else {
+      throw "Unexpected line type";
     }
   }
 
