@@ -51,7 +51,7 @@ public:
   /*!
    * \brief Universe dimention getter
    *
-   * \return The bounds of smiluated universe
+   * \return The bounds of simulated universe
    * \warning The bounds is not the smallest Rect that holds the living cells
    */
   virtual Rect &bounds() = 0;
@@ -75,21 +75,37 @@ public:
   /* Aptitudes */
 
   /*!
-   * \brief Cell state setter.
+   * \brief Cell state setter
    *
    * \param coord: coord at which to set the cell state
    * \param cell_state: cell state that to which to set the destination
    */
   virtual void set(const Vec2 &coord, CellState cell_state);
+  /*!
+   * \brief Ability to set a cell state
+   *
+   * By default returns false. Certain universes can override the function
+   * to notify their ability to set a cell state.
+   *
+   * \return The desired boolean
+   */
   virtual const bool can_set() const;
 
   /*!
    * \brief Cell state getter.
    *
-   * \param coord: Coordonnates to look at.
+   * \param coord: coordonnates to look at
    * \return The state of the cell.
    */
   virtual const CellState get(const Vec2 &coord) const;
+  /*!
+   * \brief Ability to get a cell state
+   *
+   * By default returns false. Certain universes can override the function
+   * to notify their ability to get a cell state.
+   *
+   * \return The desired boolean
+   */
   virtual const bool can_get() const;
 
   /*
@@ -118,7 +134,7 @@ public:
    * Every new cell is set to the default CellState.
    * Cells out of the new bounds are destroyed.
    *
-   * \param bounds: New universe bounds
+   * \param bounds: new universe bounds
    */
   virtual void reshape(const Rect& bounds);
   virtual const bool can_reshape() const;
