@@ -12,7 +12,8 @@
 #include <QStandardPaths>
 
 class ResourceManager {
-  /*! \class ResourceManager
+  /*!
+   * \class ResourceManager
    * \brief A class that manages resources such as icons
    *
    *  The goal of this class is to make resource management easier for the
