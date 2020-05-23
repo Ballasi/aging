@@ -1,0 +1,38 @@
+/*! \mainpage aging
+ * <div align="center">
+    <img src="https://cdn.discordapp.com/attachments/414542714365935626/692050409493102642/aging.png" />
+   <br /> <b>aging</b> genuinely is not <a href="https://sourceforge.net/projects/golly/">golly</a>
+</div><br/>
+ *
+ * **aging** is an application to explore the [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life) cellular automata using various algorithms (Life, Hashlife, ...)
+ *
+ * \section install Installation
+ *
+ * \subsection dependencies Dependencies
+ *
+ * Here are the packages aging depends on on Linux:
+ *
+ *  - `make` (as `make` with pacman and apt-get)
+ *  - `cmake` (as `cmake` with pacman and apt-get)
+ *  - `qt` (as `qt5` with pacman and as `qt5-default` with apt-get)
+ *  - `gmp` (as `gmp` with pacman and as `libgmp-dev` with apt-get)
+ *
+ * \subsection install_linux Installation on Linux
+ *
+ * For now, aging is only available through the AUR under the package name `aging` for Arch users.
+ *
+ * The package will soon be available for Debian users.
+ *
+ * If the program isn't available for you, you can build it by yourself.
+ *
+ * \subsection build Build the program
+ *
+ * Issuing the command `make` in the root directory of [the project](https://gitlab.com/aging-team/aging) will compile and link the program.
+ *
+ * The command `make run` compiles and run the program.
+ *
+ * \section contribute Contribute
+ *
+ * You can contribute to [the project on GitLab](https://gitlab.com/aging-team/aging).
+ * Join us on [Discord](https://discord.gg/35ySzjU)!
+ */
