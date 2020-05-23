@@ -4,7 +4,6 @@
 /*!
  * \file Vec2.h
  * \brief A 2 dimentionnal value
- *
  */
 
 #include <cstddef>
