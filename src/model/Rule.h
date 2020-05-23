@@ -33,7 +33,7 @@ public:
    *
    * A constructor that allows to duplicate a Rule.
    *
-   * \param rule : a reference to the rule you want to duplicate
+   * \param rule: a reference to the rule you want to duplicate
    */
   explicit Rule(const Rule &rule) = default;
 
@@ -45,7 +45,7 @@ public:
    *
    * Exception: If `rule_string` is invalid an std::invalid_argument is thrown.
    *
-   * \param rule_string : a string that describes a rule in a B/S format
+   * \param rule_string: a string that describes a rule in a B/S format
    */
   explicit Rule(QString rule_string);
 
@@ -55,8 +55,13 @@ public:
    * Creates a "blank" rule where every situation leads to
    * the default cell state.
    *
-   * \param state_count : the number of states the rule can handle
-   * \param neighbour_count : the number of neighbours the rule can handle
+   * \param state_count: the number of states the rule can handle
+   * \param neighbour_count: the number of neighbours states the rule can handle
+   * \warning neighbour_count considers the number of states the rule can
+   * handle, which is different from the number of maximum neighbour the rule
+   * can handle. In fact, having no neighbour is a state by itself. Therefore,
+   * if you can, at most, have eight neighbours, there are nine different
+   * neighbour states.
    */
   Rule(size_t state_count, size_t neighbour_count);
 
@@ -68,6 +73,7 @@ public:
    *
    * \param state: the initial cell state
    * \param neighbour: the number of neighbour the state has
+   * \return The result state when you apply the rule to the given setup
    */
   CellState apply(CellState state, size_t neighbour) const;
 
@@ -76,6 +82,15 @@ public:
    *
    * Sets the result of the rule when applied to a cell of state `state` and
    * with `neighbour` neighbours.
+   *
+   * Example usage:
+   * @code
+   * // We are setting up a Rule corresponding to Conway's Game of Life
+   * Rule rule(2, 9); // creating a blank Rule
+   * rule.set(0, 3, 1); // a dead cell becomes alive with three neighbours
+   * rule.set(1, 2, 1); // a living cell stays alive with two neighbours
+   * rule.set(1, 3, 1); // a living cell stays alive with three neighbours
+   * @endcode
    *
    * \param state: the initial cell state
    * \param neighbour: the number of neighbour the state has
@@ -92,12 +107,14 @@ public:
   void clear(CellState state = 0);
 
   /*!
-   * \brief Returns the number of states handled by the rule.
+   * \brief Getter of the number of states the rule can handle
+   * \return the number of states handled by the rule.
    */
   size_t state_count();
 
   /*!
-   * \brief Returns the number of neighbour count handled by the rule.
+   * \brief Getter of the number of neighbours the rule can handle
+   * \return the number of neighbour count handled by the rule.
    */
   size_t neighbour_count();
 
@@ -108,6 +125,8 @@ public:
    * If this rule is not about a 2 state automaton or
    * uses a neighbourhood of more than 9 neighbours,
    * a std::domain_error is raised.
+   *
+   * \return The corresponding rule string
    */
   QString to_rule_string();
 
