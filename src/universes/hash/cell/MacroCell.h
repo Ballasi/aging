@@ -65,7 +65,6 @@ using cell::Quadrant;
  * \struct hasher<MacroCell>
  */
 template <> struct hash<MacroCell> {
-
   /*!
    * \brief Call operator
    *
