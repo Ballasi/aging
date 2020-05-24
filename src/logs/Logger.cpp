@@ -1,7 +1,7 @@
 #include <logs/Logger.h>
 
-Logger::Logger(QObject *parent, QString fileName,
-                  bool append) : QObject(parent) {
+Logger::Logger(QObject *parent, QString fileName, bool append)
+    : QObject(parent) {
   m_showDate = true;
   if (!fileName.isEmpty()) {
     file = new QFile;
@@ -18,8 +18,8 @@ Logger::Logger(QObject *parent, QString fileName,
 void Logger::write(const QString &value) {
   QString text = value;
   if (m_showDate)
-    text = QDateTime::currentDateTime().toString("[dd.MM.yyyy hh:mm:ss] ")
-            + text;
+    text =
+        QDateTime::currentDateTime().toString("[dd.MM.yyyy hh:mm:ss] ") + text;
   QTextStream out(file);
   out.setCodec("UTF-8");
   if (file != 0) {
@@ -27,9 +27,7 @@ void Logger::write(const QString &value) {
   }
 }
 
-void Logger::setShowDateTime(bool value) {
-  m_showDate = value;
-}
+void Logger::setShowDateTime(bool value) { m_showDate = value; }
 
 Logger::~Logger() {
   if (file != 0)
