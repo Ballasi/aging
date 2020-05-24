@@ -1,6 +1,7 @@
 #include "model/Vec2.h"
 #include <sys/types.h>
 #include <universes/life/LifeUniverse.h>
+#include <iostream>
 
 LifeUniverse::LifeUniverse(const Vec2 &size) {
   // Adding () calls constructor for every Cell in the array
@@ -8,13 +9,20 @@ LifeUniverse::LifeUniverse(const Vec2 &size) {
   // (if possible) _width & _height
   _width = size.x.get_si() + 8 - size.x.get_si() % 8;
   _height = size.y.get_si();
-  _length_in_bytes = (size.x.get_si() + 7) * size.y.get_si() / 8;
+  _length_in_bytes = (size.x.get_si() + 8) * size.y.get_si() / 8;
   _bound_rect = Rect(Vec2(), size);
   _cell_blocks = new uint8_t[_length_in_bytes]();
 }
 
 LifeUniverse::LifeUniverse(QString file_path) {
-  throw "Unimplemented";
+  QFile file(file_path);
+  if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    return;
+  QString format = file_path.split(".")[1].simplified();
+  std::cout << "File format : " << format.toStdString() << std::endl;
+  if (format == "rle") {
+    _build_from_rle(&file);
+  }
 }
 
 LifeUniverse::~LifeUniverse() { delete[] _cell_blocks; }
@@ -120,5 +128,78 @@ void LifeUniverse::_update_neighbour_count(uint8_t *neighbour_count) {
         }
       }
     }
+  }
+}
+
+void LifeUniverse::_build_from_rle(QFile *file) {
+  Vec2 boundingbox = _read_rle_size(file);
+  _read_rle_data(file, boundingbox);
+  file->close();
+}
+
+
+Vec2 LifeUniverse::_read_rle_size(QFile *file) {
+  while (!file->atEnd()) {
+    QByteArray line = file->readLine();
+    if (line[0] == '#') {
+      continue;
+    }
+    if (line[0] == 'x') {
+      QList<QByteArray> list = line.split(',');
+      int width = ((list[0].split('='))[1].simplified()).toInt();
+      int height = ((list[1].split('='))[1].simplified()).toInt();
+      int size = qMax(width, height);
+      size = qMax(size, 128);
+      _width = size * 3 + 8 - size * 3 % 8;
+      _height = size * 3;
+      _length_in_bytes = (size * 3 + 8) * size * 3 / 8;
+      _bound_rect = Rect(Vec2(), Vec2(size * 3, size * 3));
+      _cell_blocks = new uint8_t[_length_in_bytes]();
+      return Vec2(width, height);
+    }
+  }
+  return Vec2(6);
+}
+
+void LifeUniverse::_read_rle_data(QFile *file, Vec2 boundingbox) {
+  QByteArray data("");
+  while (!file->atEnd()) {
+    QByteArray line = file->readLine();
+    data.append(line);
+  }
+
+  data = data.simplified();
+  int boundingbox_x = boundingbox.x.get_si();
+  int boundingbox_y = boundingbox.y.get_si();
+
+  int init_x = (_bound_rect.width().get_si() / 2) - boundingbox_x / 2;
+  int init_y = (_bound_rect.height().get_si() / 2) + boundingbox_y / 2;
+  int curr_x = init_x;
+  int curr_y = init_y;
+
+  QByteArray qs("");
+  for (int i = 0; i < data.length(); ++i) {
+    if (data[i] == '\0')
+      continue;
+    int q;
+    if (data[i] == '$') {
+      q = qs.isEmpty() ? 1 : qs.toInt();
+      curr_y += q;
+      curr_x = init_x;
+      qs.clear();
+    }
+    if (data[i] >= '0' && data[i] <= '9') {
+      qs.append(data[i]);
+    }
+    if (data[i] == 'o' || data[i] == 'b') {
+      q = qs.isEmpty() ? 1 : qs.toInt();
+      for (int n = 0; n < q; n++) {
+        set(Vec2(curr_x, curr_y), data[i] == 'o');
+        curr_x++;
+      }
+      qs.clear();
+    }
+    if (data[i] == '!')
+      break;
   }
 }

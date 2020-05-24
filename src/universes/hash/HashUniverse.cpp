@@ -289,7 +289,7 @@ void HashUniverse::_read_rle_data(QFile *file, Vec2 boundingbox) {
   int boundingbox_y = boundingbox.y.get_si();
 
   int init_x = (1 << (_top_level - 1)) - boundingbox_x / 2;
-  int init_y = (1 << (_top_level - 1));
+  int init_y = (1 << (_top_level - 1)) + boundingbox_y / 2;
   int curr_x = init_x;
   int curr_y = init_y;
 

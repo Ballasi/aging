@@ -545,7 +545,7 @@ void MainWindow::action_newUnivTypeNaive() {
   delete universe;
   delete ctxt.universe_scene;
 
-  universe = new LifeUniverse(Vec2(BigInt(1024), BigInt(1024)));
+  universe = new LifeUniverse(Vec2(BigInt(256), BigInt(256)));
   univ_type = UniverseType::Life;
 
   createCentralWidget();

@@ -1,6 +1,9 @@
 #ifndef LIFE_UNIVERSE_H_
 #define LIFE_UNIVERSE_H_
 
+#include <QFile>
+#include <QString>
+
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -40,6 +43,11 @@ private:
   // getters
   const bool _get(size_t x,  size_t y) const;
   void _set(size_t x, size_t y, bool state);
+
+  // File loading
+  void _build_from_rle(QFile *file);
+  Vec2 _read_rle_size(QFile *file);
+  void _read_rle_data(QFile *file, Vec2 boundingbox);
 
   // Universe interface variables
   Rect _bound_rect;
