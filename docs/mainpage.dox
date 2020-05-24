@@ -1,0 +1,56 @@
+/*! \mainpage aging
+ * <div align="center" style="margin-bottom: 16px;">
+ *    <img src="https://cdn.discordapp.com/attachments/414542714365935626/692050409493102642/aging.png" />
+ *    <br /> <b>aging</b> genuinely is not <a href="https://sourceforge.net/projects/golly/">golly</a>
+ * </div>
+ *
+ * **aging** is an application to explore the [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life) cellular automata using various algorithms (Life, Hashlife, ...)
+ *
+ * <div align="center" style="margin: 16px;">
+ *     <img src="https://cdn.discordapp.com/attachments/414542714365935626/714114855195377684/unknown.png" />
+ * </div>
+ *
+ * **aging** has been developed as a study project at the [Université Savoie-Mont Blanc](https://www.univ-smb.fr/en/).
+ *
+ * \subsection table-of-contents Table of contents
+ *
+ * - [Table of contents](#table-of-contents)
+ * - [Installation](#install)
+ *   * [Dependencies](#dependencies)
+ *   * [Installation on Linux](#install-linux)
+ *   * [Build](#build)
+ * - [Contribute](#contribute)
+ *
+ * \section install Installation
+ *
+ * \subsection dependencies Dependencies
+ *
+ * Here are the packages aging depends on on Linux:
+ *
+ *  - `make` (as `make` with pacman and apt-get)
+ *  - `cmake` (as `cmake` with pacman and apt-get)
+ *  - `qt` (as `qt5` with pacman and as `qt5-default` with apt-get)
+ *  - `gmp` (as `gmp` with pacman and as `libgmp-dev` with apt-get)
+ *
+ * \subsection install-linux Installation on Linux
+ *
+ * For now, aging is only available through the AUR under the package name `aging` for Arch users.
+ *
+ * The package will soon be available for Debian users.
+ *
+ * If the program isn't available for you, you can build it by yourself.
+ *
+ * \subsection build Build the program
+ *
+ * Issuing the command `make` in the root directory of [the project](https://gitlab.com/aging-team/aging) will compile and link the program.
+ *
+ * The command `make run` compiles and run the program.
+ *
+ * \section contribute Contribute
+ *
+ * You can contribute to [the project on GitLab](https://gitlab.com/aging-team/aging).
+ *
+ * This project is free and open-source, any contributions are welcome! You can check our [issues board](https://gitlab.com/aging-team/aging/-/boards), it's usually filled with features to implement and bugs to resolve.
+ *
+ * Come and chat with us in our [Discord server](https://discord.gg/35ySzjU)!
+ */

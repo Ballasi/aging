@@ -1,13 +1,35 @@
 #ifndef BIG_INT_H_
 #define BIG_INT_H_
 
+/* !
+   \file BigInt.h
+   \brief An alias to GMP's mpz_class
+   \author aging-team
+ */
+
 #include <gmpxx.h>
 #include <string>
 
+/*!
+ * \class BigInt
+ * \brief A class to represent arbitrary sized integers
+ *
+ * It is a simple alias to GMP's mpz_class
+ * and thus provides many highly optimized operations
+ */
 typedef mpz_class BigInt;
 
-static std::string bigint_to_str(BigInt i) {
-  std::string str_i = i.get_str();
+/*!
+ * \brief Converts a bigint to a reasonably sized string
+ *
+ * Chooses between classical and exponent notation to prevent
+ * the notation to exceed 12 characters in length
+ *
+ * \param bigint: a bigint to turn to a string
+ * \return a string of length < 12 representing the bigint
+ */
+static std::string bigint_to_str(const BigInt &bigint) {
+  std::string str_i = bigint.get_str();
   std::string result;
   if (str_i.size() <= 12) {
     return str_i;

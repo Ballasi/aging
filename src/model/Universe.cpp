@@ -29,6 +29,6 @@ void Universe::set_step_size(const size_t step_size) {
 
 const bool Universe::can_reshape() const { return false; }
 
-void Universe::reshape(Rect bounds) {
+void Universe::reshape(const Rect& bounds) {
   throw "This `reshape` method is not implemented for this universe";
 }
