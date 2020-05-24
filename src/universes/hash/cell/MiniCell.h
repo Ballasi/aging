@@ -45,6 +45,11 @@ public:
   /*!
    * \brief Handy indexed getter
    *
+   * minicell[0] == minicell.nw
+   * minicell[1] == minicell.ne
+   * minicell[2] == minicell.sw
+   * minicell[3] == minicell.se
+   *
    * \param index: index of the cell state
    */
   CellState operator[](const size_t index) const;
@@ -60,7 +65,7 @@ public:
 namespace std {
 using cell::MiniCell;
 /*!
- * \struct MiniCell hasher
+ * \struct hasher<MiniCell>
  */
 template <> struct hash<MiniCell> {
   /*!
