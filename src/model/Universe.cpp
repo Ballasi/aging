@@ -27,6 +27,12 @@ void Universe::set_step_size(const size_t step_size) {
   throw "This `set_step_size` method is not implemented for this universe";
 }
 
+const bool Universe::can_set_hyperspeed() const { return false; }
+
+void Universe::set_hyperspeed(const bool state) {
+  throw "This `set_hyperspeed` method is not implemented for this universe";
+}
+
 const bool Universe::can_reshape() const { return false; }
 
 void Universe::reshape(const Rect& bounds) {

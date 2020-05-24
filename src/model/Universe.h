@@ -127,6 +127,12 @@ public:
   virtual void set_step_size(const size_t step_size);
   virtual const bool can_set_step_size() const;
 
+  /*!
+   * \brief Sets hyperspeed mode.
+   */
+  virtual void set_hyperspeed(const bool on);
+  virtual const bool can_set_hyperspeed() const;
+
   /*
    * \brief change universe size
    *

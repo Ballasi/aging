@@ -20,6 +20,11 @@ typedef struct SwidgetsCtxt {
   Qt::MouseButton pressed_button;
   QPointF drag_position;
   QToolBar *toolbar;
+
+  QAction *inc_speed;
+  QAction *dec_speed;
+
+  QAction *hyper_speed;
 } WidgetsCtxt;
 
 class MainWindow : public QMainWindow {
@@ -57,14 +62,12 @@ protected:
   void action_zoomIn();
   void action_zoomOut();
 
-  void action_forceExpanse();
+  void action_hyperSpeed();
 
   void action_setColorBg();
   void action_setColorFg();
   void action_setColorGrid();
 
-  void action_setInfiniteGrid();
-  void action_setRankGrid();
   void action_colorTheme();
   void action_systemeTheme();
   void action_darkTheme();
