@@ -7,7 +7,7 @@
 
 // Constructors
 HashUniverse::HashUniverse(size_t top_level, Vec2 top_left)
-    : _top_left(top_left), _top_level(top_level), _step_size_maximized(true) {
+    : _top_left(top_left), _top_level(top_level), _step_size_maximized(false) {
   _macrocell_sets.resize(_top_level + 1);
   _zeros.push_back(nullptr);
   _zeros.push_back(reinterpret_cast<Quadrant *>(_minicell()));
@@ -16,39 +16,35 @@ HashUniverse::HashUniverse(size_t top_level, Vec2 top_left)
   }
 
   _root = reinterpret_cast<MacroCell *>(_zeros.back());
+  _recursion_depth = 1;
+  _step_size = 1;
 }
 
 HashUniverse::HashUniverse(QString filename, Vec2 _top_left)
-    : _top_left(_top_left), _step_size_maximized(true) {
+    : _top_left(_top_left), _step_size_maximized(false) {
   QFile file(filename);
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     return;
   QString format = filename.split(".")[1].simplified();
-  std::cout << "File format : " << format.toStdString() << std::endl;
   if (format == "rle") {
     _build_from_rle(&file);
   } else if (format == "mc") {
     _build_from_mc(&file);
   }
+  _recursion_depth = 1;
+  _step_size = 1;
 }
 
 // Interface
 void HashUniverse::update() {
-  // Assert that the creation of higher level is possible
-  _assert_handles(_top_level + 2);
-  // Add of crown of empty cell
-  _crown();
-  _crown();
+
+  _grow_to(_top_level + 2);
 
   // Setting the step size
   // Step size either grows with each step or stays user-defined.
-  if (_step_size_maximized)
-    _step_size = _top_level - 2;
-
   // Calculate result of universe
   _root = reinterpret_cast<MacroCell *>(_result(_top_level--, _root));
 
-  _generation += _step_size;
 
   Quadrant *z = _zeros[_top_level - 2];
 
@@ -59,7 +55,6 @@ void HashUniverse::update() {
       _root->se->macrocell.ne == z && _root->se->macrocell.se == z &&
       _root->se->macrocell.sw == z && _root->sw->macrocell.se == z &&
       _root->sw->macrocell.sw == z && _root->sw->macrocell.nw == z) {
-    std::cout << "Allo ?" << '\n';
     _top_level--;
     _root =
         _macrocell(_top_level, _root->nw->macrocell.se, _root->ne->macrocell.sw,
@@ -68,7 +63,14 @@ void HashUniverse::update() {
     _top_left -= Vec2(_top_level - 2);
   }
 
-  std::cout << "Universe size : " << _top_level << '\n';
+
+  _generation += _step_size;
+
+  // Calculate new step_size
+  if (_step_size_maximized) {
+	_recursion_depth = _top_level;
+    _step_size = BigInt(1) << (_recursion_depth - 2);
+  }
 }
 
 Rect &HashUniverse::bounds() {
@@ -82,15 +84,14 @@ const BigInt &HashUniverse::generation() const { return _generation; }
 
 const BigInt &HashUniverse::step_size() const { return _step_size; }
 
+const bool HashUniverse::can_set_step_size() const {
+	return true;
+}
+
 std::pair<Rect, size_t> HashUniverse::get_pattern_bounding_box() {
   Rect r = bounds();
   size_t l = _pattern_bounding_box_rec(&r, _top_level,
                                       reinterpret_cast<Quadrant *>(_root));
-
-  std::cout << "Top left : (" << r.top_left.x << ',' << r.top_left.y << ")"
-            << std::endl;
-  std::cout << "Bottom right : (" << r.bottom_right().x << ','
-            << r.bottom_right().y << ")" << std::endl;
 
   std::pair<Rect, size_t> pair(r, l);
   return pair;
@@ -101,7 +102,6 @@ size_t HashUniverse::_pattern_bounding_box_rec(Rect *box,
   if (level <= 4 || q == _zeros[level]) {
     return level;
   } else {
-    std::cout << "Searching..." << std::endl;
     Quadrant *z1 = _zeros[level - 1];
     Quadrant *z2 = _zeros[level - 2];
     bool nw = q->macrocell.nw != z1;
@@ -109,24 +109,20 @@ size_t HashUniverse::_pattern_bounding_box_rec(Rect *box,
     bool sw = q->macrocell.sw != z1;
     bool se = q->macrocell.se != z1;
     if (nw && !ne && !sw && !se) {
-      std::cout << "NW" << std::endl;
       box->size.x -= BigInt(1) << mp_size_t(level - 1);
       box->size.y -= BigInt(1) << mp_size_t(level - 1);
       return _pattern_bounding_box_rec(box, level - 1, q->macrocell.nw);
     } else if (!nw && ne && !sw && !se) {
-      std::cout << "NE" << std::endl;
       box->top_left.x += BigInt(1) << mp_size_t(level - 1);
       box->size.x -= BigInt(1) << mp_size_t(level - 1);
       box->size.y -= BigInt(1) << mp_size_t(level - 1);
       return _pattern_bounding_box_rec(box, level - 1, q->macrocell.ne);
     } else if (!nw && !ne && sw && !se) {
-      std::cout << "SW" << std::endl;
       box->top_left.y += BigInt(1) << mp_size_t(level - 1);
       box->size.y -= BigInt(1) << mp_size_t(level - 1);
       box->size.x -= BigInt(1) << mp_size_t(level - 1);
       return _pattern_bounding_box_rec(box, level - 1, q->macrocell.sw);
     } else if (!nw && !ne && !sw && se) {
-      std::cout << "SE" << std::endl;
       box->top_left.x += BigInt(1) << mp_size_t(level - 1);
       box->top_left.y += BigInt(1) << mp_size_t(level - 1);
       box->size.x -= BigInt(1) << mp_size_t(level - 1);
@@ -255,10 +251,6 @@ void HashUniverse::_build_from_mc(QFile *file) {
   //_step_size = BigInt(1) << mp_size_t(_recursion_depth - 2);
 }
 
-void HashUniverse::debug() {
-  (reinterpret_cast<Quadrant *>(_root))->debug(_top_level);
-}
-
 Vec2 HashUniverse::_read_rle_size(QFile *file) {
   while (!file->atEnd()) {
     QByteArray line = file->readLine();
@@ -322,7 +314,6 @@ void HashUniverse::_read_rle_data(QFile *file, Vec2 boundingbox) {
 
 void HashUniverse::_assert_handles(size_t asserted_level) {
   if (asserted_level >= _macrocell_sets.size()) {
-    std::cout << "Asserted level greater\n";
     size_t previous_asserted_level = _macrocell_sets.size() - 1;
 
     _macrocell_sets.resize(asserted_level + 1);
@@ -536,7 +527,7 @@ void HashUniverse::_crown() {
 }
 
 Quadrant *HashUniverse::_result(size_t level, MacroCell *macrocell_tmp) {
-  bool step_size_lock = level > _recursion_depth + 2;
+  bool step_size_lock = level > _recursion_depth;
 
   if (macrocell_tmp->result != nullptr) {
     if (step_size_lock && !macrocell_tmp->result_advances_in_time)
@@ -763,48 +754,6 @@ Quadrant *HashUniverse::_result(size_t level, MacroCell *macrocell_tmp) {
   }
 }
 
-void HashUniverse::grid(int *L, int width, Quadrant *r, int level, int x,
-                            int y) {
-  if (level == 1) {
-    L[(x) + (width) * (y)] = r->minicell.nw;
-    L[(x + 1) + (width) * (y)] = r->minicell.ne;
-    L[(x) + (width) * (y + 1)] = r->minicell.sw;
-    L[(x + 1) + (width) * (y + 1)] = r->minicell.se;
-  } else {
-    int dec = 1 << (level - 1);
-    grid(L, width, r->macrocell.nw, level - 1, x, y);
-    grid(L, width, r->macrocell.ne, level - 1, x + dec, y);
-    grid(L, width, r->macrocell.sw, level - 1, x, y + dec);
-    grid(L, width, r->macrocell.se, level - 1, x + dec, y + dec);
-  }
-}
-
-void HashUniverse::print_grid(Quadrant *r, size_t level) {
-  int cote = 1 << level;
-  int T[cote * cote];
-
-  grid(T, cote, r, static_cast<int>(level), 0, 0);
-
-  for (int i = 0; i < cote; ++i) {
-    for (int j = 0; j < cote; ++j) {
-      if (1) {
-        if (T[i * cote + j]) {
-          printf("# ");
-        } else {
-          printf(". ");
-        }
-      } else {
-        if (T[i * cote + j]) {
-          printf("█▉");
-        } else {
-          printf("╶╴");
-        }
-      }
-    }
-    printf("\n");
-  }
-}
-
 void HashUniverse::_get_cell_in_bounds_rec(Rect bounds,
                                               std::vector<Vec2> *coords,
                                               size_t current_level,
@@ -883,16 +832,26 @@ void HashUniverse::get_cell_in_bounds(Rect bounds,
 }
 
 void HashUniverse::set_step_size(size_t new_step_size) {
-  if (new_step_size <= _top_level - 2) {
-    _step_size = new_step_size;
-    _step_size_maximized = false;
-  } else {
-    throw "Step size is too big for this universe !";
-  }
+  _step_size_maximized = false;
+  _step_size = BigInt(1) << new_step_size; // BigInt (interface)
+  _recursion_depth = new_step_size + 2;
+  if (_recursion_depth > _top_level)
+	_grow_to(_recursion_depth);
 }
 
-void HashUniverse::set_step_size_maximized(bool is_maximized) {
-  _step_size_maximized = is_maximized;
-  if (_step_size_maximized)
-    set_step_size(_top_level - 2);
+void HashUniverse::set_hyperspeed(bool on) {
+  _step_size_maximized = on;
+  _recursion_depth = _top_level;
+  _step_size = BigInt(1) << (_recursion_depth - 2);
+}
+
+const bool HashUniverse::can_set_hyperspeed() const {
+  return true;
+}
+
+void HashUniverse::_grow_to(size_t target) {
+  _assert_handles(target);
+  while (_top_level < target) {
+	  _crown(); // Increase Universe level one fold
+  }
 }

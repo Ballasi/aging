@@ -3,9 +3,7 @@
 
 #include <QFile>
 #include <QString>
-#include <unordered_set>
-#include <vector>
-
+#include <unordered_set> #include <vector> 
 #include <model/Rect.h>
 #include <model/Universe.h>
 #include <model/Vec2.h>
@@ -14,7 +12,6 @@
 #include "cell/MiniCell.h"
 #include "cell/Quadrant.h"
 #include <utility>
-
 using cell::MiniCell;
 using cell::MacroCell;
 using cell::Quadrant;
@@ -35,7 +32,6 @@ public:
   // Others
   const CellState get(const Vec2& coord) const override;
   void set(const Vec2& target, CellState state) override;
-  void debug();
 
   std::pair<Rect, size_t> get_pattern_bounding_box();
   void get_cell_in_bounds(Rect bounds,
@@ -46,13 +42,13 @@ public:
   size_t get_top_level();
 
   void set_step_size(size_t new_step_size) override;
-  void set_step_size_maximized(bool is_maximized);
+  const bool can_set_step_size() const override;
 
-  void grid(int *L, int width, Quadrant *r, int level, int x, int y);
-  void print_grid(Quadrant *r, size_t level);
+  void set_hyperspeed(bool on) override;
+  const bool can_set_hyperspeed() const override;
 
 private:
-  // Inner
+  // For interface
   Rect _bounds;
   BigInt _generation;
   BigInt _step_size;
@@ -79,7 +75,6 @@ private:
   Vec2 _read_rle_size(QFile *file);
   void _read_rle_data(QFile *file, Vec2 boundingbox);
 
-  // TODO(chancyleg): find good name
   void _assert_handles(size_t asserted_level);
 
   // Step helpers
@@ -112,6 +107,8 @@ private:
                                size_t current_level, Quadrant *current_cell,
                                Vec2 current_coord,
                                size_t min_level) const;
+
+  void _grow_to(size_t target);
 };
 
 #endif // HASHLIFE_UNIVERSE_HPP
