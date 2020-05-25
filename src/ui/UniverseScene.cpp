@@ -16,8 +16,13 @@ UniverseScene::UniverseScene(QWidget *parent, Universe *universe,
 
     refresh_time_ms = 0;
     p_step = 0;
-	universe->set_step_size(p_step);
+	  if (universe->can_set_step_size()) {
+      universe->set_step_size(p_step);
+    }
     hyperspeed_state = false;
+    if (universe->can_set_hyperspeed()) {
+      universe->set_hyperspeed(false);
+    }
 
     r_area = new RenderArea(this, universe, type, &selection);
 
@@ -59,24 +64,24 @@ void UniverseScene::increase_speed() {
         p_step += 1;
 		universe->set_step_size(p_step);
     } else {
-      refresh_time_ms -= 250;
+      refresh_time_ms -= 100;
       if (refresh_time_ms <= 0) {
         p_step = 0;
         refresh_time_ms = 0;
       }
     }
-    updateStatusBar();
   } else {
     if (refresh_time_ms > 0) {
-      refresh_time_ms -= 250;
+      refresh_time_ms -= 100;
     }
   }
+  updateStatusBar();
 }
 
 void UniverseScene::decrease_speed() {
   if (universe->can_set_step_size()) {
     if (p_step == 0) {
-      refresh_time_ms += 250;
+      refresh_time_ms += 100;
     } else {
       p_step -= 1;
       if (p_step <= 0) {
@@ -85,10 +90,10 @@ void UniverseScene::decrease_speed() {
       }
 	  universe->set_step_size(p_step);
     }
-    updateStatusBar();
   } else {
-    refresh_time_ms += 250;
+    refresh_time_ms += 100;
   }
+  updateStatusBar();
 }
 
 bool UniverseScene::can_increase_speed() {

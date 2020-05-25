@@ -335,6 +335,10 @@ void MainWindow::action_openFile() {
     createCentralWidget();
   }
   ctxt.hyper_speed->setEnabled(ctxt.universe_scene->can_hyperSpeed());
+  ctxt.hyper_speed->setChecked(false);
+  ctxt.inc_speed->setEnabled(ctxt.universe_scene->can_increase_speed());
+  ctxt.dec_speed->setEnabled(ctxt.universe_scene->can_decrease_speed());
+  ctxt.playPauseAction->setIcon(*(ctxt.playIcon));
 }
 
 
@@ -534,6 +538,10 @@ void MainWindow::action_newUnivTypeHashlife() {
   univ_type = UniverseType::Hashlife;
   createCentralWidget();
   ctxt.hyper_speed->setEnabled(ctxt.universe_scene->can_hyperSpeed());
+  ctxt.hyper_speed->setChecked(false);
+  ctxt.inc_speed->setEnabled(ctxt.universe_scene->can_increase_speed());
+  ctxt.dec_speed->setEnabled(ctxt.universe_scene->can_decrease_speed());
+  ctxt.playPauseAction->setIcon(*(ctxt.playIcon));
 }
 void MainWindow::action_newUnivTypeNaive() {
   delete universe;
@@ -544,6 +552,10 @@ void MainWindow::action_newUnivTypeNaive() {
 
   createCentralWidget();
   ctxt.hyper_speed->setEnabled(ctxt.universe_scene->can_hyperSpeed());
+  ctxt.inc_speed->setEnabled(ctxt.universe_scene->can_increase_speed());
+  ctxt.dec_speed->setEnabled(ctxt.universe_scene->can_decrease_speed());
+  ctxt.hyper_speed->setChecked(false);
+  ctxt.playPauseAction->setIcon(*(ctxt.playIcon));
 }
 
 /////////////////////////////////////////////////////
