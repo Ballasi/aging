@@ -43,7 +43,6 @@ protected:
   // Fonctions actions lance par des connects
   void action_newFile();
   void action_openFile();
-  void action_saveFile();
 
   void action_copySelection();
   void action_pasteSelection();

@@ -90,10 +90,6 @@ void MainWindow::createToolBar() {
       controlToolbar->addAction(resources.getIcon("folder-open"), "Open File"),
       &QAction::triggered, this, &MainWindow::action_openFile);
 
-  // save file
-  connect(controlToolbar->addAction(resources.getIcon("floppy"), "Save File"),
-          &QAction::triggered, this, &MainWindow::action_saveFile);
-
   controlToolbar->addSeparator();
 
   // Button Play/pause
@@ -196,12 +192,6 @@ void MainWindow::createMenuBar() {
   act_open_file->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
   connect(act_open_file, &QAction::triggered, this,
           &MainWindow::action_openFile);
-
-  // save file
-  QAction *act_save_file = fileMenu->addAction("Save File");
-  act_save_file->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
-  connect(act_save_file, &QAction::triggered, this,
-          &MainWindow::action_saveFile);
 
   fileMenu->addSeparator();
 
@@ -346,9 +336,7 @@ void MainWindow::action_openFile() {
   }
   ctxt.hyper_speed->setEnabled(ctxt.universe_scene->can_hyperSpeed());
 }
-void MainWindow::action_saveFile() {
-  printf("MainWindow::action_saveFile() not Implemented\n");
-}
+
 
 void MainWindow::action_playPause() {
   ctxt.universe_scene->play_pause();
@@ -617,13 +605,9 @@ void MainWindow::mousePressEvent(QMouseEvent *event) {
         Selection s = ctxt.universe_scene->get_selection();
         if (s.state == SelectionState::Second) {
           QMenu context_menu("Selection Menu");
-          QAction save_selection_action("Save selected area");
           QAction copy_selection_action("Copy");
-          connect(&save_selection_action, &QAction::triggered, this,
-                  &MainWindow::action_saveFile);
           connect(&copy_selection_action, &QAction::triggered, this,
                   &MainWindow::action_copySelection);
-          context_menu.addAction(&save_selection_action);
           context_menu.addAction(&copy_selection_action);
           context_menu.exec(mapToGlobal(event->pos()));
         } else if (s.state == SelectionState::First && s.copy_available) {
